@@ -1,0 +1,116 @@
+package sandbox;
+
+import javax.swing.*;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.NumberFormatter;
+import java.awt.*;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Objects;
+
+public class DatePanel extends JPanel
+{
+    /**
+     * DatePanel displays the months and years in a dropdown
+     */
+    private JComboBox<String> month;
+    private JComboBox<String> year;
+
+    private int lastDay;
+    private JFormattedTextField day;
+    public DatePanel()
+    {
+        setLayout(new FlowLayout());
+
+        setSize(35, 15);
+        setUpMonth();
+
+        setUpDay();
+
+        setUpYear();
+    }
+
+    /**
+     * Method to set up the values for the month JComboBox
+     */
+    private void setUpMonth()
+    {
+        month = new JComboBox<>(new String[]{"January", "February", "March", "April",
+                "May", "June", "July", "August", "September", "October", "November", "December"});
+        month.setEditable(false);
+        DateFormat format = new SimpleDateFormat("MMMM");
+        month.setSelectedItem(format.format(new Date())); // set selected month to current month
+        add(month);
+    }
+
+    /**
+     * Method to set up the values for the year JComboBox
+     */
+    private void setUpYear()
+    {
+        year = new JComboBox<>();
+        year.setEditable(false);
+        for (int i = 1000; i < 6000; i++)
+        {
+            year.addItem(i + "");
+        }
+        DateFormat format = new SimpleDateFormat("yyyy");
+        year.setSelectedItem(format.format(new Date())); // set selected year to current year
+        add(year);
+    }
+
+    private void setUpDay()
+    {
+        day = new JFormattedTextField();
+        NumberFormatter defaultFormatter = new NumberFormatter(new DecimalFormat("#"));
+        DefaultFormatterFactory valueFactory = new DefaultFormatterFactory(defaultFormatter);
+        day.setFormatterFactory(valueFactory);
+        day.setToolTipText("Enter the day");
+        day.setSize(5, this.getHeight());
+        add(day);
+    }
+
+    /**
+     * Method to set up the last day depending on the selected month and year
+     */
+    public void validateNumberDays()
+    {
+        // check if the selected year is a leap year
+        int selectedYear = Integer.parseInt(Objects.requireNonNull(year.getSelectedItem()).toString());
+        boolean leapYear;
+        if (selectedYear % 400 == 0)
+        {
+            leapYear = true;
+        } else if (selectedYear % 100 == 0)
+        {
+            leapYear = false;
+        } else leapYear = selectedYear % 4 == 0;
+
+        // 30 days has September, April, June, and November
+        // All the rest have 31,
+        // Except February, which has 28 - and 29 in a leap year
+        switch (Objects.requireNonNull(month.getSelectedItem()).toString())
+        {
+            case "September":
+            case "April":
+            case "June":
+            case "November":
+                lastDay = 30;
+                break;
+            case "January":
+            case "March":
+            case "May":
+            case "July":
+            case "August":
+            case "October":
+            case "December":
+                lastDay = 31;
+                break;
+            case "February":
+                lastDay = leapYear ? 29 : 28;
+                break;
+        }
+    }
+}
