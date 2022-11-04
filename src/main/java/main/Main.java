@@ -1,5 +1,7 @@
 package main;
 
+
+import com.google.gson.JsonArray;
 import dagger.DaggerCurrencyExchangeComponent;
 import finance.Finance;
 import json.CurrencyExchangeServiceFactory;
@@ -7,14 +9,20 @@ import json.Symbol;
 import sandbox.Sandbox;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.Map;
 
+@Singleton
 public class Main extends JFrame
 {
+    public static final String HOME_CURRENCY = "USD";
     private Sandbox sandbox;
     private final JComboBox<String> currencyComboBox;
+
+    private Map<String, Symbol> symbolsMap;
 
     @Inject
     public Main(MainPresenter presenter)
@@ -31,27 +39,11 @@ public class Main extends JFrame
         presenter.loadSymbolsChoices();
 
         setUpJTabbedPane();
-
-    }
-
-    public void setUpJTabbedPane()
-    {
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.setForeground(Color.BLACK);
-
-        // add all the tabs to the Main frame's JTabbedPane
-        sandbox = new Sandbox();
-        Finance finance = new Finance();
-
-        tabbedPane.add("Play in the Sandbox", sandbox);
-        tabbedPane.add("Do Actual Finance Stuff", finance);
-        tabbedPane.setPreferredSize(new Dimension(950, 550));
-
-        add(tabbedPane);
     }
 
     public void setSymbolsChoices(Map<String, Symbol> symbols)
     {
+        symbolsMap = symbols;
         String[] symbolsArray = symbols.keySet().toArray(new String[0]);
         String[] descriptionsArray = new String[symbolsArray.length];
         for (int i = 0; i < symbolsArray.length; i++)
@@ -63,8 +55,26 @@ public class Main extends JFrame
 
         for (int i = 0; i < descriptionsArray.length; i++)
         {
-            currencyComboBox.addItem(descriptionsArray[i]);
+            //currencyComboBox.addItem(descriptionsArray[i]);
+            currencyComboBox.addItem(String.valueOf(symbolsMap.get(symbolsArray[i]).getCode()));
         }
+    }
+
+    public void setUpJTabbedPane()
+    {
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.setForeground(Color.BLACK);
+
+        // add all the tabs to the Main frame's JTabbedPane
+        sandbox = new Sandbox();
+        sandbox.setCurrencyComboBox(currencyComboBox);
+        Finance finance = new Finance();
+
+        tabbedPane.add("Play in the Sandbox", sandbox);
+        tabbedPane.add("Do Actual Finance Stuff", finance);
+        tabbedPane.setPreferredSize(new Dimension(950, 550));
+
+        add(tabbedPane);
     }
 
     public static void main(String[] args)

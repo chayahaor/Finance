@@ -6,9 +6,10 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static main.Main.HOME_CURRENCY;
+
 public class Sandbox extends JPanel
 {
-    private static final String HOME_CURRENCY = "USD";
     private ArrayList<WhatIfPanel> whatIfs = new ArrayList<>();
 
     private JScrollPane scrollPane;
@@ -19,12 +20,16 @@ public class Sandbox extends JPanel
 
     private DatePanel specifiedDate;
 
+    private JComboBox<String> currencyComboBox;
+
     public Sandbox()
     {
         setSize(900, 500);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         add(new InstructionsPanel());
+
+        currencyComboBox = new JComboBox<>();
 
         whatIf = new JPanel();
         whatIf.setLayout(new BoxLayout(whatIf, BoxLayout.Y_AXIS));
@@ -97,9 +102,14 @@ public class Sandbox extends JPanel
 
     private void onClick(ActionEvent actionEvent)
     {
-        WhatIfPanel whatIfPanel = new WhatIfPanel();
+        WhatIfPanel whatIfPanel = new WhatIfPanel(currencyComboBox);
         whatIf.add(whatIfPanel);
         whatIfs.add(whatIfPanel);
         this.revalidate();
+    }
+
+    public void setCurrencyComboBox(JComboBox<String> currencyComboBox)
+    {
+        this.currencyComboBox = currencyComboBox;
     }
 }
