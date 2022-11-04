@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Sandbox extends JPanel
 {
@@ -76,11 +77,21 @@ public class Sandbox extends JPanel
     private void onClickFuture(ActionEvent actionEvent)
     {
         btnAddMore.setEnabled(false);
+
+        int selectedYear = Integer.parseInt(Objects.requireNonNull(specifiedDate.getYear().getSelectedItem()).toString());
+        int selectedDay = Integer.parseInt(Objects.requireNonNull(specifiedDate.getDay().getSelectedItem()).toString());
+        String selectedMonth = Objects.requireNonNull(specifiedDate.getMonth().getSelectedItem()).toString();
+
+
+        JOptionPane.showMessageDialog(this, selectedMonth + "/" + selectedDay + "/" + selectedYear);
     }
 
     private void onClickCurrent(ActionEvent actionEvent)
     {
         btnAddMore.setEnabled(false);
+
+       JOptionPane.showMessageDialog(this, "Result goes here.");
+
     }
 
     private void onClick(ActionEvent actionEvent)

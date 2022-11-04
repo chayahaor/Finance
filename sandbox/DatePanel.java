@@ -131,4 +131,34 @@ public class DatePanel extends JPanel
                 break;
         }
     }
+
+    /**
+     * Getter for month dropdown
+     *
+     * @return month JComboBox
+     */
+    public JComboBox<String> getMonth()
+    {
+        return month;
+    }
+
+    /**
+     * Getter for year dropdown
+     *
+     * @return year JComboBox
+     */
+    public JComboBox<String> getYear()
+    {
+        return year;
+    }
+
+    /**
+     * Getter for month dropdown
+     *
+     * @return month JComboBox
+     */
+    public JComboBox<String> getDay()
+    {
+        return day;
+    }
 }
