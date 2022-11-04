@@ -6,13 +6,16 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import javax.inject.Inject;
 
-public class CurrencyExchangeServiceFactory {
+public class CurrencyExchangeServiceFactory
+{
 
     @Inject
-    public CurrencyExchangeServiceFactory(){
+    public CurrencyExchangeServiceFactory()
+    {
     }
 
-    public CurrencyExchangeService getInstance() {
+    public CurrencyExchangeService getInstance()
+    {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.exchangerate.host/")
                 .addConverterFactory(GsonConverterFactory.create())

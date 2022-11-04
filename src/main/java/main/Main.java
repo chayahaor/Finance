@@ -1,4 +1,7 @@
+package main;
+
 import sandbox.Sandbox;
+import finance.Finance;
 
 import javax.swing.*;
 import java.awt.*;
