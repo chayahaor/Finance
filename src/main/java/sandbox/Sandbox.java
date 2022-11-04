@@ -6,17 +6,21 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static main.Main.HOME_CURRENCY;
+
 public class Sandbox extends JPanel
 {
-    private static final String HOME_CURRENCY = "USD";
     private ArrayList<WhatIfPanel> whatIfs = new ArrayList<>();
 
     private JScrollPane scrollPane;
     private JPanel whatIf;
 
+    private JPanel buttonPanel;
     private JButton btnAddMore;
 
     private DatePanel specifiedDate;
+
+    private JComboBox<String> currencyComboBox;
 
     public Sandbox()
     {
@@ -24,6 +28,8 @@ public class Sandbox extends JPanel
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         add(new InstructionsPanel());
+
+        currencyComboBox = new JComboBox<>();
 
         whatIf = new JPanel();
         whatIf.setLayout(new BoxLayout(whatIf, BoxLayout.Y_AXIS));
@@ -34,7 +40,7 @@ public class Sandbox extends JPanel
         scrollPane.setMaximumSize(new Dimension(850, 450));
         add(scrollPane);
 
-        JPanel buttonPanel = new JPanel();
+        buttonPanel = new JPanel();
         buttonPanel.setMaximumSize(new Dimension(850, 100));
 
         btnAddMore = new JButton();
@@ -96,10 +102,14 @@ public class Sandbox extends JPanel
 
     private void onClick(ActionEvent actionEvent)
     {
-        WhatIfPanel whatIfPanel = new WhatIfPanel();
+        WhatIfPanel whatIfPanel = new WhatIfPanel(currencyComboBox);
         whatIf.add(whatIfPanel);
         whatIfs.add(whatIfPanel);
         this.revalidate();
     }
 
+    public void setCurrencyComboBox(JComboBox<String> currencyComboBox)
+    {
+        this.currencyComboBox = currencyComboBox;
+    }
 }

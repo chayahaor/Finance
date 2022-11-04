@@ -1,5 +1,6 @@
 package json;
 
-public class Info {
+public class Info
+{
     double rate;
 }
