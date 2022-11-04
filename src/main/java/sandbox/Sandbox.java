@@ -19,14 +19,10 @@ public class Sandbox extends JPanel
 
     private DatePanel specifiedDate;
 
-    private JComboBox<String> currencyComboBox;
-
     public Sandbox()
     {
         setSize(900, 500);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-        currencyComboBox = new JComboBox<>();
 
         add(new InstructionsPanel());
 
@@ -67,16 +63,8 @@ public class Sandbox extends JPanel
         futureRow.add(specifiedDate);
 
         buttonPanel.add(futureRow);
-        buttonPanel.setVisible(false);
 
         add(buttonPanel);
-    }
-
-    public void setCurrencyComboBox(JComboBox<String> currencyComboBox)
-    {
-        this.currencyComboBox = currencyComboBox;
-        buttonPanel.setVisible(true);
-        this.revalidate();
     }
 
     private void onClickReset(ActionEvent actionEvent)
@@ -114,5 +102,4 @@ public class Sandbox extends JPanel
         whatIfs.add(whatIfPanel);
         this.revalidate();
     }
-
 }

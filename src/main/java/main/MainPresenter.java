@@ -18,7 +18,6 @@ public class MainPresenter
     private final Provider<Main> viewProvider;
     private final CurrencyExchangeService model;
     private Disposable disposable;
-    private Disposable symbolsDisposable;
 
     @Inject
     public MainPresenter(
@@ -53,7 +52,7 @@ public class MainPresenter
 
     public void loadSymbolsChoices()
     {
-        symbolsDisposable = model.getCurrencySymbols()
+        Disposable symbolsDisposable = model.getCurrencySymbols()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.newThread())
                 .subscribe(this::onSymbolsNext);

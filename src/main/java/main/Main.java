@@ -14,39 +14,40 @@ import java.util.Map;
 public class Main extends JFrame
 {
     private Sandbox sandbox;
-
-    private Finance finance;
-    private JComboBox<String> currencyComboBox;
+    private final JComboBox<String> currencyComboBox;
 
     @Inject
     public Main(MainPresenter presenter)
     {
+        CurrencyExchangeServiceFactory factory = new CurrencyExchangeServiceFactory();
+
         setTitle("Finance Project");
         setSize(1000, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new FlowLayout());
         setResizable(true);
 
-        CurrencyExchangeServiceFactory factory = new CurrencyExchangeServiceFactory();
         currencyComboBox = new JComboBox<>();
+        presenter.loadSymbolsChoices();
 
+        setUpJTabbedPane();
+
+    }
+
+    public void setUpJTabbedPane()
+    {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setForeground(Color.BLACK);
 
         // add all the tabs to the Main frame's JTabbedPane
         sandbox = new Sandbox();
-        sandbox.setCurrencyComboBox(currencyComboBox);
+        Finance finance = new Finance();
 
-        System.out.println(currencyComboBox.getItemCount());
-        finance = new Finance();
         tabbedPane.add("Play in the Sandbox", sandbox);
         tabbedPane.add("Do Actual Finance Stuff", finance);
         tabbedPane.setPreferredSize(new Dimension(950, 550));
 
         add(tabbedPane);
-
-        presenter.loadSymbolsChoices();
-
     }
 
     public void setSymbolsChoices(Map<String, Symbol> symbols)
@@ -57,6 +58,7 @@ public class Main extends JFrame
         {
             descriptionsArray[i] = symbols.get(symbolsArray[i]).getDescription();
         }
+
         currencyComboBox.removeAllItems();
 
         for (int i = 0; i < descriptionsArray.length; i++)
