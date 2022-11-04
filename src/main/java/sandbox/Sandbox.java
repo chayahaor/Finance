@@ -1,5 +1,7 @@
 package sandbox;
 
+import json.CurrencyExchangeServiceFactory;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -18,12 +20,14 @@ public class Sandbox extends JPanel
 
     private DatePanel specifiedDate;
 
-    public Sandbox()
+    public Sandbox(JComboBox<String> fromComboBox)
     {
         setSize(900, 500);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         add(new InstructionsPanel());
+
+        System.out.println(fromComboBox.getItemCount());
 
         whatIf = new JPanel();
         whatIf.setLayout(new BoxLayout(whatIf, BoxLayout.Y_AXIS));
