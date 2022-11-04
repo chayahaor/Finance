@@ -79,6 +79,33 @@ public class Main extends JFrame
 
     public static void main(String[] args)
     {
+        Font font = new Font("Lucida Sans Unicode", Font.PLAIN, 12);
+
+        // update the UIManager to use the Nimbus Look and Feel
+        try
+        {
+            UIManager.LookAndFeelInfo[] lookAndFeels = UIManager.getInstalledLookAndFeels();
+            for (UIManager.LookAndFeelInfo info : lookAndFeels)
+            {
+                if ("Nimbus".equals(info.getName()))
+                {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception ignored)
+        {
+        }
+
+        // change the font of the program
+        UIManager.put("Button.font", font);
+        UIManager.put("Label.font", font);
+        UIManager.put("TabbedPane.font", font);
+        UIManager.put("TextField.font", font);
+        UIManager.put("OptionPane.messageFont", font);
+        UIManager.put("TextArea.font", font);
+        UIManager.put("ComboBox.font", font);
+
         // instantiate the Main frame
         Main frame =
                 DaggerCurrencyExchangeComponent
