@@ -18,17 +18,16 @@ public class InstructionsPanel extends JPanel
         currencyInstruction.setText("Select the currency");
         add(currencyInstruction);
 
+        JLabel maturityDateInstruction = new JLabel();
+        maturityDateInstruction.setText("Enter the maturity date");
+        add(maturityDateInstruction);
+
         JLabel fxRateInstruction = new JLabel();
-        fxRateInstruction.setText("Enter the FX Rate");
+        fxRateInstruction.setText("         Enter the FX Rate");
         add(fxRateInstruction);
 
         JLabel forwardRateInstruction = new JLabel();
         forwardRateInstruction.setText("Enter the Forward Rate");
         add(forwardRateInstruction);
-
-        JLabel maturityDateInstruction = new JLabel();
-        maturityDateInstruction.setText("Enter the maturity date");
-        add(maturityDateInstruction);
-
     }
 }
