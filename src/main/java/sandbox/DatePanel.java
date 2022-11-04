@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
@@ -87,6 +88,11 @@ public class DatePanel extends JPanel
         {
             day.addItem(i + "");
         }
+        Date today = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(today);
+        int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+        day.setSelectedItem(dayOfMonth + "");
         add(day);
     }
 
