@@ -1,7 +1,5 @@
 package sandbox;
 
-import json.CurrencyExchangeServiceFactory;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -16,18 +14,21 @@ public class Sandbox extends JPanel
     private JScrollPane scrollPane;
     private JPanel whatIf;
 
+    private JPanel buttonPanel;
     private JButton btnAddMore;
 
     private DatePanel specifiedDate;
 
-    public Sandbox(JComboBox<String> fromComboBox)
+    private JComboBox<String> currencyComboBox;
+
+    public Sandbox()
     {
         setSize(900, 500);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        add(new InstructionsPanel());
+        currencyComboBox = new JComboBox<>();
 
-        System.out.println(fromComboBox.getItemCount());
+        add(new InstructionsPanel());
 
         whatIf = new JPanel();
         whatIf.setLayout(new BoxLayout(whatIf, BoxLayout.Y_AXIS));
@@ -38,7 +39,7 @@ public class Sandbox extends JPanel
         scrollPane.setMaximumSize(new Dimension(850, 450));
         add(scrollPane);
 
-        JPanel buttonPanel = new JPanel();
+        buttonPanel = new JPanel();
         buttonPanel.setMaximumSize(new Dimension(850, 100));
 
         btnAddMore = new JButton();
@@ -66,8 +67,16 @@ public class Sandbox extends JPanel
         futureRow.add(specifiedDate);
 
         buttonPanel.add(futureRow);
+        buttonPanel.setVisible(false);
 
         add(buttonPanel);
+    }
+
+    public void setCurrencyComboBox(JComboBox<String> currencyComboBox)
+    {
+        this.currencyComboBox = currencyComboBox;
+        buttonPanel.setVisible(true);
+        this.revalidate();
     }
 
     private void onClickReset(ActionEvent actionEvent)

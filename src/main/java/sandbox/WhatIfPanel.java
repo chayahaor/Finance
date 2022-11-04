@@ -16,6 +16,7 @@ public class WhatIfPanel extends JPanel
         NumberFormatter defaultFormatter = new NumberFormatter(new DecimalFormat("#.##"));
 
         JFormattedTextField amount = new JFormattedTextField(defaultFormatter);
+        amount.setValue(100.00);
         amount.setColumns(numColumns);
         add(amount);
 
@@ -25,11 +26,13 @@ public class WhatIfPanel extends JPanel
         add(currencies);
 
         JFormattedTextField fxRate = new JFormattedTextField(defaultFormatter);
+        fxRate.setValue(3.5);
         fxRate.setColumns(numColumns);
         add(fxRate);
 
         JFormattedTextField forwardRate = new JFormattedTextField(defaultFormatter);
         forwardRate.setColumns(numColumns);
+        forwardRate.setValue(4.0);
         add(forwardRate);
 
         add(new DatePanel());
