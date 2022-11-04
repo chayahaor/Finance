@@ -7,27 +7,80 @@ import java.util.ArrayList;
 
 public class Sandbox extends JPanel
 {
+    private static final String HOME_CURRENCY = "USD";
     private ArrayList<WhatIfPanel> whatIfs = new ArrayList<>();
+
+    private JScrollPane scrollPane;
     private JPanel whatIf;
+
+    private JButton btnAddMore;
+
+    private DatePanel specifiedDate;
 
     public Sandbox()
     {
         setSize(900, 500);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        JScrollPane scrollPane;
+        add(new InstructionsPanel());
+
         whatIf = new JPanel();
         whatIf.setLayout(new BoxLayout(whatIf, BoxLayout.Y_AXIS));
-        whatIf.setMaximumSize(new Dimension(850, 300));
+        whatIf.setMaximumSize(new Dimension(850, 450));
 
         scrollPane = new JScrollPane(whatIf);
-        scrollPane.setSize(new Dimension(850, 300));
+        scrollPane.setPreferredSize(new Dimension(850, 0));
+        scrollPane.setMaximumSize(new Dimension(850, 450));
         add(scrollPane);
 
-        JButton btnAddMore = new JButton();
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setMaximumSize(new Dimension(850, 100));
+
+        btnAddMore = new JButton();
         btnAddMore.setText("Add another what if row");
         btnAddMore.addActionListener(this::onClick);
-        add(btnAddMore);
+        buttonPanel.add(btnAddMore);
+
+        JButton btnResetSandbox = new JButton();
+        btnResetSandbox.setText("Reset the Sandbox");
+        btnResetSandbox.addActionListener(this::onClickReset);
+        buttonPanel.add(btnResetSandbox);
+
+        JButton btnShowCurrentResults = new JButton();
+        btnShowCurrentResults.setText("Show amount in " + HOME_CURRENCY + " today");
+        btnShowCurrentResults.addActionListener(this::onClickCurrent);
+        buttonPanel.add(btnShowCurrentResults);
+
+        JPanel futureRow = new JPanel();
+        JButton btnShowFutureResults = new JButton();
+        btnShowFutureResults.setText("Show amount in " + HOME_CURRENCY + " at specified maturity date");
+        btnShowFutureResults.addActionListener(this::onClickFuture);
+        futureRow.add(btnShowFutureResults);
+
+        specifiedDate = new DatePanel();
+        futureRow.add(specifiedDate);
+
+        buttonPanel.add(futureRow);
+
+        add(buttonPanel);
+    }
+
+    private void onClickReset(ActionEvent actionEvent)
+    {
+        btnAddMore.setEnabled(true);
+        whatIfs.clear();
+        whatIf.removeAll();
+        scrollPane.setViewportView(whatIf);
+    }
+
+    private void onClickFuture(ActionEvent actionEvent)
+    {
+        btnAddMore.setEnabled(false);
+    }
+
+    private void onClickCurrent(ActionEvent actionEvent)
+    {
+        btnAddMore.setEnabled(false);
     }
 
     private void onClick(ActionEvent actionEvent)
@@ -35,7 +88,7 @@ public class Sandbox extends JPanel
         WhatIfPanel whatIfPanel = new WhatIfPanel();
         whatIf.add(whatIfPanel);
         whatIfs.add(whatIfPanel);
-        this.validate();
+        this.revalidate();
     }
 
 }

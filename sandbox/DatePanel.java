@@ -1,11 +1,9 @@
 package sandbox;
 
 import javax.swing.*;
-import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.NumberFormatter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
@@ -19,17 +17,25 @@ public class DatePanel extends JPanel
     private JComboBox<String> year;
 
     private int lastDay;
-    private JFormattedTextField day;
+    private JComboBox<String> day;
+
     public DatePanel()
     {
         setLayout(new FlowLayout());
 
         setSize(35, 15);
-        setUpMonth();
 
+        setUpMonth();
+        setUpYear();
+
+        month.addActionListener(this::onChange);
+        year.addActionListener(this::onChange);
+
+        validateNumberDays();
         setUpDay();
 
-        setUpYear();
+        add(year);
+
     }
 
     /**
@@ -58,17 +64,29 @@ public class DatePanel extends JPanel
         }
         DateFormat format = new SimpleDateFormat("yyyy");
         year.setSelectedItem(format.format(new Date())); // set selected year to current year
+    }
+
+    private void onChange(ActionEvent actionEvent)
+    {
+        if (day != null)
+        {
+            remove(day);
+            remove(year);
+        }
+        validateNumberDays();
+        setUpDay();
         add(year);
     }
 
     private void setUpDay()
     {
-        day = new JFormattedTextField();
-        NumberFormatter defaultFormatter = new NumberFormatter(new DecimalFormat("#"));
-        DefaultFormatterFactory valueFactory = new DefaultFormatterFactory(defaultFormatter);
-        day.setFormatterFactory(valueFactory);
-        day.setToolTipText("Enter the day");
+        day = new JComboBox<>();
         day.setSize(5, this.getHeight());
+
+        for (int i = 1; i <= lastDay; i++)
+        {
+            day.addItem(i + "");
+        }
         add(day);
     }
 
