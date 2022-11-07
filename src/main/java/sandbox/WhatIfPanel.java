@@ -43,5 +43,10 @@ public class WhatIfPanel extends JPanel
         forwardRate.setValue(4.0);
         add(forwardRate);
 
+        JComboBox<String> buyOrSell = new JComboBox<>();
+        buyOrSell.addItem("Buy");
+        buyOrSell.addItem("Sell");
+        add(buyOrSell);
+
     }
 }
