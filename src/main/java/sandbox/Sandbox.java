@@ -17,26 +17,21 @@ import static main.Main.HOME_CURRENCY;
 public class Sandbox extends JPanel
 {
     private final ArrayList<WhatIfPanel> whatIfs = new ArrayList<>();
-
     private final JScrollPane scrollPane;
-    private JPanel whatIf;
-
+    private final JPanel whatIf;
     private DatePanel specifiedDate;
-
     private final JFormattedTextField defaultAmount;
     private JComboBox<String> currencyComboBox;
 
-    private class DeleteButton extends JButton
+    private static class DeleteButton extends JButton
     {
         private final WhatIfPanel panelToBeDeleted;
 
         public DeleteButton(WhatIfPanel panelToBeDeleted)
         {
             this.panelToBeDeleted = panelToBeDeleted;
-
             setText("DELETE ENTRY");
             setForeground(Color.RED);
-            //addActionListener(this::onClickDelete);
         }
 
         public WhatIfPanel getPanelToBeDeleted()
@@ -142,7 +137,12 @@ public class Sandbox extends JPanel
 
     private void onClickCurrent(ActionEvent actionEvent)
     {
-        JOptionPane.showMessageDialog(this, "Result goes here.");
+        double sum = 0.0;
+        for (WhatIfPanel possibility : whatIfs)
+        {
+            sum += possibility.getAmount();
+        }
+        JOptionPane.showMessageDialog(this, sum);
     }
 
     private void onClickFuture(ActionEvent actionEvent)
