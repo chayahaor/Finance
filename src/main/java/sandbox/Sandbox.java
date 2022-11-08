@@ -1,8 +1,10 @@
 package sandbox;
 
 import javax.swing.*;
+import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -10,21 +12,36 @@ import static main.Main.HOME_CURRENCY;
 
 public class Sandbox extends JPanel
 {
-    private ArrayList<WhatIfPanel> whatIfs = new ArrayList<>();
+    private final ArrayList<WhatIfPanel> whatIfs = new ArrayList<>();
 
-    private JScrollPane scrollPane;
-    private JPanel whatIf;
+    private final JScrollPane scrollPane;
+    private final JPanel whatIf;
 
-    private JButton btnAddMore;
+    private final JButton btnAddMore;
 
-    private DatePanel specifiedDate;
+    private final DatePanel specifiedDate;
 
+    private final JFormattedTextField defaultAmount;
     private JComboBox<String> currencyComboBox;
 
     public Sandbox()
     {
         setSize(900, 500);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+        JPanel startingRow = new JPanel();
+        startingRow.setMaximumSize(new Dimension(850, 50));
+
+        startingRow.add(new JLabel("Enter the starting value (in " + HOME_CURRENCY + ")"));
+
+        NumberFormatter defaultFormatter = new NumberFormatter(new DecimalFormat("#.##"));
+        int numColumns = 5;
+        defaultAmount = new JFormattedTextField(defaultFormatter);
+        defaultAmount.setValue(10000.00);
+        defaultAmount.setColumns(numColumns);
+        startingRow.add(defaultAmount);
+
+        add(startingRow);
 
         add(new InstructionsPanel());
 
@@ -79,9 +96,11 @@ public class Sandbox extends JPanel
     private void onClickReset(ActionEvent actionEvent)
     {
         btnAddMore.setEnabled(true);
+        defaultAmount.setValue(10000.00);
         whatIfs.clear();
         whatIf.removeAll();
         scrollPane.setViewportView(whatIf);
+        this.revalidate();
     }
 
     private void onClickFuture(ActionEvent actionEvent)

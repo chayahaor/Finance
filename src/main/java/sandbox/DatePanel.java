@@ -81,6 +81,20 @@ public class DatePanel extends JPanel
 
     private void setUpDay()
     {
+        int dayOfMonth;
+        boolean alreadySet = (day != null);
+        Date today = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(today);
+
+        if (!alreadySet)
+        {
+            dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+        } else
+        {
+            dayOfMonth = Integer.parseInt(Objects.requireNonNull(day.getSelectedItem()).toString());
+        }
+
         day = new JComboBox<>();
         day.setSize(5, this.getHeight());
 
@@ -88,11 +102,9 @@ public class DatePanel extends JPanel
         {
             day.addItem(i + "");
         }
-        Date today = new Date();
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(today);
-        int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
-        day.setSelectedItem(dayOfMonth + "");
+
+        day.setSelectedItem(dayOfMonth > lastDay ? cal.get(Calendar.DAY_OF_MONTH) + "" : dayOfMonth + "");
+
         add(day);
     }
 
