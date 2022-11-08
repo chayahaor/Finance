@@ -20,6 +20,7 @@ public class Main extends JFrame
 {
     public static final String HOME_CURRENCY = "USD";
     private Sandbox sandbox;
+    private Finance finance;
     private final JComboBox<String> currencyComboBox;
 
     private Map<String, Symbol> symbolsMap;
@@ -68,7 +69,8 @@ public class Main extends JFrame
         // add all the tabs to the Main frame's JTabbedPane
         sandbox = new Sandbox();
         sandbox.setCurrencyComboBox(currencyComboBox);
-        Finance finance = new Finance();
+        finance = new Finance();
+        finance.setCurrencyComboBox(currencyComboBox);
 
         tabbedPane.add("Play in the Sandbox", sandbox);
         tabbedPane.add("Do Actual Finance Stuff", finance);

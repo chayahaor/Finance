@@ -29,7 +29,8 @@ public class Sandbox extends JPanel
 
         add(new InstructionsPanel());
 
-        currencyComboBox = new JComboBox<>();
+        // appears this is unnecessary
+        // currencyComboBox = new JComboBox<>();
 
         whatIf = new JPanel();
         whatIf.setLayout(new BoxLayout(whatIf, BoxLayout.Y_AXIS));
