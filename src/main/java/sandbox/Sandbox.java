@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -17,9 +18,9 @@ public class Sandbox extends JPanel
     private final JScrollPane scrollPane;
     private final JPanel whatIf;
 
-    private final JButton btnAddMore;
+    private JButton btnAddMore;
 
-    private final DatePanel specifiedDate;
+    private DatePanel specifiedDate;
 
     private final JFormattedTextField defaultAmount;
     private JComboBox<String> currencyComboBox;
@@ -56,33 +57,27 @@ public class Sandbox extends JPanel
         scrollPane.setMaximumSize(new Dimension(850, 450));
         add(scrollPane);
 
+        setUpButtonPanel();
+
+    }
+
+    private void setUpButtonPanel()
+    {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setMaximumSize(new Dimension(850, 100));
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 
         JPanel actionRow = new JPanel();
 
-        btnAddMore = new JButton();
-        btnAddMore.setText("Add another what if row");
-        btnAddMore.addActionListener(this::onClick);
-        actionRow.add(btnAddMore);
+        btnAddMore = setButton("Add another what if row", this::onClickMore, actionRow);
 
-        JButton btnResetSandbox = new JButton();
-        btnResetSandbox.setText("Reset the Sandbox");
-        btnResetSandbox.addActionListener(this::onClickReset);
-        actionRow.add(btnResetSandbox);
+        setButton("Reset the Sandbox", this::onClickReset, actionRow);
 
         JPanel calcRow = new JPanel();
 
-        JButton btnShowCurrentResults = new JButton();
-        btnShowCurrentResults.setText("Show amount in " + HOME_CURRENCY + " today");
-        btnShowCurrentResults.addActionListener(this::onClickCurrent);
-        calcRow.add(btnShowCurrentResults);
+        setButton("Show amount in " + HOME_CURRENCY + " today", this::onClickCurrent, calcRow);
 
-        JButton btnShowFutureResults = new JButton();
-        btnShowFutureResults.setText("Show amount in " + HOME_CURRENCY + " at specified maturity date");
-        btnShowFutureResults.addActionListener(this::onClickFuture);
-        calcRow.add(btnShowFutureResults);
+        setButton("Show amount in " + HOME_CURRENCY + " at specified maturity date", this::onClickFuture, calcRow);
 
         specifiedDate = new DatePanel();
 
@@ -90,9 +85,16 @@ public class Sandbox extends JPanel
         buttonPanel.add(calcRow);
 
         add(buttonPanel);
-
     }
 
+    private JButton setButton(String text, ActionListener listener, JPanel panel)
+    {
+        JButton button = new JButton();
+        button.setText(text);
+        button.addActionListener(listener);
+        panel.add(button);
+        return button;
+    }
     private void onClickReset(ActionEvent actionEvent)
     {
         btnAddMore.setEnabled(true);
@@ -121,10 +123,9 @@ public class Sandbox extends JPanel
         btnAddMore.setEnabled(false);
 
         JOptionPane.showMessageDialog(this, "Result goes here.");
-
     }
 
-    private void onClick(ActionEvent actionEvent)
+    private void onClickMore(ActionEvent actionEvent)
     {
         WhatIfPanel whatIfPanel = new WhatIfPanel(currencyComboBox);
         whatIf.add(whatIfPanel);

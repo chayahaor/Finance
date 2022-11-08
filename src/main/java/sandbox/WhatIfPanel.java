@@ -16,8 +16,7 @@ public class WhatIfPanel extends JPanel
         NumberFormatter defaultFormatter = new NumberFormatter(new DecimalFormat("#.##"));
         int numColumns = 5;
 
-        JFormattedTextField amount = generateTextField(defaultFormatter, numColumns, 100.00);
-        add(amount);
+        add(generateTextField(defaultFormatter, numColumns, 100.00, "amount"));
 
         JComboBox<String> currencies = new JComboBox<>();
         for (int i = 0; i < currencyComboBox.getItemCount(); i++)
@@ -31,11 +30,9 @@ public class WhatIfPanel extends JPanel
 
         add(new DatePanel());
 
-        JFormattedTextField fxRate = generateTextField(defaultFormatter, numColumns, 3.5);
-        add(fxRate);
+        add(generateTextField(defaultFormatter, numColumns, 3.5, "fxRate"));
 
-        JFormattedTextField forwardRate = generateTextField(defaultFormatter, numColumns,4.0);
-        add(forwardRate);
+        add(generateTextField(defaultFormatter, numColumns,4.0, "forwardRate"));
 
         JComboBox<String> buyOrSell = new JComboBox<>();
         buyOrSell.addItem("Buy");
@@ -44,11 +41,15 @@ public class WhatIfPanel extends JPanel
 
     }
 
-    public JFormattedTextField generateTextField(NumberFormatter defaultFormatter, int numColumns, double value)
+    public JFormattedTextField generateTextField(NumberFormatter defaultFormatter,
+                                                 int numColumns,
+                                                 double value,
+                                                 String name)
     {
         JFormattedTextField textField = new JFormattedTextField(defaultFormatter);
         textField.setColumns(numColumns);
         textField.setValue(value);
+        textField.setName(name);
         return textField;
     }
 }
