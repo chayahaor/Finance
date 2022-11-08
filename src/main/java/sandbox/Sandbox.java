@@ -18,12 +18,40 @@ public class Sandbox extends JPanel
     private final JScrollPane scrollPane;
     private final JPanel whatIf;
 
-    private JButton btnAddMore;
-
     private DatePanel specifiedDate;
 
     private final JFormattedTextField defaultAmount;
     private JComboBox<String> currencyComboBox;
+
+    private class DeleteButton extends JButton
+    {
+        private final WhatIfPanel panelToBeDeleted;
+        public DeleteButton(WhatIfPanel panelToBeDeleted)
+        {
+            this.panelToBeDeleted = panelToBeDeleted;
+
+            setText("DELETE ENTRY");
+            setForeground(Color.RED);
+            addActionListener(this::onClickDelete);
+        }
+
+        private void onClickDelete(ActionEvent actionEvent)
+        {
+            int option = JOptionPane.showConfirmDialog(scrollPane,
+                    "You are about to delete an entry. Are you sure? ",
+                    "Warning!", JOptionPane.YES_NO_OPTION);
+            if (option == JOptionPane.YES_OPTION)
+            {
+                panelToBeDeleted.setVisible(false);
+                this.setVisible(false);
+                whatIf.remove(panelToBeDeleted);
+                whatIf.remove(this);
+                whatIfs.remove(panelToBeDeleted);
+                whatIf.revalidate();
+            }
+        }
+
+    }
 
     public Sandbox()
     {
@@ -69,15 +97,15 @@ public class Sandbox extends JPanel
 
         JPanel actionRow = new JPanel();
 
-        btnAddMore = setButton("Add another what if row", this::onClickMore, actionRow);
+        generateButton("Add another what if row", this::onClickMore, actionRow);
 
-        setButton("Reset the Sandbox", this::onClickReset, actionRow);
+        generateButton("Reset the Sandbox", this::onClickReset, actionRow);
 
         JPanel calcRow = new JPanel();
 
-        setButton("Show amount in " + HOME_CURRENCY + " today", this::onClickCurrent, calcRow);
+        generateButton("Show amount in " + HOME_CURRENCY + " today", this::onClickCurrent, calcRow);
 
-        setButton("Show amount in " + HOME_CURRENCY + " at specified maturity date", this::onClickFuture, calcRow);
+        generateButton("Show amount in " + HOME_CURRENCY + " at specified maturity date", this::onClickFuture, calcRow);
 
         specifiedDate = new DatePanel();
 
@@ -87,7 +115,7 @@ public class Sandbox extends JPanel
         add(buttonPanel);
     }
 
-    private JButton setButton(String text, ActionListener listener, JPanel panel)
+    private JButton generateButton(String text, ActionListener listener, JPanel panel)
     {
         JButton button = new JButton();
         button.setText(text);
@@ -98,15 +126,20 @@ public class Sandbox extends JPanel
 
     private void onClickMore(ActionEvent actionEvent)
     {
+        JPanel row = new JPanel(new BorderLayout());
+        row.setMaximumSize(new Dimension(1000, 30));
+
         WhatIfPanel whatIfPanel = new WhatIfPanel(currencyComboBox);
-        whatIf.add(whatIfPanel);
+        row.add(new DeleteButton(whatIfPanel), BorderLayout.EAST);
+        row.add(whatIfPanel);
+
         whatIfs.add(whatIfPanel);
+        whatIf.add(row);
         this.revalidate();
     }
 
     private void onClickReset(ActionEvent actionEvent)
     {
-        btnAddMore.setEnabled(true);
         defaultAmount.setValue(10000.00);
         whatIfs.clear();
         whatIf.removeAll();
@@ -116,15 +149,11 @@ public class Sandbox extends JPanel
 
     private void onClickCurrent(ActionEvent actionEvent)
     {
-        btnAddMore.setEnabled(false);
-
         JOptionPane.showMessageDialog(this, "Result goes here.");
     }
 
     private void onClickFuture(ActionEvent actionEvent)
     {
-        btnAddMore.setEnabled(false);
-
         JOptionPane.showMessageDialog(this, specifiedDate, "Enter specified maturity date", JOptionPane.PLAIN_MESSAGE);
 
         int selectedYear = Integer.parseInt(Objects.requireNonNull(specifiedDate.getYear().getSelectedItem()).toString());

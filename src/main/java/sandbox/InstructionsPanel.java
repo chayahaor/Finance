@@ -7,32 +7,21 @@ public class InstructionsPanel extends JPanel
 {
     public InstructionsPanel()
     {
-        setLayout(new GridLayout(1, 6));
+        setLayout(new GridLayout(1, 7));
         setMaximumSize(new Dimension(1000, 100));
 
-        JLabel amountInstruction = new JLabel();
-        amountInstruction.setText("                Enter amount");
-        amountInstruction.setHorizontalTextPosition(SwingConstants.RIGHT);
-        add(amountInstruction);
+        add(new JLabel("Enter amount", SwingConstants.RIGHT));
 
-        JLabel currencyInstruction = new JLabel();
-        currencyInstruction.setText("      Select currency");
-        add(currencyInstruction);
+        add(new JLabel("Select currency", SwingConstants.RIGHT));
 
-        JLabel maturityDateInstruction = new JLabel();
-        maturityDateInstruction.setText("Enter maturity date");
-        add(maturityDateInstruction);
+        add(new JLabel("Enter maturity date", SwingConstants.RIGHT));
 
-        JLabel fxRateInstruction = new JLabel();
-        fxRateInstruction.setText("             Enter FX Rate   ");
-        add(fxRateInstruction);
+        add(new JLabel("Enter FX Rate", SwingConstants.RIGHT));
 
-        JLabel forwardRateInstruction = new JLabel();
-        forwardRateInstruction.setText("          Enter Forward Rate");
-        add(forwardRateInstruction);
+        add(new JLabel("Enter Forward Rate", SwingConstants.RIGHT));
 
-        JLabel buyOrSellInstruction = new JLabel();
-        buyOrSellInstruction.setText("         Buy or Sell");
-        add(buyOrSellInstruction);
+        add(new JLabel("Buy or Sell", SwingConstants.CENTER));
+
+        add(new JLabel("    "));
     }
 }
