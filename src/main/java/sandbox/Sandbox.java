@@ -15,7 +15,6 @@ public class Sandbox extends JPanel
     private JScrollPane scrollPane;
     private JPanel whatIf;
 
-    private JPanel buttonPanel;
     private JButton btnAddMore;
 
     private DatePanel specifiedDate;
@@ -40,36 +39,41 @@ public class Sandbox extends JPanel
         scrollPane.setMaximumSize(new Dimension(850, 450));
         add(scrollPane);
 
-        buttonPanel = new JPanel();
+        JPanel buttonPanel = new JPanel();
         buttonPanel.setMaximumSize(new Dimension(850, 100));
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+
+        JPanel actionRow = new JPanel();
 
         btnAddMore = new JButton();
         btnAddMore.setText("Add another what if row");
         btnAddMore.addActionListener(this::onClick);
-        buttonPanel.add(btnAddMore);
+        actionRow.add(btnAddMore);
 
         JButton btnResetSandbox = new JButton();
         btnResetSandbox.setText("Reset the Sandbox");
         btnResetSandbox.addActionListener(this::onClickReset);
-        buttonPanel.add(btnResetSandbox);
+        actionRow.add(btnResetSandbox);
+
+        JPanel calcRow = new JPanel();
 
         JButton btnShowCurrentResults = new JButton();
         btnShowCurrentResults.setText("Show amount in " + HOME_CURRENCY + " today");
         btnShowCurrentResults.addActionListener(this::onClickCurrent);
-        buttonPanel.add(btnShowCurrentResults);
+        calcRow.add(btnShowCurrentResults);
 
-        JPanel futureRow = new JPanel();
         JButton btnShowFutureResults = new JButton();
         btnShowFutureResults.setText("Show amount in " + HOME_CURRENCY + " at specified maturity date");
         btnShowFutureResults.addActionListener(this::onClickFuture);
-        futureRow.add(btnShowFutureResults);
+        calcRow.add(btnShowFutureResults);
 
         specifiedDate = new DatePanel();
-        futureRow.add(specifiedDate);
 
-        buttonPanel.add(futureRow);
+        buttonPanel.add(actionRow);
+        buttonPanel.add(calcRow);
 
         add(buttonPanel);
+
     }
 
     private void onClickReset(ActionEvent actionEvent)
@@ -84,10 +88,11 @@ public class Sandbox extends JPanel
     {
         btnAddMore.setEnabled(false);
 
+        JOptionPane.showMessageDialog(this, specifiedDate, "Enter specified maturity date", JOptionPane.PLAIN_MESSAGE);
+
         int selectedYear = Integer.parseInt(Objects.requireNonNull(specifiedDate.getYear().getSelectedItem()).toString());
         int selectedDay = Integer.parseInt(Objects.requireNonNull(specifiedDate.getDay().getSelectedItem()).toString());
         String selectedMonth = Objects.requireNonNull(specifiedDate.getMonth().getSelectedItem()).toString();
-
 
         JOptionPane.showMessageDialog(this, selectedMonth + "/" + selectedDay + "/" + selectedYear);
     }
@@ -96,7 +101,7 @@ public class Sandbox extends JPanel
     {
         btnAddMore.setEnabled(false);
 
-       JOptionPane.showMessageDialog(this, "Result goes here.");
+        JOptionPane.showMessageDialog(this, "Result goes here.");
 
     }
 
