@@ -4,6 +4,7 @@ import sandbox.DatePanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.text.NumberFormat;
 
 import static main.Main.HOME_CURRENCY;
@@ -11,6 +12,7 @@ import static main.Main.HOME_CURRENCY;
 public class Finance extends JPanel
 {
     private double currentValue;
+    private int columnLength = 5;
 
     private JComboBox<String> action;
     private JComboBox<String> initialCurrency;
@@ -69,6 +71,8 @@ public class Finance extends JPanel
             action.setEditable(false);
             performAction.add(action);
 
+            currencyComboBox = new JComboBox<>();
+
             initialCurrency = new JComboBox<>();
             for (int i = 0; i < currencyComboBox.getItemCount(); i++)
             {
@@ -79,7 +83,39 @@ public class Finance extends JPanel
             initialCurrency.setSize(35, 15);
             performAction.add(initialCurrency);
 
+            toCurrency = new JComboBox<>();
+            for (int i = 0; i < currencyComboBox.getItemCount(); i++)
+            {
+                toCurrency.addItem(currencyComboBox.getItemAt(i));
+            }
+            toCurrency.setSelectedItem(HOME_CURRENCY);
+            toCurrency.setEditable(false);
+            toCurrency.setSize(35, 15);
+            performAction.add(toCurrency);
+
+            amount = new JFormattedTextField();
+            amount.setValue(500);
+            amount.setColumns(columnLength);
+            performAction.add(amount);
+
+            fxRate = new JFormattedTextField();
+            fxRate.setValue(3.5);
+            fxRate.setColumns(columnLength);
+            performAction.add(fxRate);
+
+            maturityDate = new DatePanel();
+            performAction.add(maturityDate);
+
+            doAction = new JButton();
+            doAction.setText("Perform Action");
+            doAction.addActionListener(this::onClick);
+            performAction.add(doAction);
+
             add(performAction);
+        }
+
+        private void onClick(ActionEvent actionEvent) {
+            //add to the database
         }
     }
 
