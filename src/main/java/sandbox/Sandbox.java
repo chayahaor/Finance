@@ -1,5 +1,7 @@
 package sandbox;
 
+import main.Main;
+
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
@@ -7,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 import static main.Main.HOME_CURRENCY;
@@ -16,7 +19,7 @@ public class Sandbox extends JPanel
     private final ArrayList<WhatIfPanel> whatIfs = new ArrayList<>();
 
     private final JScrollPane scrollPane;
-    private final JPanel whatIf;
+    private JPanel whatIf;
 
     private DatePanel specifiedDate;
 
@@ -26,31 +29,20 @@ public class Sandbox extends JPanel
     private class DeleteButton extends JButton
     {
         private final WhatIfPanel panelToBeDeleted;
+
         public DeleteButton(WhatIfPanel panelToBeDeleted)
         {
             this.panelToBeDeleted = panelToBeDeleted;
 
             setText("DELETE ENTRY");
             setForeground(Color.RED);
-            addActionListener(this::onClickDelete);
+            //addActionListener(this::onClickDelete);
         }
 
-        private void onClickDelete(ActionEvent actionEvent)
+        public WhatIfPanel getPanelToBeDeleted()
         {
-            int option = JOptionPane.showConfirmDialog(scrollPane,
-                    "You are about to delete an entry. Are you sure? ",
-                    "Warning!", JOptionPane.YES_NO_OPTION);
-            if (option == JOptionPane.YES_OPTION)
-            {
-                panelToBeDeleted.setVisible(false);
-                this.setVisible(false);
-                whatIf.remove(panelToBeDeleted);
-                whatIf.remove(this);
-                whatIfs.remove(panelToBeDeleted);
-                whatIf.revalidate();
-            }
+            return panelToBeDeleted;
         }
-
     }
 
     public Sandbox()
@@ -130,9 +122,10 @@ public class Sandbox extends JPanel
         row.setMaximumSize(new Dimension(1000, 30));
 
         WhatIfPanel whatIfPanel = new WhatIfPanel(currencyComboBox);
-        row.add(new DeleteButton(whatIfPanel), BorderLayout.EAST);
+        DeleteButton deleteButton = new DeleteButton(whatIfPanel);
+        deleteButton.addActionListener(this::onClickDelete);
+        row.add(deleteButton, BorderLayout.EAST);
         row.add(whatIfPanel);
-
         whatIfs.add(whatIfPanel);
         whatIf.add(row);
         this.revalidate();
@@ -161,6 +154,23 @@ public class Sandbox extends JPanel
         String selectedMonth = Objects.requireNonNull(specifiedDate.getMonth().getSelectedItem()).toString();
 
         JOptionPane.showMessageDialog(this, selectedMonth + "/" + selectedDay + "/" + selectedYear);
+    }
+
+
+    private void onClickDelete(ActionEvent actionEvent)
+    {
+        DeleteButton button = (DeleteButton) actionEvent.getSource();
+        int option = JOptionPane.showConfirmDialog(scrollPane,
+                "You are about to delete an entry. Are you sure? ",
+                "Warning!", JOptionPane.YES_NO_OPTION);
+        if (option == JOptionPane.YES_OPTION)
+        {
+            whatIf.remove(button.getParent());
+            whatIfs.remove(button.getPanelToBeDeleted());
+            whatIf.revalidate();
+            scrollPane.setViewportView(whatIf);
+            scrollPane.revalidate();
+        }
     }
 
     public void setCurrencyComboBox(JComboBox<String> currencyComboBox)
