@@ -15,38 +15,29 @@ public class Finance extends JPanel
     private int columnLength = 5;
 
     private JComboBox<String> action;
-    private JComboBox<String> initialCurrency;
-    private JComboBox<String> toCurrency;
     private JFormattedTextField amount;
     private JFormattedTextField fxRate;
     private DatePanel maturityDate;
     private JButton doAction;
+    private JPanel perform;
 
-    private JComboBox<String> currencyComboBox;
+    private JComboBox<String> currencyComboBoxFrom;
+    private JComboBox<String> currencyComboBoxTo;
+
 
     public Finance()
     {
+        this.currencyComboBoxFrom = new JComboBox<>();
+        this.currencyComboBoxTo = new JComboBox<>();
         currentValue = 10000;
 
         setSize(900, 500);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-        add(new PerformActionPanel());
-
-        //not sure if I should put this in a class "upper panel"
-        //I think the variables need to stay in this class
-        //If they can move, we should move this to another class
-        /*JPanel frame = new JPanel();
-        frame.setLayout(new GridLayout(1, 5));
-        frame.setMaximumSize(new Dimension(850, 100));
-
-        currentValueDisplay = new JTextArea(String.valueOf(getCurrentValue()));
-        frame.add(currentValueDisplay);*/
     }
 
     private class PerformActionPanel extends JPanel
     {
-        public PerformActionPanel()
+        public PerformActionPanel(JComboBox<String> from, JComboBox<String> to)
         {
             JPanel displayAmount = new JPanel();
             displayAmount.setMaximumSize(new Dimension(850, 100));
@@ -71,27 +62,10 @@ public class Finance extends JPanel
             action.setEditable(false);
             performAction.add(action);
 
-            currencyComboBox = new JComboBox<>();
 
-            initialCurrency = new JComboBox<>();
-            for (int i = 0; i < currencyComboBox.getItemCount(); i++)
-            {
-                initialCurrency.addItem(currencyComboBox.getItemAt(i));
-            }
-            initialCurrency.setSelectedItem(HOME_CURRENCY);
-            initialCurrency.setEditable(false);
-            initialCurrency.setSize(35, 15);
-            performAction.add(initialCurrency);
 
-            toCurrency = new JComboBox<>();
-            for (int i = 0; i < currencyComboBox.getItemCount(); i++)
-            {
-                toCurrency.addItem(currencyComboBox.getItemAt(i));
-            }
-            toCurrency.setSelectedItem(HOME_CURRENCY);
-            toCurrency.setEditable(false);
-            toCurrency.setSize(35, 15);
-            performAction.add(toCurrency);
+            performAction.add(from);
+            performAction.add(to);
 
             amount = new JFormattedTextField();
             amount.setValue(500);
@@ -124,9 +98,17 @@ public class Finance extends JPanel
         return currentValue;
     }
 
-    public void setCurrencyComboBox(JComboBox<String> currencyComboBox)
+    public void setCurrencyComboBoxFrom(JComboBox<String> financeComboBox)
     {
-        this.currencyComboBox = currencyComboBox;
+        this.currencyComboBoxFrom = financeComboBox;
     }
 
+    public void setCurrencyComboBoxTo(JComboBox<String> financeComboBox)
+    {
+        this.currencyComboBoxTo = financeComboBox;
+    }
+
+    public void addPerformActionPanel(){
+        add(new PerformActionPanel(currencyComboBoxFrom, currencyComboBoxTo));
+    }
 }
