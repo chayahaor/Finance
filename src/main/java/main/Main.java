@@ -9,7 +9,6 @@ import sandbox.Sandbox;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.Map;
@@ -21,8 +20,8 @@ public class Main extends JFrame
     private Sandbox sandbox;
     private Finance finance;
     private final JComboBox<String> currencyComboBox;
-    private final JComboBox<String> fromCurrency;
-    private final JComboBox<String> toCurrency;
+    public static final JComboBox<String> fromCurrency = new JComboBox<>();
+    public static final JComboBox<String> toCurrency = new JComboBox<>();
 
 
     private Map<String, Symbol> symbolsMap;
@@ -39,9 +38,6 @@ public class Main extends JFrame
         setResizable(true);
 
         currencyComboBox = new JComboBox<>();
-        fromCurrency = new JComboBox<>();
-        toCurrency = new JComboBox<>();
-
         presenter.loadSymbolsChoices();
 
         setUpJTabbedPane();
@@ -81,13 +77,9 @@ public class Main extends JFrame
         sandbox.setCurrencyComboBox(currencyComboBox);
 
         finance = new Finance();
-        finance.setCurrencyComboBoxFrom(fromCurrency);
-        finance.setCurrencyComboBoxTo(toCurrency);
-        finance.addPerformActionPanel();
-
 
         tabbedPane.add("Play in the Sandbox", sandbox);
-        tabbedPane.add("Do Actual Finance Stuff", finance);
+        tabbedPane.add("Finance Stuff", finance);
         tabbedPane.setPreferredSize(new Dimension(950, 550));
 
         add(tabbedPane);
