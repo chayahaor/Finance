@@ -9,7 +9,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.text.NumberFormat;
 
-public class Finance extends Panel {
+public class Finance extends JPanel {
     private double currentValue;
     private JLabel userValue;
     private JComboBox<String> action;
