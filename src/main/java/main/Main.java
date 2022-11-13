@@ -1,6 +1,5 @@
 package main;
 
-
 import dagger.DaggerCurrencyExchangeComponent;
 import finance.Finance;
 import json.CurrencyExchangeServiceFactory;
@@ -20,10 +19,8 @@ public class Main extends JFrame
     private Sandbox sandbox;
     private Finance finance;
     private final JComboBox<String> currencyComboBox;
-    public static final JComboBox<String> fromCurrency = new JComboBox<>();
-    public static final JComboBox<String> toCurrency = new JComboBox<>();
-
-
+    public JComboBox<String> fromCurrency;
+    public JComboBox<String> toCurrency;
     private Map<String, Symbol> symbolsMap;
 
     @Inject
@@ -38,9 +35,28 @@ public class Main extends JFrame
         setResizable(true);
 
         currencyComboBox = new JComboBox<>();
+        fromCurrency = new JComboBox<>();
+        toCurrency = new JComboBox<>();
         presenter.loadSymbolsChoices();
 
         setUpJTabbedPane();
+    }
+
+    public void setUpJTabbedPane()
+    {
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.setForeground(Color.BLACK);
+
+        // add all the tabs to the Main frame's JTabbedPane
+        sandbox = new Sandbox(currencyComboBox);
+
+        finance = new Finance(fromCurrency, toCurrency);
+
+        tabbedPane.add("Play in the Sandbox", sandbox);
+        tabbedPane.add("Finance Stuff", finance);
+        tabbedPane.setPreferredSize(new Dimension(950, 550));
+
+        add(tabbedPane);
     }
 
     public void setSymbolsChoices(Map<String, Symbol> symbols)
@@ -52,37 +68,18 @@ public class Main extends JFrame
         fromCurrency.removeAllItems();
         toCurrency.removeAllItems();
 
-
         for (int i = 0; i < symbolsArray.length; i++)
         {
             //currencyComboBox.addItem(descriptionsArray[i]);
-            currencyComboBox.addItem(String.valueOf(symbolsMap.get(symbolsArray[i]).getCode()));
-            fromCurrency.addItem(String.valueOf(symbolsMap.get(symbolsArray[i]).getCode()));
-            toCurrency.addItem(String.valueOf(symbolsMap.get(symbolsArray[i]).getCode()));
+            currencyComboBox.addItem(symbolsArray[i]);
+            fromCurrency.addItem(symbolsArray[i]);
+            toCurrency.addItem(symbolsArray[i]);
+           // currencyComboBox.addItem(String.valueOf(symbolsMap.get(symbolsArray[i]).getCode()));
         }
-
         fromCurrency.setSelectedItem(HOME_CURRENCY);
         fromCurrency.setEditable(false);
         toCurrency.setSelectedItem(HOME_CURRENCY);
         toCurrency.setEditable(false);
-    }
-
-    public void setUpJTabbedPane()
-    {
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.setForeground(Color.BLACK);
-
-        // add all the tabs to the Main frame's JTabbedPane
-        sandbox = new Sandbox();
-        sandbox.setCurrencyComboBox(currencyComboBox);
-
-        finance = new Finance();
-
-        tabbedPane.add("Play in the Sandbox", sandbox);
-        tabbedPane.add("Finance Stuff", finance);
-        tabbedPane.setPreferredSize(new Dimension(950, 550));
-
-        add(tabbedPane);
     }
 
     public static void main(String[] args)

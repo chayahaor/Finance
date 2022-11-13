@@ -1,6 +1,6 @@
 package sandbox;
 
-import main.Main;
+import helpers.DatePanel;
 
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 
 import static main.Main.HOME_CURRENCY;
@@ -40,7 +39,7 @@ public class Sandbox extends JPanel
         }
     }
 
-    public Sandbox()
+    public Sandbox(JComboBox<String> currencyComboBox)
     {
         setSize(900, 500);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -61,7 +60,7 @@ public class Sandbox extends JPanel
 
         add(new InstructionsPanel());
 
-        currencyComboBox = new JComboBox<>();
+        this.currencyComboBox = currencyComboBox;
 
         whatIf = new JPanel();
         whatIf.setLayout(new BoxLayout(whatIf, BoxLayout.Y_AXIS));

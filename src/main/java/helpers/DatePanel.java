@@ -1,4 +1,4 @@
-package sandbox;
+package helpers;
 
 import javax.swing.*;
 import java.awt.*;
