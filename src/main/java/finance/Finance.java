@@ -28,6 +28,10 @@ public class Finance extends JPanel {
         this.currentValue = pullCurrentValue();
         setSize(900, 500);
         setLayout(new FlowLayout());
+        NumberFormat moneyFormatter = NumberFormat.getCurrencyInstance();
+        add(new JLabel("Currently Have: "));
+        userValue = new JLabel(moneyFormatter.format(currentValue));
+        add(userValue);
         add(addActionComponents());
         add(addGraph());
     }
@@ -40,10 +44,7 @@ public class Finance extends JPanel {
     private JPanel addActionComponents() {
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout());
-        NumberFormat moneyFormatter = NumberFormat.getCurrencyInstance();
-        panel.add(new JLabel("Currently Have: "));
-        userValue = new JLabel(moneyFormatter.format(currentValue));
-        panel.add(userValue);
+
         action = new JComboBox<>(new String[]{
                 "Buy Spot",
                 "Buy Forward",
