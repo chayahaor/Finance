@@ -1,4 +1,4 @@
-package main;
+package helpers;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -12,18 +12,15 @@ import javax.inject.Singleton;
 import java.util.Map;
 
 @Singleton
-public class MainPresenter
+public class CurrencyExchangePresenter
 {
-
-    private final Provider<Main> viewProvider;
+    private final Provider<CurrencyComboBox> viewProvider;
     private final CurrencyExchangeService model;
     private Disposable disposable;
 
-    private Disposable symbolsDisposable;
-
     @Inject
-    public MainPresenter(
-            Provider<Main> viewProvider,
+    public CurrencyExchangePresenter(
+            Provider<CurrencyComboBox> viewProvider,
             CurrencyExchangeService model)
     {
         this.viewProvider = viewProvider;
@@ -51,10 +48,9 @@ public class MainPresenter
         }
     }
 
-
     public void loadSymbolsChoices()
     {
-        symbolsDisposable = model.getCurrencySymbols()
+        Disposable symbolsDisposable = model.getCurrencySymbols()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.newThread())
                 .subscribe(this::onSymbolsNext);
