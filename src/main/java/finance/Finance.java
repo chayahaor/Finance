@@ -1,9 +1,8 @@
 package finance;
 
 import dagger.DaggerCurrencyExchangeComponent;
-import helpers.CurrencyComboBox;
+import helpers.*;
 import org.jfree.chart.ChartPanel;
-import helpers.DatePanel;
 
 import javax.swing.*;
 import java.awt.*;

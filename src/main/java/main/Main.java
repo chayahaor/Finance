@@ -1,8 +1,6 @@
 package main;
 
-import dagger.DaggerCurrencyExchangeComponent;
 import finance.Finance;
-import helpers.CurrencyComboBox;
 import sandbox.Sandbox;
 
 import javax.swing.*;

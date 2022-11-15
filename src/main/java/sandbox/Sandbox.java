@@ -1,8 +1,7 @@
 package sandbox;
 
 import dagger.DaggerCurrencyExchangeComponent;
-import helpers.CurrencyComboBox;
-import helpers.DatePanel;
+import helpers.*;
 
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
