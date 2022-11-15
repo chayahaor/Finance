@@ -13,7 +13,6 @@ public class Main extends JFrame
     public static final String HOME_CURRENCY = "USD";
     private Sandbox sandbox;
     private Finance finance;
-    private CurrencyComboBox currencyComboBox;
     public CurrencyComboBox fromCurrency;
     public CurrencyComboBox toCurrency;
 
@@ -32,10 +31,6 @@ public class Main extends JFrame
 
     private void setUpCurrencyComboBox()
     {
-        currencyComboBox =
-                DaggerCurrencyExchangeComponent
-                        .create()
-                        .getCurrencyExchange();
         toCurrency = DaggerCurrencyExchangeComponent
                 .create()
                 .getCurrencyExchange();
@@ -50,9 +45,9 @@ public class Main extends JFrame
         tabbedPane.setForeground(Color.BLACK);
 
         // add all the tabs to the Main frame's JTabbedPane
-        sandbox = new Sandbox(currencyComboBox);
+        sandbox = new Sandbox();
 
-        finance = new Finance(fromCurrency, toCurrency);
+        finance = new Finance();
 
         tabbedPane.add("Play in the Sandbox", sandbox);
         tabbedPane.add("Finance Stuff", finance);
