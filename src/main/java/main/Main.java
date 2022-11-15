@@ -13,8 +13,6 @@ public class Main extends JFrame
     public static final String HOME_CURRENCY = "USD";
     private Sandbox sandbox;
     private Finance finance;
-    public CurrencyComboBox fromCurrency;
-    public CurrencyComboBox toCurrency;
 
     public Main()
     {
@@ -24,19 +22,7 @@ public class Main extends JFrame
         setLayout(new FlowLayout());
         setResizable(true);
 
-        setUpCurrencyComboBox();
-
         setUpJTabbedPane();
-    }
-
-    private void setUpCurrencyComboBox()
-    {
-        toCurrency = DaggerCurrencyExchangeComponent
-                .create()
-                .getCurrencyExchange();
-        fromCurrency = DaggerCurrencyExchangeComponent
-                .create()
-                .getCurrencyExchange();
     }
 
     public void setUpJTabbedPane()
