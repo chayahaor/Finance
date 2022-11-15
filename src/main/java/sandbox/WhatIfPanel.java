@@ -14,7 +14,6 @@ public class WhatIfPanel extends JPanel
 {
     private JFormattedTextField amount;
     private JComboBox<String> buyOrSell;
-
     private JComboBox<String> currencies;
 
     public WhatIfPanel(JComboBox<String> currencyComboBox)

@@ -21,8 +21,8 @@ public class Sandbox extends JPanel
     private final JPanel whatIf;
     private DatePanel specifiedDate;
     private final JFormattedTextField defaultAmount;
-    private final CurrencyComboBox currencyComboBox;
 
+    private final CurrencyComboBox currencyComboBox;
     private static class DeleteButton extends JButton
     {
         private final WhatIfPanel panelToBeDeleted;
@@ -45,6 +45,10 @@ public class Sandbox extends JPanel
         setSize(900, 500);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
+        currencyComboBox = DaggerCurrencyExchangeComponent
+                .create()
+                .getCurrencyExchange();
+
         JPanel startingRow = new JPanel();
         startingRow.setMaximumSize(new Dimension(850, 50));
 
@@ -60,11 +64,6 @@ public class Sandbox extends JPanel
         add(startingRow);
 
         add(new InstructionsPanel());
-
-        this.currencyComboBox =
-                DaggerCurrencyExchangeComponent
-                        .create()
-                        .getCurrencyExchange();
 
         whatIf = new JPanel();
         whatIf.setLayout(new BoxLayout(whatIf, BoxLayout.Y_AXIS));
