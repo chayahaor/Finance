@@ -1,6 +1,6 @@
 package dagger;
 
-import main.Main;
+import helpers.CurrencyComboBox;
 
 import javax.inject.Singleton;
 
@@ -9,5 +9,5 @@ import javax.inject.Singleton;
 
 public interface CurrencyExchangeComponent
 {
-   Main getCurrencyExchangeFrame();
+    CurrencyComboBox getCurrencyExchange();
 }

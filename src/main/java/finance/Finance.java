@@ -1,7 +1,8 @@
 package finance;
 
+import dagger.DaggerCurrencyExchangeComponent;
+import helpers.*;
 import org.jfree.chart.ChartPanel;
-import helpers.DatePanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,12 +19,10 @@ public class Finance extends JPanel {
     private JFormattedTextField fxRate;
     private DatePanel maturityDate;
     private JButton doAction;
-    private JComboBox<String> currencyComboBoxFrom;
-    private JComboBox<String> currencyComboBoxTo;
+    private CurrencyComboBox fromCurrency;
+    private CurrencyComboBox toCurrency;
 
-    public Finance(JComboBox<String> from, JComboBox<String> to) {
-        this.currencyComboBoxFrom = from;
-        this.currencyComboBoxTo = to;
+    public Finance() {
         this.currentValue = pullCurrentValue();
         setSize(900, 500);
         setLayout(new BorderLayout());
@@ -65,8 +64,14 @@ public class Finance extends JPanel {
                 "Cover Short Position"});
         panel.add(action);
 
-        panel.add(currencyComboBoxFrom);
-        panel.add(currencyComboBoxTo);
+        toCurrency = DaggerCurrencyExchangeComponent
+                .create()
+                .getCurrencyExchange();
+        fromCurrency = DaggerCurrencyExchangeComponent
+                .create()
+                .getCurrencyExchange();
+        panel.add(toCurrency);
+        panel.add(fromCurrency);
 
         amount = new JFormattedTextField();
         amount.setValue(500);
@@ -99,13 +104,5 @@ public class Finance extends JPanel {
         ChartPanel chartPanel = new ChartPanel(profitLoss.getChart());
         graphPanel.add(chartPanel, BorderLayout.CENTER);
         return graphPanel;
-    }
-
-    public void setFromCurrencyComboBox(JComboBox<String> fromCurrency) {
-        this.currencyComboBoxFrom = fromCurrency;
-    }
-
-    public void setToCurrencyComboBox(JComboBox<String> toCurrency) {
-        this.currencyComboBoxTo = toCurrency;
     }
 }
