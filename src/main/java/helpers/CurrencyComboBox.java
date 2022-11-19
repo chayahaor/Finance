@@ -1,7 +1,7 @@
 package helpers;
 
+import json.CurrencyExchange;
 import json.CurrencyExchangeServiceFactory;
-import json.Symbol;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -20,7 +20,7 @@ public class CurrencyComboBox extends JComboBox<String>
         presenter.loadSymbolsChoices();
     }
 
-    public void setSymbolsChoices(Map<String, Symbol> symbols)
+    public void setSymbolsChoices(Map<String, CurrencyExchange.Symbol> symbols)
     {
         String[] symbolsArray = symbols.keySet().toArray(new String[0]);
 

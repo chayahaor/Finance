@@ -38,6 +38,7 @@ public class Finance extends JPanel {
     private JPanel doFinancePanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setSize(new Dimension(500, 200));
         panel.add(addCurrentValue());
         panel.add(addActionComponents());
         return panel;

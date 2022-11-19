@@ -4,7 +4,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import json.CurrencyExchange;
 import json.CurrencyExchangeService;
-import json.Symbol;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -58,7 +57,7 @@ public class CurrencyExchangePresenter
 
     private void onSymbolsNext(CurrencyExchange object)
     {
-        Map<String, Symbol> symbols = object.getSymbols();
+        Map<String, CurrencyExchange.Symbol> symbols = object.getSymbols();
         viewProvider.get().setSymbolsChoices(symbols);
     }
 }
