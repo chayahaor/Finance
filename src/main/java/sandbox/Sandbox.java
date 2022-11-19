@@ -4,13 +4,11 @@ import dagger.DaggerCurrencyExchangeComponent;
 import helpers.*;
 
 import javax.swing.*;
-import javax.swing.text.NumberFormatter;
+import javax.swing.text.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Objects;
+import java.awt.event.*;
+import java.text.*;
+import java.util.*;
 
 import static main.Main.HOME_CURRENCY;
 
@@ -104,13 +102,12 @@ public class Sandbox extends JPanel
         add(buttonPanel);
     }
 
-    private JButton generateButton(String text, ActionListener listener, JPanel panel)
+    private void generateButton(String text, ActionListener listener, JPanel panel)
     {
         JButton button = new JButton();
         button.setText(text);
         button.addActionListener(listener);
         panel.add(button);
-        return button;
     }
 
     private void onClickMore(ActionEvent actionEvent)
