@@ -19,25 +19,7 @@ public class Sandbox extends JPanel
     private final JPanel whatIf;
     private DatePanel specifiedDate;
     private final JFormattedTextField defaultAmount;
-
     private final CurrencyComboBox currencyComboBox;
-    private static class DeleteButton extends JButton
-    {
-        private final WhatIfPanel panelToBeDeleted;
-
-        public DeleteButton(WhatIfPanel panelToBeDeleted)
-        {
-            this.panelToBeDeleted = panelToBeDeleted;
-            setText("DELETE ENTRY");
-            setForeground(Color.RED);
-        }
-
-        public WhatIfPanel getPanelToBeDeleted()
-        {
-            return panelToBeDeleted;
-        }
-    }
-
     public Sandbox()
     {
         setSize(900, 500);
@@ -155,7 +137,6 @@ public class Sandbox extends JPanel
         JOptionPane.showMessageDialog(this, selectedMonth + "/" + selectedDay + "/" + selectedYear);
     }
 
-
     private void onClickDelete(ActionEvent actionEvent)
     {
         DeleteButton button = (DeleteButton) actionEvent.getSource();
@@ -165,7 +146,7 @@ public class Sandbox extends JPanel
         if (option == JOptionPane.YES_OPTION)
         {
             whatIf.remove(button.getParent());
-            whatIfs.remove(button.getPanelToBeDeleted());
+            whatIfs.remove((WhatIfPanel) button.getComponentToBeDeleted());
             whatIf.revalidate();
             scrollPane.setViewportView(whatIf);
             scrollPane.revalidate();
