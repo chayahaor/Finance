@@ -34,9 +34,9 @@ public class Sandbox extends JPanel
 
         startingRow.add(new JLabel("Enter the starting value (in " + HOME_CURRENCY + ")"));
 
-        NumberFormatter defaultFormatter = new NumberFormatter(new DecimalFormat("#.##"));
-        int numColumns = 5;
-        defaultAmount = new JFormattedTextField(defaultFormatter);
+        NumberFormat moneyFormat = NumberFormat.getCurrencyInstance();
+        int numColumns = 7;
+        defaultAmount = new JFormattedTextField(moneyFormat);
         defaultAmount.setValue(10000.00);
         defaultAmount.setColumns(numColumns);
         startingRow.add(defaultAmount);
