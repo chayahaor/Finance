@@ -28,7 +28,9 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
     implementation 'org.jfree:jfreechart:1.5.3'
+    implementation 'mysql:mysql-connector-java:8.0.26'
 }
+
 test {
     useJUnitPlatform()
 }
