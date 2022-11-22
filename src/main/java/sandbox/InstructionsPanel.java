@@ -18,7 +18,7 @@ public class InstructionsPanel extends JPanel
 
         add(new JLabel("Maturity date", SwingConstants.RIGHT));
 
-        add(new JLabel("  FX Rate /USD", SwingConstants.RIGHT));
+        add(new JLabel("  FX Rate /" + HOME_CURRENCY, SwingConstants.RIGHT));
 
         add(new JLabel("Forward Rate", SwingConstants.RIGHT));
 
