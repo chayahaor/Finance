@@ -16,10 +16,10 @@ public class Main extends JFrame
     {
         setTitle("Finance Project");
         setSize(1000, 600);
+        setMinimumSize(new Dimension(1000, 600));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new FlowLayout());
         setResizable(true);
-
         setUpJTabbedPane();
     }
 
