@@ -1,0 +1,157 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.0
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Nov 23, 2022 at 01:35 AM
+-- Server version: 10.4.25-MariaDB
+-- PHP Version: 8.1.10
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `finance`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `action`
+--
+
+CREATE TABLE `action` (
+  `ID` int(11) NOT NULL,
+  `Action` varchar(15) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `action`
+--
+
+INSERT INTO `action` (`ID`, `Action`) VALUES
+(1, 'Buy'),
+(2, 'Sell'),
+(3, 'Close'),
+(4, 'Adjustment');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `maindata`
+--
+
+CREATE TABLE `maindata` (
+  `ID` int(11) NOT NULL,
+  `ActionDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `Action_Id` int(11) NOT NULL,
+  `StartCurrency` varchar(10) NOT NULL,
+  `EndCurrency` varchar(10) NOT NULL,
+  `MaturityDate` datetime NOT NULL,
+  `Amount` float NOT NULL,
+  `FXRate` float NOT NULL,
+  `HomeCurrencyTotal` float DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pnl`
+--
+
+CREATE TABLE `pnl` (
+  `ID` int(11) NOT NULL,
+  `Date` datetime NOT NULL,
+  `PNL` float NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `snapshot`
+--
+
+CREATE TABLE `snapshot` (
+  `ID` int(11) NOT NULL,
+  `Currency` varchar(10) NOT NULL,
+  `CurrentAmount` float NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `action`
+--
+ALTER TABLE `action`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indexes for table `maindata`
+--
+ALTER TABLE `maindata`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `FK_Action_Id` (`Action_Id`);
+
+--
+-- Indexes for table `pnl`
+--
+ALTER TABLE `pnl`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indexes for table `snapshot`
+--
+ALTER TABLE `snapshot`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `action`
+--
+ALTER TABLE `action`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `maindata`
+--
+ALTER TABLE `maindata`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `pnl`
+--
+ALTER TABLE `pnl`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `snapshot`
+--
+ALTER TABLE `snapshot`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `maindata`
+--
+ALTER TABLE `maindata`
+  ADD CONSTRAINT `FK_Action_Id` FOREIGN KEY (`Action_Id`) REFERENCES `action` (`ID`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
