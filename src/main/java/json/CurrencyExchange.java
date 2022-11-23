@@ -4,6 +4,33 @@ import java.util.Map;
 
 public class CurrencyExchange
 {
+    public class Info
+    {
+        double rate;
+    }
+
+    public class Symbol
+    {
+        String description;
+        String code;
+
+        public Symbol(String description, String code)
+        {
+            this.description = description;
+            this.code = code;
+        }
+
+        public String getDescription()
+        {
+            return description;
+        }
+
+        public String getCode()
+        {
+            return code;
+        }
+    }
+
     String date;
     double result;
     Info info;

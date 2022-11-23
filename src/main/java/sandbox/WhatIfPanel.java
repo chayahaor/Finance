@@ -1,5 +1,7 @@
 package sandbox;
 
+import helpers.DatePanel;
+
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
@@ -12,14 +14,15 @@ public class WhatIfPanel extends JPanel
 {
     private JFormattedTextField amount;
     private JComboBox<String> buyOrSell;
-
     private JComboBox<String> currencies;
+    private JFormattedTextField fxRate;
 
     public WhatIfPanel(JComboBox<String> currencyComboBox)
     {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         setMaximumSize(new Dimension(1000, 30));
         NumberFormatter defaultFormatter = new NumberFormatter(new DecimalFormat("#.##"));
+        NumberFormatter sixDecimalFormatter = new NumberFormatter(new DecimalFormat("#.######"));
         int numColumns = 5;
 
         amount = generateTextField(defaultFormatter, numColumns, 100.00, "amount");
@@ -37,7 +40,8 @@ public class WhatIfPanel extends JPanel
 
         add(new DatePanel());
 
-        add(generateTextField(defaultFormatter, numColumns, 3.5, "fxRate"));
+        fxRate = generateTextField(sixDecimalFormatter, numColumns, 1.0, "fxRate");
+        add(fxRate);
 
         add(generateTextField(defaultFormatter, numColumns,4.0, "forwardRate"));
 
@@ -72,7 +76,7 @@ public class WhatIfPanel extends JPanel
         if (!Objects.equals(currencies.getSelectedItem(), HOME_CURRENCY))
         {
             // TODO: if not home currency, convert to home currency
-            amount = 0;
+            amount = Double.parseDouble(fxRate.getText()) * amount;
         }
         return amount;
     }

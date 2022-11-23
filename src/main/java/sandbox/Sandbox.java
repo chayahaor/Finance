@@ -1,16 +1,14 @@
 package sandbox;
 
-import main.Main;
+import dagger.DaggerCurrencyExchangeComponent;
+import helpers.*;
 
 import javax.swing.*;
-import javax.swing.text.NumberFormatter;
+import javax.swing.text.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
+import java.awt.event.*;
+import java.text.*;
+import java.util.*;
 
 import static main.Main.HOME_CURRENCY;
 
@@ -21,38 +19,24 @@ public class Sandbox extends JPanel
     private final JPanel whatIf;
     private DatePanel specifiedDate;
     private final JFormattedTextField defaultAmount;
-    private JComboBox<String> currencyComboBox;
-
-    private static class DeleteButton extends JButton
-    {
-        private final WhatIfPanel panelToBeDeleted;
-
-        public DeleteButton(WhatIfPanel panelToBeDeleted)
-        {
-            this.panelToBeDeleted = panelToBeDeleted;
-            setText("DELETE ENTRY");
-            setForeground(Color.RED);
-        }
-
-        public WhatIfPanel getPanelToBeDeleted()
-        {
-            return panelToBeDeleted;
-        }
-    }
-
+    private final CurrencyComboBox currencyComboBox;
     public Sandbox()
     {
         setSize(900, 500);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+        currencyComboBox = DaggerCurrencyExchangeComponent
+                .create()
+                .getCurrencyExchange();
 
         JPanel startingRow = new JPanel();
         startingRow.setMaximumSize(new Dimension(850, 50));
 
         startingRow.add(new JLabel("Enter the starting value (in " + HOME_CURRENCY + ")"));
 
-        NumberFormatter defaultFormatter = new NumberFormatter(new DecimalFormat("#.##"));
-        int numColumns = 5;
-        defaultAmount = new JFormattedTextField(defaultFormatter);
+        NumberFormat moneyFormat = NumberFormat.getCurrencyInstance();
+        int numColumns = 7;
+        defaultAmount = new JFormattedTextField(moneyFormat);
         defaultAmount.setValue(10000.00);
         defaultAmount.setColumns(numColumns);
         startingRow.add(defaultAmount);
@@ -60,8 +44,6 @@ public class Sandbox extends JPanel
         add(startingRow);
 
         add(new InstructionsPanel());
-
-        currencyComboBox = new JComboBox<>();
 
         whatIf = new JPanel();
         whatIf.setLayout(new BoxLayout(whatIf, BoxLayout.Y_AXIS));
@@ -102,13 +84,12 @@ public class Sandbox extends JPanel
         add(buttonPanel);
     }
 
-    private JButton generateButton(String text, ActionListener listener, JPanel panel)
+    private void generateButton(String text, ActionListener listener, JPanel panel)
     {
         JButton button = new JButton();
         button.setText(text);
         button.addActionListener(listener);
         panel.add(button);
-        return button;
     }
 
     private void onClickMore(ActionEvent actionEvent)
@@ -156,7 +137,6 @@ public class Sandbox extends JPanel
         JOptionPane.showMessageDialog(this, selectedMonth + "/" + selectedDay + "/" + selectedYear);
     }
 
-
     private void onClickDelete(ActionEvent actionEvent)
     {
         DeleteButton button = (DeleteButton) actionEvent.getSource();
@@ -166,15 +146,10 @@ public class Sandbox extends JPanel
         if (option == JOptionPane.YES_OPTION)
         {
             whatIf.remove(button.getParent());
-            whatIfs.remove(button.getPanelToBeDeleted());
+            whatIfs.remove((WhatIfPanel) button.getComponentToBeDeleted());
             whatIf.revalidate();
             scrollPane.setViewportView(whatIf);
             scrollPane.revalidate();
         }
-    }
-
-    public void setCurrencyComboBox(JComboBox<String> currencyComboBox)
-    {
-        this.currencyComboBox = currencyComboBox;
     }
 }
