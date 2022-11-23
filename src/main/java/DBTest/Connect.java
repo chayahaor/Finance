@@ -6,10 +6,11 @@ public class Connect {
 
     public static void main(String[] args) {
         String dbName = "finance";
+        int portNumber = 3306;
         try
         {
             Connection connection = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/"+dbName, "root", "");
+                    "jdbc:mysql://localhost:" + portNumber + "/" + dbName, "root", "");
             Statement stmt = connection.createStatement();
             ResultSet resultSet = stmt.executeQuery("Select * from action");
             while (resultSet.next())
