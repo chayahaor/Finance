@@ -14,7 +14,7 @@ public class Connect {
             ResultSet resultSet = stmt.executeQuery("Select * from action");
             while (resultSet.next())
             {
-                System.out.println(resultSet.getString(2));
+                System.out.println(resultSet.getString(1) + " " + resultSet.getString(2));
             }
         }
         catch (Exception e)
