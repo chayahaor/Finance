@@ -28,6 +28,7 @@ public class Sandbox extends JPanel
         currencyComboBox = DaggerCurrencyExchangeComponent
                 .create()
                 .getCurrencyExchange();
+        currencyComboBox.addSymbols();
 
         JPanel startingRow = new JPanel();
         startingRow.setMaximumSize(new Dimension(850, 50));
