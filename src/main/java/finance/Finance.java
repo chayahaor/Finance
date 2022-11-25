@@ -68,13 +68,15 @@ public class Finance extends JPanel {
         toCurrency = DaggerCurrencyExchangeComponent
                 .create()
                 .getCurrencyExchange();
-        toCurrency.addSymbols();
         fromCurrency = DaggerCurrencyExchangeComponent
                 .create()
                 .getCurrencyExchange();
-        fromCurrency.addSymbols();
+
         panel.add(toCurrency);
         panel.add(fromCurrency);
+
+        toCurrency.addSymbols();
+        fromCurrency.addSymbols();
 
         amount = new JFormattedTextField();
         amount.setValue(500);
