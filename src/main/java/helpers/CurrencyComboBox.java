@@ -13,11 +13,12 @@ import static main.Main.HOME_CURRENCY;
 @Singleton
 public class CurrencyComboBox extends JComboBox<String>
 {
+    private CurrencyExchangePresenter presenter;
     @Inject
     public CurrencyComboBox(CurrencyExchangePresenter presenter)
     {
+        this.presenter = presenter;
         new CurrencyExchangeServiceFactory();
-        presenter.loadSymbolsChoices();
     }
 
     public void setSymbolsChoices(Map<String, CurrencyExchange.Symbol> symbols)
@@ -32,5 +33,10 @@ public class CurrencyComboBox extends JComboBox<String>
         }
         setSelectedItem(HOME_CURRENCY);
         setEditable(false);
+    }
+
+    public void addSymbols()
+    {
+        presenter.loadSymbolsChoices();
     }
 }

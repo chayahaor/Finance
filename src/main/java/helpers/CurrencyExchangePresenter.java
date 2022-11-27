@@ -10,6 +10,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.util.Map;
 
+// There are three instances of CurrencyComboBox created despite the @Singleton tag
 @Singleton
 public class CurrencyExchangePresenter
 {
@@ -55,9 +56,9 @@ public class CurrencyExchangePresenter
                 .subscribe(this::onSymbolsNext);
     }
 
-    private void onSymbolsNext(CurrencyExchange object)
+    private void onSymbolsNext(CurrencyExchange currencyExchange)
     {
-        Map<String, CurrencyExchange.Symbol> symbols = object.getSymbols();
+        Map<String, CurrencyExchange.Symbol> symbols = currencyExchange.getSymbols();
         viewProvider.get().setSymbolsChoices(symbols);
     }
 }
