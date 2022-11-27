@@ -10,6 +10,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.util.Map;
 
+// There are three instances of CurrencyComboBox created despite the @Singleton tag
 @Singleton
 public class CurrencyExchangePresenter
 {
