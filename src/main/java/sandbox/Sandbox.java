@@ -1,14 +1,16 @@
 package sandbox;
 
 import dagger.DaggerCurrencyExchangeComponent;
-import helpers.*;
+import helpers.CurrencyComboBox;
+import helpers.DatePanel;
 
 import javax.swing.*;
-import javax.swing.text.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.text.*;
-import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Objects;
 
 import static main.Main.HOME_CURRENCY;
 
@@ -20,6 +22,7 @@ public class Sandbox extends JPanel
     private DatePanel specifiedDate;
     private final JFormattedTextField defaultAmount;
     private final CurrencyComboBox currencyComboBox;
+
     public Sandbox()
     {
         setSize(900, 500);

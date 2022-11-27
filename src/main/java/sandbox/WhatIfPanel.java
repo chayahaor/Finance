@@ -12,10 +12,10 @@ import static main.Main.HOME_CURRENCY;
 
 public class WhatIfPanel extends JPanel
 {
-    private JFormattedTextField amount;
-    private JComboBox<String> buyOrSell;
-    private JComboBox<String> currencies;
-    private JFormattedTextField fxRate;
+    private final JFormattedTextField amount;
+    private final JComboBox<String> buyOrSell;
+    private final JComboBox<String> currencies;
+    private final JFormattedTextField fxRate;
 
     public WhatIfPanel(JComboBox<String> currencyComboBox)
     {
@@ -43,7 +43,7 @@ public class WhatIfPanel extends JPanel
         fxRate = generateTextField(sixDecimalFormatter, numColumns, 1.0, "fxRate");
         add(fxRate);
 
-        add(generateTextField(defaultFormatter, numColumns,4.0, "forwardRate"));
+        add(generateTextField(defaultFormatter, numColumns, 4.0, "forwardRate"));
 
         String[] options = {"Buy", "Sell"};
         buyOrSell = new JComboBox<>(options);
@@ -75,7 +75,7 @@ public class WhatIfPanel extends JPanel
     {
         if (!Objects.equals(currencies.getSelectedItem(), HOME_CURRENCY))
         {
-            // TODO: if not home currency, convert to home currency
+            // if not home currency, convert to home currency
             amount = Double.parseDouble(fxRate.getText()) * amount;
         }
         return amount;

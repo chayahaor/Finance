@@ -13,7 +13,7 @@ import static main.Main.HOME_CURRENCY;
 @Singleton
 public class CurrencyComboBox extends JComboBox<String>
 {
-    private CurrencyExchangePresenter presenter;
+    private final CurrencyExchangePresenter presenter;
     @Inject
     public CurrencyComboBox(CurrencyExchangePresenter presenter)
     {
@@ -27,10 +27,11 @@ public class CurrencyComboBox extends JComboBox<String>
 
         this.removeAllItems();
 
-        for (int i = 0; i < symbolsArray.length; i++)
+        for (String symbol : symbolsArray)
         {
-            addItem(symbolsArray[i]);
+            addItem(symbol);
         }
+
         setSelectedItem(HOME_CURRENCY);
         setEditable(false);
     }
