@@ -82,7 +82,7 @@ public class Sandbox extends JPanel
 
         generateButton("Show amount in " + HOME_CURRENCY + " today", this::onClickCurrent, calcRow);
 
-        generateButton("Show amount in " + HOME_CURRENCY + " at specified maturity date", this::onClickFuture, calcRow);
+        generateButton("Show amount in " + HOME_CURRENCY + " at specified date", this::onClickFuture, calcRow);
 
         specifiedDate = new DatePanel();
 
@@ -156,7 +156,7 @@ public class Sandbox extends JPanel
 
     private void onClickFuture(ActionEvent actionEvent)
     {
-        JOptionPane.showMessageDialog(this, specifiedDate, "Enter specified maturity date", JOptionPane.PLAIN_MESSAGE);
+        JOptionPane.showMessageDialog(this, specifiedDate, "Enter specified date", JOptionPane.PLAIN_MESSAGE);
 
         int selectedYear = specifiedDate.getYear();
         int selectedMonth = specifiedDate.getMonthNumber();
