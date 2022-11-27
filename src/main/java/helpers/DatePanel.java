@@ -16,9 +16,10 @@ public class DatePanel extends JPanel
      */
     private JComboBox<String> month;
     private JComboBox<String> year;
-
     private int lastDay;
     private JComboBox<String> day;
+    private final String[] monthNames = new String[]{"January", "February", "March", "April",
+            "May", "June", "July", "August", "September", "October", "November", "December"};
 
     public DatePanel()
     {
@@ -44,8 +45,7 @@ public class DatePanel extends JPanel
      */
     private void setUpMonth()
     {
-        month = new JComboBox<>(new String[]{"January", "February", "March", "April",
-                "May", "June", "July", "August", "September", "October", "November", "December"});
+        month = new JComboBox<>(monthNames);
         month.setEditable(false);
         DateFormat format = new SimpleDateFormat("MMMM");
         month.setSelectedItem(format.format(new Date())); // set selected month to current month
@@ -155,7 +155,7 @@ public class DatePanel extends JPanel
      *
      * @return month JComboBox
      */
-    public JComboBox<String> getMonth()
+    public JComboBox<String> getMonthComboBox()
     {
         return month;
     }
@@ -165,7 +165,7 @@ public class DatePanel extends JPanel
      *
      * @return year JComboBox
      */
-    public JComboBox<String> getYear()
+    public JComboBox<String> getYearComboBox()
     {
         return year;
     }
@@ -175,8 +175,38 @@ public class DatePanel extends JPanel
      *
      * @return month JComboBox
      */
-    public JComboBox<String> getDay()
+    public JComboBox<String> getDayComboBox()
     {
         return day;
+    }
+
+    public int getYear()
+    {
+        return Integer.parseInt(Objects.requireNonNull(getYearComboBox().getSelectedItem()).toString());
+    }
+
+    public String getMonthName()
+    {
+        return Objects.requireNonNull(getMonthComboBox().getSelectedItem()).toString();
+    }
+
+    public int getMonthNumber()
+    {
+        int monthNumber = 0;
+        String monthName = getMonthName();
+        for (int i = 0; i < monthNames.length; i++)
+        {
+            if (monthNames[i].equals(monthName))
+            {
+                monthNumber = i;
+                break;
+            }
+        }
+        return monthNumber;
+    }
+
+    public int getDay()
+    {
+        return Integer.parseInt(Objects.requireNonNull(getDayComboBox().getSelectedItem()).toString());
     }
 }

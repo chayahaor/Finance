@@ -10,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Objects;
 
 import static main.Main.HOME_CURRENCY;
@@ -134,11 +136,16 @@ public class Sandbox extends JPanel
     {
         JOptionPane.showMessageDialog(this, specifiedDate, "Enter specified maturity date", JOptionPane.PLAIN_MESSAGE);
 
-        int selectedYear = Integer.parseInt(Objects.requireNonNull(specifiedDate.getYear().getSelectedItem()).toString());
-        int selectedDay = Integer.parseInt(Objects.requireNonNull(specifiedDate.getDay().getSelectedItem()).toString());
-        String selectedMonth = Objects.requireNonNull(specifiedDate.getMonth().getSelectedItem()).toString();
+        int selectedYear = specifiedDate.getYear();
+        int selectedMonth = specifiedDate.getMonthNumber();
+        int selectedDay = specifiedDate.getDay();
+        Date specified = new GregorianCalendar(selectedYear, selectedMonth, selectedDay).getTime();
 
-        JOptionPane.showMessageDialog(this, selectedMonth + "/" + selectedDay + "/" + selectedYear);
+        for (WhatIfPanel possibility : whatIfs)
+        {
+            System.out.println(possibility.getForwardAmount(specified));
+        }
+        JOptionPane.showMessageDialog(this, (selectedMonth + 1) + "/" + selectedDay + "/" + selectedYear);
     }
 
     private void onClickDelete(ActionEvent actionEvent)
