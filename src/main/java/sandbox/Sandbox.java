@@ -12,7 +12,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import static main.Main.HOME_CURRENCY;
 
@@ -124,10 +124,24 @@ public class Sandbox extends JPanel
 
     private void onClickCurrent(ActionEvent actionEvent)
     {
+        Date today = new Date();
+        int yesterdayCount = 0;
         double sum = 0.0;
         for (WhatIfPanel possibility : whatIfs)
         {
-            sum += possibility.getAmount();
+            long diff = getDateDiffDiff(today, possibility);
+            if (diff >= 0)
+            {
+                sum += possibility.getAmount();
+            } else
+            {
+                yesterdayCount++;
+            }
+        }
+        if (yesterdayCount > 0)
+        {
+            JOptionPane.showMessageDialog(this,
+                    "At least one maturity date happened already -- its value was ignored");
         }
         JOptionPane.showMessageDialog(this, sum);
     }
@@ -139,13 +153,40 @@ public class Sandbox extends JPanel
         int selectedYear = specifiedDate.getYear();
         int selectedMonth = specifiedDate.getMonthNumber();
         int selectedDay = specifiedDate.getDay();
+        JOptionPane.showMessageDialog(this, (selectedMonth + 1) + "/" + selectedDay + "/" + selectedYear);
+
+        Date today = new Date();
         Date specified = new GregorianCalendar(selectedYear, selectedMonth, selectedDay).getTime();
 
+        int yesterdayCount = 0;
+        double sum = 0.0;
         for (WhatIfPanel possibility : whatIfs)
         {
-            System.out.println(possibility.getForwardAmount(specified));
+            long diff = getDateDiffDiff(today, possibility);
+            if (diff >= 0)
+            {
+                sum += possibility.getForwardAmount(specified);
+            } else
+            {
+                yesterdayCount++;
+            }
         }
-        JOptionPane.showMessageDialog(this, (selectedMonth + 1) + "/" + selectedDay + "/" + selectedYear);
+
+        if (yesterdayCount > 0)
+        {
+            JOptionPane.showMessageDialog(this,
+                    "At least one maturity date happened already -- its value was ignored");
+        }
+        JOptionPane.showMessageDialog(this, sum);
+    }
+
+    private static long getDateDiffDiff(Date today, WhatIfPanel possibility)
+    {
+        DatePanel maturityDate = possibility.getMaturityDate();
+        Date maturity = new GregorianCalendar(maturityDate.getYear(),
+                maturityDate.getMonthNumber(), maturityDate.getDay()).getTime();
+        long diffInMs = maturity.getTime() - today.getTime();
+        return TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
     }
 
     private void onClickDelete(ActionEvent actionEvent)

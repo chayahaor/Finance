@@ -20,6 +20,8 @@ public class WhatIfPanel extends JPanel
     private final JComboBox<String> currencies;
     private final DatePanel maturityDate;
     private final JFormattedTextField fxRate;
+    private final JFormattedTextField forwardRate;
+
 
     public WhatIfPanel(JComboBox<String> currencyComboBox)
     {
@@ -43,18 +45,25 @@ public class WhatIfPanel extends JPanel
         add(currencies);
 
         maturityDate = new DatePanel();
+
         add(maturityDate);
 
         fxRate = generateTextField(sixDecimalFormatter, numColumns, 1.0, "fxRate");
         add(fxRate);
 
-        add(generateTextField(twoDecimalFormatter, numColumns, 4.0, "forwardRate"));
+        forwardRate = generateTextField(twoDecimalFormatter, numColumns, 4.0, "forwardRate");
+        add(forwardRate);
 
         String[] options = {"Buy", "Sell"};
         buyOrSell = new JComboBox<>(options);
         buyOrSell.setEditable(false);
         add(buyOrSell);
 
+    }
+
+    public DatePanel getMaturityDate()
+    {
+        return this.maturityDate;
     }
 
     public JFormattedTextField generateTextField(NumberFormatter formatter, int numColumns, double value, String name)
@@ -91,11 +100,11 @@ public class WhatIfPanel extends JPanel
 
         Date maturity = new GregorianCalendar(selectedYear, selectedMonth, selectedDay).getTime();
         long diffInMs = maturity.getTime() - specifiedDate.getTime();
-        if (diffInMs > 0)
-        {
-            long diff = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
-            System.out.println(diff);
-        }
-        return 0.0;
+        long diff = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
+
+        double val = getInHomeCurrency(Math.abs(Double.parseDouble(amount.getText())));
+        val = (Objects.equals(buyOrSell.getSelectedItem(), "Buy") ? val : -val);
+
+        return val * (1 + diff/365) * Double.parseDouble(forwardRate.getText());
     }
 }
