@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -22,6 +23,7 @@ public class Sandbox extends JPanel
     private final JScrollPane scrollPane;
     private final JPanel whatIf;
     private DatePanel specifiedDate;
+    private NumberFormat moneyFormat;
     private final JFormattedTextField defaultAmount;
     private final CurrencyComboBox currencyComboBox;
 
@@ -40,7 +42,7 @@ public class Sandbox extends JPanel
 
         startingRow.add(new JLabel("Enter the starting value (in " + HOME_CURRENCY + ")"));
 
-        NumberFormat moneyFormat = NumberFormat.getCurrencyInstance();
+        moneyFormat = NumberFormat.getCurrencyInstance();
         int numColumns = 7;
         defaultAmount = new JFormattedTextField(moneyFormat);
         defaultAmount.setValue(10000.00);
@@ -127,6 +129,12 @@ public class Sandbox extends JPanel
         Date today = new Date();
         int yesterdayCount = 0;
         double sum = 0.0;
+        try
+        {
+            sum = Double.parseDouble(moneyFormat.parse(defaultAmount.getText()).toString());
+        } catch (Exception ignored)
+        {
+        }
         for (WhatIfPanel possibility : whatIfs)
         {
             long diff = getDateDiffDiff(today, possibility);
@@ -160,6 +168,12 @@ public class Sandbox extends JPanel
 
         int yesterdayCount = 0;
         double sum = 0.0;
+        try
+        {
+            sum = Double.parseDouble(moneyFormat.parse(defaultAmount.getText()).toString());
+        } catch (Exception ignored)
+        {
+        }
         for (WhatIfPanel possibility : whatIfs)
         {
             long diff = getDateDiffDiff(today, possibility);

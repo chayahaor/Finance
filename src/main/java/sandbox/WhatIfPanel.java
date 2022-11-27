@@ -105,6 +105,9 @@ public class WhatIfPanel extends JPanel
         double val = getInHomeCurrency(Math.abs(Double.parseDouble(amount.getText())));
         val = (Objects.equals(buyOrSell.getSelectedItem(), "Buy") ? val : -val);
 
-        return val * (1 + diff/365) * Double.parseDouble(forwardRate.getText());
+        System.out.println(diff/365.0);
+        double amount =  val * ((1 + (diff/365.0)) * Double.parseDouble(forwardRate.getText()));
+        System.out.println(amount);
+        return amount;
     }
 }
