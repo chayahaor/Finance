@@ -1,0 +1,18 @@
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spInitial`(IN `InitialAmount` INT(11), IN `HomeCurrency` VARCHAR(10), IN `InitialDate` DATETIME)
+    DETERMINISTIC
+BEGIN
+insert into `maindata` (ActionDate, Action_Id, StartCurrency, EndCurrency,
+                        MaturityDate, Amount, FXRate, HomeCurrencyTotal)
+                        values (InitialDate, 5, HomeCurrency, HomeCurrency,
+                                InitialDate, InitialAmount, 1, InitialAmount);
+insert into `snapshot` (Currency, CurrentAmount) values (HomeCurrency, InitialAmount);
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spGetCurrentAmount`(IN `HomeCurrency` VARCHAR(10))
+BEGIN
+select CurrentAmount from `snapshot` where currency = HomeCurrency;
+END$$
+DELIMITER ;
