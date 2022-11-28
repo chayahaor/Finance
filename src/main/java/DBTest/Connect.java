@@ -17,6 +17,10 @@ public class Connect {
             {
                 System.out.println(resultSet.getString(1) + " " + resultSet.getString(2));
             }
+
+            // NOTE:
+            // Strings MUST be enclosed in ''
+            // DateTime MUST be in this format 'YYYY-MM-DD hh:mm:ss'
         }
         catch (Exception e)
         {

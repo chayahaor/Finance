@@ -8,9 +8,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.NumberFormat;
 
 import static main.Main.HOME_CURRENCY;
+
 
 public class Finance extends JPanel {
     private double currentValue;
@@ -25,17 +29,30 @@ public class Finance extends JPanel {
     private CurrencyComboBox toCurrency;
 
     public Finance(Connection connection) {
-        this.currentValue = pullCurrentValue();
         this.connection = connection;
+        this.currentValue = pullCurrentValue();
         setSize(900, 500);
         setLayout(new BorderLayout());
         add(doFinancePanel(), BorderLayout.NORTH);
         add(addGraph());
     }
 
-    private double pullCurrentValue() {
-        //TODO: replace with DB call
-        return 10000;
+    private double pullCurrentValue()
+    {
+        double retVal = 10000;
+        try
+        {
+            Statement stmt = connection.createStatement();
+            ResultSet resultSet = stmt.executeQuery("Call spGetCurrentAmount ('" + HOME_CURRENCY + "');");
+            if (resultSet.next())
+            {
+                retVal = Double.parseDouble(resultSet.getString(1));
+            }
+        } catch (SQLException exception)
+        {
+            System.out.println("reached here" + exception.getMessage());
+        }
+        return retVal;
     }
 
     private JPanel doFinancePanel() {
