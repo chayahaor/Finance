@@ -72,6 +72,12 @@ public class DatePanel extends JPanel
         year.setSelectedItem(format.format(new Date())); // set selected year to current year
     }
 
+    /**
+     * Every time a month or year is changed, the number of days also changes
+     * Updates number of days and adds them again to the DatePanel
+     *
+     * @param actionEvent - the action of changing selected month or year
+     */
     private void onChange(ActionEvent actionEvent)
     {
         if (day != null)
@@ -84,6 +90,9 @@ public class DatePanel extends JPanel
         add(year);
     }
 
+    /**
+     * Set up days for the JComboBox
+     */
     private void setUpDay()
     {
         int dayOfMonth;
