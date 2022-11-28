@@ -96,8 +96,8 @@ public class WhatIfPanel extends JPanel
         // if diff is positive, specified date is earlier than maturity date -- linear accretion
         // note that neither date can be before buying/selling date -- bad data is rejected before reaching this point
         double amount = (diff < 0)
-                ? val * (1 + rfr)
-                : val * (1 + ((((double) diff) / 365) * rfr));
+                ? val * (1 + (maturityDate.dateDiffFromToday() / 365.0) * rfr)
+                : val * (1 + (diff / 365.0) * rfr);
 
         System.out.println(amount);
         return amount;
