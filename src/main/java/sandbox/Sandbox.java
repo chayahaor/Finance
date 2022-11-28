@@ -115,6 +115,15 @@ public class Sandbox extends JPanel
         panel.add(button);
     }
 
+    private void onClickReset(ActionEvent actionEvent)
+    {
+        defaultAmount.setValue(10000.00);
+        whatIfs.clear();
+        whatIf.removeAll();
+        scrollPane.setViewportView(whatIf);
+        this.revalidate();
+    }
+
     private void onClickMore(ActionEvent actionEvent)
     {
         JPanel row = new JPanel(new BorderLayout());
@@ -128,82 +137,6 @@ public class Sandbox extends JPanel
         whatIfs.add(whatIfPanel);
         whatIf.add(row);
         this.revalidate();
-    }
-
-    private void onClickReset(ActionEvent actionEvent)
-    {
-        defaultAmount.setValue(10000.00);
-        whatIfs.clear();
-        whatIf.removeAll();
-        scrollPane.setViewportView(whatIf);
-        this.revalidate();
-    }
-
-    private void onClickCurrent(ActionEvent actionEvent)
-    {
-        int yesterdayCount = 0;
-        double sum = 0.0;
-        try
-        {
-            sum = Double.parseDouble(moneyFormat.parse(defaultAmount.getText()).toString());
-        } catch (Exception ignored)
-        {
-        }
-        for (WhatIfPanel possibility : whatIfs)
-        {
-            DatePanel maturityDate = possibility.getMaturityDate();
-            long diff = maturityDate.dateDiffFromToday();
-            if (diff >= 0)
-            {
-                sum += possibility.getAmount();
-            } else
-            {
-                yesterdayCount++;
-            }
-        }
-        if (yesterdayCount > 0)
-        {
-            JOptionPane.showMessageDialog(this,
-                    "At least one maturity date happened already -- its value was ignored");
-        }
-        JOptionPane.showMessageDialog(this, sum);
-    }
-
-    private void onClickFuture(ActionEvent actionEvent)
-    {
-        JOptionPane.showMessageDialog(this, specifiedDate, "Enter specified date", JOptionPane.PLAIN_MESSAGE);
-
-        JOptionPane.showMessageDialog(this, specifiedDate.toString());
-
-        Date specified = specifiedDate.getDate();
-
-        int yesterdayCount = 0;
-        double sum = 0.0;
-        try
-        {
-            sum = Double.parseDouble(moneyFormat.parse(defaultAmount.getText()).toString());
-        } catch (Exception ignored)
-        {
-        }
-        for (WhatIfPanel possibility : whatIfs)
-        {
-            DatePanel maturityDate = possibility.getMaturityDate();
-            long diff = maturityDate.dateDiffFromToday();
-            if (diff >= 0)
-            {
-                sum += possibility.getForwardAmount(specified);
-            } else
-            {
-                yesterdayCount++;
-            }
-        }
-
-        if (yesterdayCount > 0)
-        {
-            JOptionPane.showMessageDialog(this,
-                    "At least one maturity date happened already -- its value was ignored");
-        }
-        JOptionPane.showMessageDialog(this, sum);
     }
 
     private void onClickDelete(ActionEvent actionEvent)
@@ -221,4 +154,71 @@ public class Sandbox extends JPanel
             scrollPane.revalidate();
         }
     }
+
+    private void onClickCurrent(ActionEvent actionEvent)
+    {
+        int yesterdayCount = 0;
+        double sum = 0.0;
+        sum = getSum(sum);
+        for (WhatIfPanel possibility : whatIfs)
+        {
+            DatePanel maturityDate = possibility.getMaturityDate();
+            long diff = maturityDate.dateDiffFromToday();
+            if (diff >= 0)
+            {
+                sum += possibility.getAmount();
+            } else
+            {
+                yesterdayCount++;
+            }
+        }
+        displayResults(yesterdayCount, sum);
+    }
+
+    private void onClickFuture(ActionEvent actionEvent)
+    {
+        JOptionPane.showMessageDialog(this, specifiedDate, "Enter specified date", JOptionPane.PLAIN_MESSAGE);
+
+        JOptionPane.showMessageDialog(this, specifiedDate.toString());
+
+        Date specified = specifiedDate.getDate();
+
+        int yesterdayCount = 0;
+        double sum = 0.0;
+        sum = getSum(sum);
+        for (WhatIfPanel possibility : whatIfs)
+        {
+            DatePanel maturityDate = possibility.getMaturityDate();
+            long diff = maturityDate.dateDiffFromToday();
+            if (diff >= 0)
+            {
+                sum += possibility.getForwardAmount(specified);
+            } else
+            {
+                yesterdayCount++;
+            }
+        }
+
+        displayResults(yesterdayCount, sum);
+    }
+
+    private double getSum(double sum)
+    {
+        try
+        {
+            sum = Double.parseDouble(moneyFormat.parse(defaultAmount.getText()).toString());
+        } catch (Exception ignored) {}
+        return sum;
+    }
+
+    private void displayResults(int yesterdayCount, double sum)
+    {
+        if (yesterdayCount > 0)
+        {
+            JOptionPane.showMessageDialog(this,
+                    "At least one maturity date happened already -- its value was ignored");
+        }
+        JOptionPane.showMessageDialog(this, sum);
+    }
+
 }
