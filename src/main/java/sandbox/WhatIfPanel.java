@@ -98,9 +98,9 @@ public class WhatIfPanel extends JPanel
 
         double fwRate = Double.parseDouble(forwardRate.getText());
         // if diff is negative, specified date is later than maturity date -- you already have full amount
-        // if diff is zero, specified date equals maturity date -- you have the full amount today
+        // if diff is zero, specified date equals maturity date -- you have the full amount at specified date
         // if diff is positive, specified date is earlier than maturity date -- linear accretion
-        // note that neither date can be before buying/selling date -- that is rejected before reaching this point
+        // note that neither date can be before buying/selling date -- bad data is rejected before reaching this point
         double amount = (diff <= 0) ? val * fwRate : val * (1 + (diff/maturityDate.dateDiffFromToday())) * fwRate;
         //double amount =  val * ((1 + (diff/365)) * Double.parseDouble(forwardRate.getText()));
         System.out.println(amount);

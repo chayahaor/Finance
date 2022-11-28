@@ -185,16 +185,31 @@ public class DatePanel extends JPanel
         return day;
     }
 
+    /**
+     * Getter for year value
+     *
+     * @return the year
+     */
     public int getYear()
     {
         return Integer.parseInt(Objects.requireNonNull(getYearComboBox().getSelectedItem()).toString());
     }
 
+    /**
+     * Getter for selected month name
+     *
+     * @return month name
+     */
     public String getMonthName()
     {
         return Objects.requireNonNull(getMonthComboBox().getSelectedItem()).toString();
     }
 
+    /**
+     * Getter for month number (0 = January, 11 = December)
+     *
+     * @return month number
+     */
     public int getMonthNumber()
     {
         int monthNumber = 0;
@@ -210,16 +225,31 @@ public class DatePanel extends JPanel
         return monthNumber;
     }
 
+    /**
+     * Getter for day of month
+     *
+     * @return day of month
+     */
     public int getDay()
     {
         return Integer.parseInt(Objects.requireNonNull(getDayComboBox().getSelectedItem()).toString());
     }
 
+    /**
+     * Generate Date object from the year, month, and day
+     *
+     * @return generated Date object
+     */
     public Date getDate()
     {
         return new GregorianCalendar(getYear(), getMonthNumber(), getDay()).getTime();
     }
 
+    /**
+     * Get the number of days between today and Date in DatePanel
+     *
+     * @return number of days
+     */
     public long dateDiffFromToday()
     {
         Date today = new Date();
@@ -228,6 +258,12 @@ public class DatePanel extends JPanel
         return TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * Get the number of days between specified Date object and Date in DatePanel
+     *
+     * @param specifiedDate - the specified Date
+     * @return number of days
+     */
     public long dateDiffFromSpecifiedDate(Date specifiedDate)
     {
         Date thisDate = getDate();
@@ -235,6 +271,11 @@ public class DatePanel extends JPanel
         return TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * toString() method - returns the Date in MM-dd-yyyy format
+     *
+     * @return MM-dd-yyyy format of the Date in the DatePanel
+     */
     @Override
     public String toString()
     {
