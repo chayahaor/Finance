@@ -7,21 +7,17 @@ import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 import static main.Main.HOME_CURRENCY;
 
 public class WhatIfPanel extends JPanel
 {
-    private final JFormattedTextField amount;
+    private final JFormattedTextField quantity;
     private final JComboBox<String> buyOrSell;
     private final JComboBox<String> currencies;
     private final DatePanel maturityDate;
     private final JFormattedTextField fxRate;
-    private final JFormattedTextField forwardRate;
-
 
     public WhatIfPanel(JComboBox<String> currencyComboBox)
     {
@@ -31,8 +27,8 @@ public class WhatIfPanel extends JPanel
         NumberFormatter sixDecimalFormatter = new NumberFormatter(new DecimalFormat("#.######"));
         int numColumns = 5;
 
-        amount = generateTextField(twoDecimalFormatter, numColumns, 100.00, "amount");
-        add(amount);
+        quantity = generateTextField(twoDecimalFormatter, numColumns, 100.00, "amount");
+        add(quantity);
 
         currencies = new JComboBox<>();
         for (int i = 0; i < currencyComboBox.getItemCount(); i++)
@@ -50,9 +46,6 @@ public class WhatIfPanel extends JPanel
 
         fxRate = generateTextField(sixDecimalFormatter, numColumns, 1.0, "fxRate");
         add(fxRate);
-
-        forwardRate = generateTextField(twoDecimalFormatter, numColumns, 4.0, "forwardRate");
-        add(forwardRate);
 
         String[] options = {"Buy", "Sell"};
         buyOrSell = new JComboBox<>(options);
@@ -74,42 +67,40 @@ public class WhatIfPanel extends JPanel
         return textField;
     }
 
-    public double getAmount()
+    public double getQuantity()
     {
-        double val = getInHomeCurrency(Math.abs(Double.parseDouble(amount.getText())));
+        double val = getInHomeCurrency(Math.abs(Double.parseDouble(quantity.getText())));
         val = (Objects.equals(buyOrSell.getSelectedItem(), "Buy") ? val : -val);
         return val;
     }
 
-    private double getInHomeCurrency(double amount)
+    private double getInHomeCurrency(double quantity)
     {
         if (!Objects.equals(currencies.getSelectedItem(), HOME_CURRENCY))
         {
             // if not home currency, convert to home currency
-            amount = Double.parseDouble(fxRate.getText()) * amount;
+            quantity = quantity / Double.parseDouble(fxRate.getText());
         }
-        return amount;
+        return quantity;
     }
 
-    public double getForwardAmount(Date specifiedDate)
+    public double getForwardAmount(double rfr, Date specifiedDate)
     {
         // maturity date - specified date
         long diff = maturityDate.dateDiffFromSpecifiedDate(specifiedDate);
 
-        double val = getAmount();
-
-        // TODO: forward rate is a percent -- should I divide by 100?
-        double fwRate = Double.parseDouble(forwardRate.getText());
+        double val = getQuantity();
 
         // if diff is negative, specified date is later than maturity date -- you already have full amount
         // if diff is zero, specified date equals maturity date -- you have the full amount at specified date
         // if diff is positive, specified date is earlier than maturity date -- linear accretion
         // note that neither date can be before buying/selling date -- bad data is rejected before reaching this point
-        double amount = (diff <= 0)
-                ? val * fwRate
-                : val * (1 + (((double) diff) / maturityDate.dateDiffFromToday()) * fwRate);
-        //double amount =  val * ((1 + (diff/365)) * Double.parseDouble(forwardRate.getText()));
+        double amount = val * (1 + (((double) diff) / 365) * rfr);
+
         System.out.println(amount);
         return amount;
+
+        // show NPV in USD
+        // Spot Price FX/USD
     }
 }

@@ -11,7 +11,6 @@ import java.text.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import static main.Main.HOME_CURRENCY;
 
@@ -23,6 +22,8 @@ public class Sandbox extends JPanel
     private DatePanel specifiedDate;
     private NumberFormat moneyFormat;
     private JFormattedTextField defaultAmount;
+
+    private JFormattedTextField rfr;
     private final CurrencyComboBox currencyComboBox;
 
     public Sandbox()
@@ -36,6 +37,8 @@ public class Sandbox extends JPanel
         currencyComboBox.addSymbols();
 
         addStartingRow();
+
+        addSecondaryStartingRow();
 
         addMiddleRow();
 
@@ -61,7 +64,7 @@ public class Sandbox extends JPanel
 
         startingRow.add(new JLabel("Enter the starting value (in " + HOME_CURRENCY + ")     $"));
 
-        moneyFormat = new DecimalFormat("#,###.00");
+        moneyFormat = new DecimalFormat("#,##0.00");
         int numColumns = 7;
         defaultAmount = new JFormattedTextField(moneyFormat);
         defaultAmount.setValue(10000.00);
@@ -69,6 +72,21 @@ public class Sandbox extends JPanel
         startingRow.add(defaultAmount);
 
         add(startingRow);
+    }
+
+    private void addSecondaryStartingRow()
+    {
+        JPanel panel = new JPanel();
+        panel.setMaximumSize(new Dimension(850, 50));
+        panel.add(new JLabel("Enter the " + HOME_CURRENCY + " risk free rate as a percentage"));
+
+        DecimalFormat formatter = new DecimalFormat("#.##");
+        rfr = new JFormattedTextField(formatter);
+        rfr.setColumns(7);
+        rfr.setValue(4);
+        panel.add(rfr);
+
+        add(panel);
     }
 
     private void addMiddleRow()
@@ -95,9 +113,9 @@ public class Sandbox extends JPanel
 
         JPanel calcRow = new JPanel();
 
-        generateButton("Show amount in " + HOME_CURRENCY + " today", this::onClickCurrent, calcRow);
+        generateButton("Show NPV in " + HOME_CURRENCY + " today", this::onClickCurrent, calcRow);
 
-        generateButton("Show amount in " + HOME_CURRENCY + " at specified date", this::onClickFuture, calcRow);
+        generateButton("Show NPV in " + HOME_CURRENCY + " at specified date", this::onClickFuture, calcRow);
 
         specifiedDate = new DatePanel();
 
@@ -166,7 +184,7 @@ public class Sandbox extends JPanel
             long diff = maturityDate.dateDiffFromToday();
             if (diff >= 0)
             {
-                sum += possibility.getAmount();
+                sum += possibility.getQuantity();
             } else
             {
                 yesterdayCount++;
@@ -197,7 +215,9 @@ public class Sandbox extends JPanel
             long diff = maturityDate.dateDiffFromToday();
             if (diff >= 0)
             {
-                sum += possibility.getForwardAmount(specified);
+                // it is a percentage -- so divide by 100
+                double riskFreeRate = Double.parseDouble(rfr.getText()) / 100;
+                sum += possibility.getForwardAmount(riskFreeRate, specified);
             } else
             {
                 yesterdayCount++;
