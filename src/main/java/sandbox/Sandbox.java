@@ -6,13 +6,9 @@ import helpers.DatePanel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.awt.event.*;
+import java.text.*;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static main.Main.HOME_CURRENCY;
@@ -40,9 +36,9 @@ public class Sandbox extends JPanel
         JPanel startingRow = new JPanel();
         startingRow.setMaximumSize(new Dimension(850, 50));
 
-        startingRow.add(new JLabel("Enter the starting value (in " + HOME_CURRENCY + ")"));
+        startingRow.add(new JLabel("Enter the starting value (in " + HOME_CURRENCY + ")     $"));
 
-        moneyFormat = NumberFormat.getCurrencyInstance();
+        moneyFormat = new DecimalFormat("#,###.00");
         int numColumns = 7;
         defaultAmount = new JFormattedTextField(moneyFormat);
         defaultAmount.setValue(10000.00);
