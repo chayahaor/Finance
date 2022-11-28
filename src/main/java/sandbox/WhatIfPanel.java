@@ -92,11 +92,14 @@ public class WhatIfPanel extends JPanel
     }
     public double getForwardAmount(Date specifiedDate)
     {
+        // maturity date - specified date
         long diff = maturityDate.dateDiffFromSpecifiedDate(specifiedDate);
 
         double val = getAmount();
 
+        // TODO: forward rate is a percent -- should I divide by 100?
         double fwRate = Double.parseDouble(forwardRate.getText());
+
         // if diff is negative, specified date is later than maturity date -- you already have full amount
         // if diff is zero, specified date equals maturity date -- you have the full amount at specified date
         // if diff is positive, specified date is earlier than maturity date -- linear accretion
