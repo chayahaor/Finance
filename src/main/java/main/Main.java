@@ -45,7 +45,7 @@ public class Main extends JFrame
         String dbName = "finance";
         int portNumber = 3306;
         Connection connection = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:" + portNumber + "/" + dbName, "root", "");
+                "jdbc:mysql://localhost:" + portNumber + "/" + dbName, "root", "");
 
         Statement stmt = connection.createStatement();
         ResultSet resultSet = stmt.executeQuery("Select * from Snapshot");
@@ -107,7 +107,5 @@ public class Main extends JFrame
         // instantiate the Main frame
         Main frame = new Main();
         frame.setVisible(true);
-
-
     }
 }

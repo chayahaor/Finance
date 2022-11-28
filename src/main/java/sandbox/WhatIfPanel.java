@@ -17,17 +17,18 @@ public class WhatIfPanel extends JPanel
     private final JComboBox<String> buyOrSell;
     private final JComboBox<String> currencies;
     private final DatePanel maturityDate;
-    private final JFormattedTextField fxRate;
+    private final JFormattedTextField spotPrice;
 
     public WhatIfPanel(JComboBox<String> currencyComboBox)
     {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         setMaximumSize(new Dimension(1000, 30));
+
         NumberFormatter twoDecimalFormatter = new NumberFormatter(new DecimalFormat("#.##"));
         NumberFormatter sixDecimalFormatter = new NumberFormatter(new DecimalFormat("#.######"));
         int numColumns = 5;
 
-        quantity = generateTextField(twoDecimalFormatter, numColumns, 100.00, "amount");
+        quantity = generateTextField(twoDecimalFormatter, numColumns, 100.00);
         add(quantity);
 
         currencies = new JComboBox<>();
@@ -41,14 +42,12 @@ public class WhatIfPanel extends JPanel
         add(currencies);
 
         maturityDate = new DatePanel();
-
         add(maturityDate);
 
-        fxRate = generateTextField(sixDecimalFormatter, numColumns, 1.0, "fxRate");
-        add(fxRate);
+        spotPrice = generateTextField(sixDecimalFormatter, numColumns, 1.0);
+        add(spotPrice);
 
-        String[] options = {"Buy", "Sell"};
-        buyOrSell = new JComboBox<>(options);
+        buyOrSell = new JComboBox<>(new String[]{"Buy", "Sell"});
         buyOrSell.setEditable(false);
         add(buyOrSell);
     }
@@ -58,12 +57,11 @@ public class WhatIfPanel extends JPanel
         return this.maturityDate;
     }
 
-    public JFormattedTextField generateTextField(NumberFormatter formatter, int numColumns, double value, String name)
+    public JFormattedTextField generateTextField(NumberFormatter formatter, int numColumns, double value)
     {
         JFormattedTextField textField = new JFormattedTextField(formatter);
         textField.setColumns(numColumns);
         textField.setValue(value);
-        textField.setName(name);
         return textField;
     }
 
@@ -79,7 +77,7 @@ public class WhatIfPanel extends JPanel
         if (!Objects.equals(currencies.getSelectedItem(), HOME_CURRENCY))
         {
             // if not home currency, convert to home currency
-            quantity = quantity / Double.parseDouble(fxRate.getText());
+            quantity = quantity / Double.parseDouble(spotPrice.getText());
         }
         return quantity;
     }
