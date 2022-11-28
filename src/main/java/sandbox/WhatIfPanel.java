@@ -95,12 +95,11 @@ public class WhatIfPanel extends JPanel
         // if diff is zero, specified date equals maturity date -- you have the full amount at specified date
         // if diff is positive, specified date is earlier than maturity date -- linear accretion
         // note that neither date can be before buying/selling date -- bad data is rejected before reaching this point
-        double amount = val * (1 + (((double) diff) / 365) * rfr);
+        double amount = (diff < 0)
+                ? val * (1 + rfr)
+                : val * (1 + ((((double) diff) / 365) * rfr));
 
         System.out.println(amount);
         return amount;
-
-        // show NPV in USD
-        // Spot Price FX/USD
     }
 }
