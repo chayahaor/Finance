@@ -8,6 +8,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -20,7 +22,7 @@ public class Sandbox extends JPanel
     private final JPanel whatIf;
     private DatePanel specifiedDate;
     private NumberFormat moneyFormat;
-    private final JFormattedTextField defaultAmount;
+    private JFormattedTextField defaultAmount;
     private final CurrencyComboBox currencyComboBox;
 
     public Sandbox()
@@ -33,19 +35,9 @@ public class Sandbox extends JPanel
                 .getCurrencyExchange();
         currencyComboBox.addSymbols();
 
-        JPanel startingRow = new JPanel();
-        startingRow.setMaximumSize(new Dimension(850, 50));
+        addStartingRow();
 
-        startingRow.add(new JLabel("Enter the starting value (in " + HOME_CURRENCY + ")     $"));
-
-        moneyFormat = new DecimalFormat("#,###.00");
-        int numColumns = 7;
-        defaultAmount = new JFormattedTextField(moneyFormat);
-        defaultAmount.setValue(10000.00);
-        defaultAmount.setColumns(numColumns);
-        startingRow.add(defaultAmount);
-
-        add(startingRow);
+        addMiddleRow();
 
         add(new InstructionsPanel());
 
@@ -60,6 +52,33 @@ public class Sandbox extends JPanel
 
         setUpButtonPanel();
 
+    }
+
+    private void addStartingRow()
+    {
+        JPanel startingRow = new JPanel();
+        startingRow.setMaximumSize(new Dimension(850, 50));
+
+        startingRow.add(new JLabel("Enter the starting value (in " + HOME_CURRENCY + ")     $"));
+
+        moneyFormat = new DecimalFormat("#,###.00");
+        int numColumns = 7;
+        defaultAmount = new JFormattedTextField(moneyFormat);
+        defaultAmount.setValue(10000.00);
+        defaultAmount.setColumns(numColumns);
+        startingRow.add(defaultAmount);
+
+        add(startingRow);
+    }
+
+    private void addMiddleRow()
+    {
+        JPanel middleRow = new JPanel();
+        middleRow.setMaximumSize(new Dimension(850, 50));
+        LocalDate today = LocalDate.now();
+        String formatted = DateTimeFormatter.ofPattern("MM-dd-yyyy", Locale.ENGLISH).format(today);
+        middleRow.add(new JLabel(" *** Play with buying or selling on " + formatted + " ***"));
+        add(middleRow);
     }
 
     private void setUpButtonPanel()

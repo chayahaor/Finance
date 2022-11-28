@@ -105,8 +105,15 @@ public class WhatIfPanel extends JPanel
         double val = getInHomeCurrency(Math.abs(Double.parseDouble(amount.getText())));
         val = (Objects.equals(buyOrSell.getSelectedItem(), "Buy") ? val : -val);
 
+        System.out.println(diff);
         System.out.println(diff/365);
-        double amount =  val * ((1 + (diff/365)) * Double.parseDouble(forwardRate.getText()));
+        double fwRate = Double.parseDouble(forwardRate.getText());
+        // if diff is negative, specified date is later than maturity date -- you already have full amount
+        // if diff is zero, specified date equals maturity date -- you have the full amount today
+        // if diff is positive, specified date is earlier than maturity date -- linear accretion
+        // note that neither date can be before buying/selling date -- that is rejected before reaching this point
+        double amount = (diff <= 0) ? val * fwRate : val * (1 + (diff/365.0)) * fwRate;
+        //double amount =  val * ((1 + (diff/365)) * Double.parseDouble(forwardRate.getText()));
         System.out.println(amount);
         return amount;
     }
