@@ -65,10 +65,9 @@ public class Sandbox extends JPanel
         startingRow.add(new JLabel("Enter the starting value (in " + HOME_CURRENCY + ")     $"));
 
         moneyFormat = new DecimalFormat("#,##0.00");
-        int numColumns = 7;
         defaultAmount = new JFormattedTextField(moneyFormat);
         defaultAmount.setValue(10000.00);
-        defaultAmount.setColumns(numColumns);
+        defaultAmount.setColumns(7);
         startingRow.add(defaultAmount);
 
         add(startingRow);
@@ -80,7 +79,7 @@ public class Sandbox extends JPanel
         panel.setMaximumSize(new Dimension(850, 50));
         panel.add(new JLabel("Enter the " + HOME_CURRENCY + " risk free rate as a percentage"));
 
-        DecimalFormat formatter = new DecimalFormat("#.##");
+        DecimalFormat formatter = new DecimalFormat("#.######");
         rfr = new JFormattedTextField(formatter);
         rfr.setColumns(7);
         rfr.setValue(4);
@@ -204,8 +203,6 @@ public class Sandbox extends JPanel
 
         JOptionPane.showMessageDialog(this, specifiedDate.toString());
 
-        Date specified = specifiedDate.getDate();
-
         int yesterdayCount = 0;
         double sum = 0.0;
         sum = getSum(sum);
@@ -217,7 +214,7 @@ public class Sandbox extends JPanel
             {
                 // it is a percentage -- so divide by 100
                 double riskFreeRate = Double.parseDouble(rfr.getText()) / 100;
-                sum += possibility.getForwardAmount(riskFreeRate, specified);
+                sum += possibility.getForwardQuantity(riskFreeRate, specifiedDate);
             } else
             {
                 yesterdayCount++;
@@ -245,7 +242,8 @@ public class Sandbox extends JPanel
             JOptionPane.showMessageDialog(this,
                     "At least one maturity date happened already -- its value was ignored");
         }
-        JOptionPane.showMessageDialog(this, sum);
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        JOptionPane.showMessageDialog(this, decimalFormat.format(sum));
     }
 
 }

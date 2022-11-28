@@ -84,22 +84,21 @@ public class WhatIfPanel extends JPanel
         return quantity;
     }
 
-    public double getForwardAmount(double rfr, Date specifiedDate)
+    public double getForwardQuantity(double riskFreeRate, DatePanel specifiedDate)
     {
-        // maturity date - specified date
-        long diff = maturityDate.dateDiffFromSpecifiedDate(specifiedDate);
+        Date specified = specifiedDate.getDate();
 
-        double val = getQuantity();
+        // if maturity date - specified date is negative
+        // specified date is later than maturity date -- you already have full amount
+        // else -- use specified date - today for linear accretion
+        // note that neither date can be before today (buying/selling date)
+        // -- bad data is rejected before reaching this point
+        long diff = maturityDate.dateDiffFromSpecifiedDate(specified) < 0
+                ? maturityDate.dateDiffFromToday()
+                : specifiedDate.dateDiffFromToday();
 
-        // if diff is negative, specified date is later than maturity date -- you already have full amount
-        // if diff is zero, specified date equals maturity date -- you have the full amount at specified date
-        // if diff is positive, specified date is earlier than maturity date -- linear accretion
-        // note that neither date can be before buying/selling date -- bad data is rejected before reaching this point
-        double amount = (diff < 0)
-                ? val * (1 + (maturityDate.dateDiffFromToday() / 365.0) * rfr)
-                : val * (1 + (diff / 365.0) * rfr);
+        double quantity = getQuantity();
 
-        System.out.println(amount);
-        return amount;
+        return quantity * (1 + (diff / 365.0) * riskFreeRate);
     }
 }
