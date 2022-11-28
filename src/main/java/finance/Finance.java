@@ -48,10 +48,8 @@ public class Finance extends JPanel {
             {
                 retVal = Double.parseDouble(resultSet.getString(1));
             }
-        } catch (SQLException exception)
-        {
-            System.out.println("reached here" + exception.getMessage());
-        }
+        } catch (SQLException ignored)
+        {}
         return retVal;
     }
 

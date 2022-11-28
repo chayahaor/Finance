@@ -90,6 +90,7 @@ public class WhatIfPanel extends JPanel
         }
         return amount;
     }
+
     public double getForwardAmount(Date specifiedDate)
     {
         // maturity date - specified date
@@ -104,7 +105,9 @@ public class WhatIfPanel extends JPanel
         // if diff is zero, specified date equals maturity date -- you have the full amount at specified date
         // if diff is positive, specified date is earlier than maturity date -- linear accretion
         // note that neither date can be before buying/selling date -- bad data is rejected before reaching this point
-        double amount = (diff <= 0) ? val * fwRate : val * (1 + (diff/maturityDate.dateDiffFromToday())) * fwRate;
+        double amount = (diff <= 0)
+                ? val * fwRate
+                : val * (1 + (((double) diff) / maturityDate.dateDiffFromToday()) * fwRate);
         //double amount =  val * ((1 + (diff/365)) * Double.parseDouble(forwardRate.getText()));
         System.out.println(amount);
         return amount;
