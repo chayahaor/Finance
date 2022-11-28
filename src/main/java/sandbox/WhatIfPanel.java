@@ -58,7 +58,6 @@ public class WhatIfPanel extends JPanel
         buyOrSell = new JComboBox<>(options);
         buyOrSell.setEditable(false);
         add(buyOrSell);
-
     }
 
     public DatePanel getMaturityDate()
@@ -91,28 +90,18 @@ public class WhatIfPanel extends JPanel
         }
         return amount;
     }
-
     public double getForwardAmount(Date specifiedDate)
     {
-        int selectedYear = maturityDate.getYear();
-        int selectedMonth = maturityDate.getMonthNumber();
-        int selectedDay = maturityDate.getDay();
+        long diff = maturityDate.dateDiffFromSpecifiedDate(specifiedDate);
 
-        Date maturity = new GregorianCalendar(selectedYear, selectedMonth, selectedDay).getTime();
-        long diffInMs = maturity.getTime() - specifiedDate.getTime();
-        long diff = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
+        double val = getAmount();
 
-        double val = getInHomeCurrency(Math.abs(Double.parseDouble(amount.getText())));
-        val = (Objects.equals(buyOrSell.getSelectedItem(), "Buy") ? val : -val);
-
-        System.out.println(diff);
-        System.out.println(diff/365);
         double fwRate = Double.parseDouble(forwardRate.getText());
         // if diff is negative, specified date is later than maturity date -- you already have full amount
         // if diff is zero, specified date equals maturity date -- you have the full amount today
         // if diff is positive, specified date is earlier than maturity date -- linear accretion
         // note that neither date can be before buying/selling date -- that is rejected before reaching this point
-        double amount = (diff <= 0) ? val * fwRate : val * (1 + (diff/365.0)) * fwRate;
+        double amount = (diff <= 0) ? val * fwRate : val * (1 + (diff/maturityDate.dateDiffFromToday())) * fwRate;
         //double amount =  val * ((1 + (diff/365)) * Double.parseDouble(forwardRate.getText()));
         System.out.println(amount);
         return amount;

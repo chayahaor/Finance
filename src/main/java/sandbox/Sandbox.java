@@ -141,7 +141,6 @@ public class Sandbox extends JPanel
 
     private void onClickCurrent(ActionEvent actionEvent)
     {
-        Date today = new Date();
         int yesterdayCount = 0;
         double sum = 0.0;
         try
@@ -152,7 +151,8 @@ public class Sandbox extends JPanel
         }
         for (WhatIfPanel possibility : whatIfs)
         {
-            long diff = getDateDiffDiff(today, possibility);
+            DatePanel maturityDate = possibility.getMaturityDate();
+            long diff = maturityDate.dateDiffFromToday();
             if (diff >= 0)
             {
                 sum += possibility.getAmount();
@@ -173,13 +173,9 @@ public class Sandbox extends JPanel
     {
         JOptionPane.showMessageDialog(this, specifiedDate, "Enter specified date", JOptionPane.PLAIN_MESSAGE);
 
-        int selectedYear = specifiedDate.getYear();
-        int selectedMonth = specifiedDate.getMonthNumber();
-        int selectedDay = specifiedDate.getDay();
-        JOptionPane.showMessageDialog(this, (selectedMonth + 1) + "/" + selectedDay + "/" + selectedYear);
+        JOptionPane.showMessageDialog(this, specifiedDate.toString());
 
-        Date today = new Date();
-        Date specified = new GregorianCalendar(selectedYear, selectedMonth, selectedDay).getTime();
+        Date specified = specifiedDate.getDate();
 
         int yesterdayCount = 0;
         double sum = 0.0;
@@ -191,7 +187,8 @@ public class Sandbox extends JPanel
         }
         for (WhatIfPanel possibility : whatIfs)
         {
-            long diff = getDateDiffDiff(today, possibility);
+            DatePanel maturityDate = possibility.getMaturityDate();
+            long diff = maturityDate.dateDiffFromToday();
             if (diff >= 0)
             {
                 sum += possibility.getForwardAmount(specified);
@@ -207,15 +204,6 @@ public class Sandbox extends JPanel
                     "At least one maturity date happened already -- its value was ignored");
         }
         JOptionPane.showMessageDialog(this, sum);
-    }
-
-    private static long getDateDiffDiff(Date today, WhatIfPanel possibility)
-    {
-        DatePanel maturityDate = possibility.getMaturityDate();
-        Date maturity = new GregorianCalendar(maturityDate.getYear(),
-                maturityDate.getMonthNumber(), maturityDate.getDay()).getTime();
-        long diffInMs = maturity.getTime() - today.getTime();
-        return TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
     }
 
     private void onClickDelete(ActionEvent actionEvent)

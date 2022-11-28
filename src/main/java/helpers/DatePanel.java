@@ -5,9 +5,14 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Objects;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class DatePanel extends JPanel
 {
@@ -208,5 +213,34 @@ public class DatePanel extends JPanel
     public int getDay()
     {
         return Integer.parseInt(Objects.requireNonNull(getDayComboBox().getSelectedItem()).toString());
+    }
+
+    public Date getDate()
+    {
+        return new GregorianCalendar(getYear(), getMonthNumber(), getDay()).getTime();
+    }
+
+    public long dateDiffFromToday()
+    {
+        Date today = new Date();
+        Date thisDate = getDate();
+        long diffInMs = thisDate.getTime() - today.getTime();
+        return TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
+    }
+
+    public long dateDiffFromSpecifiedDate(Date specifiedDate)
+    {
+        Date thisDate = getDate();
+        long diffInMs = thisDate.getTime() - specifiedDate.getTime();
+        return TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public String toString()
+    {
+        Date date = getDate();
+        Instant instant = date.toInstant();
+        LocalDateTime ldt = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
+        return DateTimeFormatter.ofPattern("MM-dd-yyyy", Locale.ENGLISH).format(ldt);
     }
 }
