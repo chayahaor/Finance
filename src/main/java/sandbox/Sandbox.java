@@ -179,6 +179,11 @@ public class Sandbox extends JPanel
     {
         JOptionPane.showMessageDialog(this, specifiedDate, "Enter specified date", JOptionPane.PLAIN_MESSAGE);
 
+        while (specifiedDate.dateDiffFromToday() < 0)
+        {
+            JOptionPane.showMessageDialog(this, specifiedDate, "Specified date already occurred - try again", JOptionPane.INFORMATION_MESSAGE);
+        }
+
         JOptionPane.showMessageDialog(this, specifiedDate.toString());
 
         Date specified = specifiedDate.getDate();
@@ -207,7 +212,9 @@ public class Sandbox extends JPanel
         try
         {
             sum = Double.parseDouble(moneyFormat.parse(defaultAmount.getText()).toString());
-        } catch (Exception ignored) {}
+        } catch (Exception ignored)
+        {
+        }
         return sum;
     }
 
