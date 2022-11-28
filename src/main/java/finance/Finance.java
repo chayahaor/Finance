@@ -7,6 +7,7 @@ import org.jfree.chart.ChartPanel;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.sql.Connection;
 import java.text.NumberFormat;
 
 import static main.Main.HOME_CURRENCY;
@@ -14,6 +15,7 @@ import static main.Main.HOME_CURRENCY;
 public class Finance extends JPanel {
     private double currentValue;
     private JLabel userValue;
+    private Connection connection;
     private JComboBox<String> action;
     private JFormattedTextField amount;
     private JFormattedTextField fxRate;
@@ -22,8 +24,9 @@ public class Finance extends JPanel {
     private CurrencyComboBox fromCurrency;
     private CurrencyComboBox toCurrency;
 
-    public Finance() {
+    public Finance(Connection connection) {
         this.currentValue = pullCurrentValue();
+        this.connection = connection;
         setSize(900, 500);
         setLayout(new BorderLayout());
         add(doFinancePanel(), BorderLayout.NORTH);

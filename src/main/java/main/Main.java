@@ -5,6 +5,7 @@ import sandbox.Sandbox;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.*;
 
 public class Main extends JFrame
 {
@@ -20,18 +21,30 @@ public class Main extends JFrame
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new FlowLayout());
         setResizable(true);
-        setUpJTabbedPane();
+        try
+        {
+            setUpJTabbedPane();
+        } catch (SQLException exception)
+        {
+            JOptionPane.showMessageDialog(this, "Something went wrong with the SQL connection.");
+            System.exit(0);
+        }
     }
 
-    public void setUpJTabbedPane()
+    public void setUpJTabbedPane() throws SQLException
     {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setForeground(Color.BLACK);
 
+        String dbName = "finance";
+        int portNumber = 3306;
+        Connection connection = DriverManager.getConnection(
+                    "jdbc:mysql://localhost:" + portNumber + "/" + dbName, "root", "");
+
         // add all the tabs to the Main frame's JTabbedPane
         sandbox = new Sandbox();
 
-        finance = new Finance();
+        finance = new Finance(connection);
 
         tabbedPane.add("Play in the Sandbox", sandbox);
         tabbedPane.add("Finance Stuff", finance);
@@ -72,5 +85,7 @@ public class Main extends JFrame
         // instantiate the Main frame
         Main frame = new Main();
         frame.setVisible(true);
+
+
     }
 }
