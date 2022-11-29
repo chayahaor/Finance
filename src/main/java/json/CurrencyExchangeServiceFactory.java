@@ -8,7 +8,6 @@ import javax.inject.Inject;
 
 public class CurrencyExchangeServiceFactory
 {
-
     @Inject
     public CurrencyExchangeServiceFactory()
     {
@@ -23,5 +22,4 @@ public class CurrencyExchangeServiceFactory
                 .build();
         return retrofit.create(CurrencyExchangeService.class);
     }
-
 }

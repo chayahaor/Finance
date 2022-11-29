@@ -3,10 +3,8 @@ package finance;
 import dagger.DaggerCurrencyComboBoxComponent;
 import dagger.DaggerCurrencyExchangeComponent;
 import helpers.*;
-import json.CurrencyExchangeService;
 import org.jfree.chart.ChartPanel;
 
-import javax.inject.Provider;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -16,7 +14,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Currency;
+import java.util.HashMap;
 
 import static main.Main.HOME_CURRENCY;
 
@@ -48,9 +46,8 @@ public class Finance extends JPanel {
         try
         {
             Statement stmt = connection.createStatement();
-            // spGetMainData has
             ResultSet resultSet = stmt.executeQuery("Call spGetMainData();");
-            ArrayList<Double> quantitiesPerCurrency = new ArrayList<>();
+            HashMap<String, Double> quantitiesPerCurrency = new HashMap<>();
             //TODO: Pull value from database
             // Pull maindata table sorted by Currency
             // Until the currency is different,
@@ -59,25 +56,32 @@ public class Finance extends JPanel {
             //      unless current currency is HOME_CURRENCY
             //      add value to quantitiesPerCurrency
             // Loop through all doubles in quantitiesPerCurrency and add them up as retVal
-            double sum = 0.0;
-            String currentCurrency = "";
-            double currentFX = 1;
+            double sum;
+            String currentCurrency;
             while (resultSet.next())
             {
                 currentCurrency = resultSet.getString("StartCurrency");
+                sum = quantitiesPerCurrency.get(currentCurrency) == null
+                        ? 0.0 : quantitiesPerCurrency.get(currentCurrency);
                 if (!currentCurrency.equals(HOME_CURRENCY))
                 {
-                    CurrencyExchanger currencyExchanger = DaggerCurrencyExchangeComponent.create().getCurrencyExchange();
+                    CurrencyExchanger currencyExchanger = DaggerCurrencyExchangeComponent
+                            .create()
+                            .getCurrencyExchange();
                     currencyExchanger.doTheCurrencyExchange(Double.parseDouble(resultSet.getString("Amount")),
                             currentCurrency, HOME_CURRENCY);
-                    currentFX = currencyExchanger.calculateFXRate();
+                    sum += currencyExchanger.getExchangedValue();
                 }
-                sum += Double.parseDouble(resultSet.getString(1));
+                else
+                {
+                    sum += Double.parseDouble(resultSet.getString("Amount"));
+                }
+                quantitiesPerCurrency.put(currentCurrency, sum);
             }
 
-            for (Double quantity : quantitiesPerCurrency)
+            for (String currency : quantitiesPerCurrency.keySet())
             {
-                retVal += quantity;
+                retVal += quantitiesPerCurrency.get(currency);
             }
         } catch (SQLException exception)
         {

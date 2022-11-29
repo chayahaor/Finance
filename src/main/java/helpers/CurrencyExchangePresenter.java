@@ -31,11 +31,9 @@ public class CurrencyExchangePresenter
                 .subscribe(this::onNext, this::onError);
     }
 
-
     private void onNext(CurrencyExchange currencyExchange)
     {
-        double result = currencyExchange.getResult();
-        viewProvider.get().getCurrencyExchangeValue(result);
+        viewProvider.get().setValue(currencyExchange.getResult());
     }
 
     private void onError(Throwable throwable)
@@ -51,5 +49,4 @@ public class CurrencyExchangePresenter
             disposable.dispose();
         }
     }
-
 }
