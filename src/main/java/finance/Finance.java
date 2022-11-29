@@ -43,10 +43,11 @@ public class Finance extends JPanel {
         try
         {
             Statement stmt = connection.createStatement();
-            ResultSet resultSet = stmt.executeQuery("Call spGetCurrentAmount ('" + HOME_CURRENCY + "');");
-            if (resultSet.next())
+            ResultSet resultSet = stmt.executeQuery("Call spGetMainData();");
+            double sum = 0.0;
+            while (resultSet.next())
             {
-                retVal = Double.parseDouble(resultSet.getString(1));
+                sum += Double.parseDouble(resultSet.getString(1));
             }
         } catch (SQLException ignored)
         {}
@@ -118,6 +119,21 @@ public class Finance extends JPanel {
 
     private void onClick(ActionEvent event) {
         //TODO: Store values in DB
+        // GUI changes:
+        // a) Validate that if one is selected, other is USD - ONLY
+        // b) Cannot allow yesterday maturity date
+        // c) Buy or Sell as only two options -- REMOVE this combobox altogether
+        // Database changes:
+        // a) remove homecurrencytotal column,
+        // b) remove endcurrency column,
+        // c) rename fromcurrency to be currency
+        // Perform action is going to make two database inserts
+        // (Buy) 30 ILS - startcurrency is USD and endcurrency is ILS
+        // add into database one row negative (30 / fxRate) USD
+        // add into database one row positive 30 ILS
+        // (Sell) 30 ILS - startcurrency is ILS and endcurrency is USD
+        // add into database one row positive (30 / fxRate) USD
+        // add into database one row negative 30 ILS
     }
 
     public JPanel addGraph() {
