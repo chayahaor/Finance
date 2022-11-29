@@ -1,13 +1,15 @@
 package sandbox;
 
 import dagger.DaggerCurrencyExchangeComponent;
-import helpers.*;
+import helpers.CurrencyComboBox;
+import helpers.DatePanel;
 
 import javax.swing.*;
-import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static main.Main.HOME_CURRENCY;
@@ -18,8 +20,12 @@ public class Sandbox extends JPanel
     private final JScrollPane scrollPane;
     private final JPanel whatIf;
     private DatePanel specifiedDate;
-    private final JFormattedTextField defaultAmount;
+    private NumberFormat moneyFormat;
+    private JFormattedTextField defaultAmount;
+
+    private JFormattedTextField rfr;
     private final CurrencyComboBox currencyComboBox;
+
     public Sandbox()
     {
         setSize(900, 500);
@@ -30,19 +36,11 @@ public class Sandbox extends JPanel
                 .getCurrencyExchange();
         currencyComboBox.addSymbols();
 
-        JPanel startingRow = new JPanel();
-        startingRow.setMaximumSize(new Dimension(850, 50));
+        addStartingRow();
 
-        startingRow.add(new JLabel("Enter the starting value (in " + HOME_CURRENCY + ")"));
+        addSecondaryStartingRow();
 
-        NumberFormat moneyFormat = NumberFormat.getCurrencyInstance();
-        int numColumns = 7;
-        defaultAmount = new JFormattedTextField(moneyFormat);
-        defaultAmount.setValue(10000.00);
-        defaultAmount.setColumns(numColumns);
-        startingRow.add(defaultAmount);
-
-        add(startingRow);
+        addMiddleRow();
 
         add(new InstructionsPanel());
 
@@ -59,6 +57,47 @@ public class Sandbox extends JPanel
 
     }
 
+    private void addStartingRow()
+    {
+        JPanel startingRow = new JPanel();
+        startingRow.setMaximumSize(new Dimension(850, 50));
+
+        startingRow.add(new JLabel("Enter the starting value (in " + HOME_CURRENCY + ")     $"));
+
+        moneyFormat = new DecimalFormat("#,##0.00");
+        defaultAmount = new JFormattedTextField(moneyFormat);
+        defaultAmount.setValue(10000.00);
+        defaultAmount.setColumns(7);
+        startingRow.add(defaultAmount);
+
+        add(startingRow);
+    }
+
+    private void addSecondaryStartingRow()
+    {
+        JPanel panel = new JPanel();
+        panel.setMaximumSize(new Dimension(850, 50));
+        panel.add(new JLabel("Enter the " + HOME_CURRENCY + " risk free rate as a percentage"));
+
+        DecimalFormat formatter = new DecimalFormat("#.######");
+        rfr = new JFormattedTextField(formatter);
+        rfr.setColumns(7);
+        rfr.setValue(4);
+        panel.add(rfr);
+
+        add(panel);
+    }
+
+    private void addMiddleRow()
+    {
+        JPanel middleRow = new JPanel();
+        middleRow.setMaximumSize(new Dimension(850, 50));
+        LocalDate today = LocalDate.now();
+        String formatted = DateTimeFormatter.ofPattern("MM-dd-yyyy", Locale.ENGLISH).format(today);
+        middleRow.add(new JLabel(" *** Play with buying or selling on " + formatted + " ***"));
+        add(middleRow);
+    }
+
     private void setUpButtonPanel()
     {
         JPanel buttonPanel = new JPanel();
@@ -73,9 +112,9 @@ public class Sandbox extends JPanel
 
         JPanel calcRow = new JPanel();
 
-        generateButton("Show amount in " + HOME_CURRENCY + " today", this::onClickCurrent, calcRow);
+        generateButton("Show NPV in " + HOME_CURRENCY + " today", this::onClickCurrent, calcRow);
 
-        generateButton("Show amount in " + HOME_CURRENCY + " at specified maturity date", this::onClickFuture, calcRow);
+        generateButton("Show NPV in " + HOME_CURRENCY + " at specified date", this::onClickFuture, calcRow);
 
         specifiedDate = new DatePanel();
 
@@ -93,6 +132,15 @@ public class Sandbox extends JPanel
         panel.add(button);
     }
 
+    private void onClickReset(ActionEvent actionEvent)
+    {
+        defaultAmount.setValue(10000.00);
+        whatIfs.clear();
+        whatIf.removeAll();
+        scrollPane.setViewportView(whatIf);
+        this.revalidate();
+    }
+
     private void onClickMore(ActionEvent actionEvent)
     {
         JPanel row = new JPanel(new BorderLayout());
@@ -106,36 +154,6 @@ public class Sandbox extends JPanel
         whatIfs.add(whatIfPanel);
         whatIf.add(row);
         this.revalidate();
-    }
-
-    private void onClickReset(ActionEvent actionEvent)
-    {
-        defaultAmount.setValue(10000.00);
-        whatIfs.clear();
-        whatIf.removeAll();
-        scrollPane.setViewportView(whatIf);
-        this.revalidate();
-    }
-
-    private void onClickCurrent(ActionEvent actionEvent)
-    {
-        double sum = 0.0;
-        for (WhatIfPanel possibility : whatIfs)
-        {
-            sum += possibility.getAmount();
-        }
-        JOptionPane.showMessageDialog(this, sum);
-    }
-
-    private void onClickFuture(ActionEvent actionEvent)
-    {
-        JOptionPane.showMessageDialog(this, specifiedDate, "Enter specified maturity date", JOptionPane.PLAIN_MESSAGE);
-
-        int selectedYear = Integer.parseInt(Objects.requireNonNull(specifiedDate.getYear().getSelectedItem()).toString());
-        int selectedDay = Integer.parseInt(Objects.requireNonNull(specifiedDate.getDay().getSelectedItem()).toString());
-        String selectedMonth = Objects.requireNonNull(specifiedDate.getMonth().getSelectedItem()).toString();
-
-        JOptionPane.showMessageDialog(this, selectedMonth + "/" + selectedDay + "/" + selectedYear);
     }
 
     private void onClickDelete(ActionEvent actionEvent)
@@ -153,4 +171,79 @@ public class Sandbox extends JPanel
             scrollPane.revalidate();
         }
     }
+
+    private void onClickCurrent(ActionEvent actionEvent)
+    {
+        int yesterdayCount = 0;
+        double sum = 0.0;
+        sum = getSum(sum);
+        for (WhatIfPanel possibility : whatIfs)
+        {
+            DatePanel maturityDate = possibility.getMaturityDate();
+            long diff = maturityDate.dateDiffFromToday();
+            if (diff >= 0)
+            {
+                sum += possibility.getQuantity();
+            } else
+            {
+                yesterdayCount++;
+            }
+        }
+        displayResults(yesterdayCount, sum);
+    }
+
+    private void onClickFuture(ActionEvent actionEvent)
+    {
+        JOptionPane.showMessageDialog(this, specifiedDate, "Enter specified date", JOptionPane.PLAIN_MESSAGE);
+
+        while (specifiedDate.dateDiffFromToday() < 0)
+        {
+            JOptionPane.showMessageDialog(this, specifiedDate, "Specified date already occurred - try again", JOptionPane.INFORMATION_MESSAGE);
+        }
+
+        JOptionPane.showMessageDialog(this, specifiedDate.toString());
+
+        int yesterdayCount = 0;
+        double sum = 0.0;
+        sum = getSum(sum);
+        for (WhatIfPanel possibility : whatIfs)
+        {
+            DatePanel maturityDate = possibility.getMaturityDate();
+            long diff = maturityDate.dateDiffFromToday();
+            if (diff >= 0)
+            {
+                // it is a percentage -- so divide by 100
+                double riskFreeRate = Double.parseDouble(rfr.getText()) / 100;
+                sum += possibility.getForwardQuantity(riskFreeRate, specifiedDate);
+            } else
+            {
+                yesterdayCount++;
+            }
+        }
+
+        displayResults(yesterdayCount, sum);
+    }
+
+    private double getSum(double sum)
+    {
+        try
+        {
+            sum = Double.parseDouble(moneyFormat.parse(defaultAmount.getText()).toString());
+        } catch (Exception ignored)
+        {
+        }
+        return sum;
+    }
+
+    private void displayResults(int yesterdayCount, double sum)
+    {
+        if (yesterdayCount > 0)
+        {
+            JOptionPane.showMessageDialog(this,
+                    "At least one maturity date happened already -- its value was ignored");
+        }
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        JOptionPane.showMessageDialog(this, decimalFormat.format(sum));
+    }
+
 }

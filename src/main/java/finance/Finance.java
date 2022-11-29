@@ -7,13 +7,19 @@ import org.jfree.chart.ChartPanel;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.NumberFormat;
 
 import static main.Main.HOME_CURRENCY;
 
+
 public class Finance extends JPanel {
     private double currentValue;
     private JLabel userValue;
+    private Connection connection;
     private JComboBox<String> action;
     private JFormattedTextField amount;
     private JFormattedTextField fxRate;
@@ -22,7 +28,8 @@ public class Finance extends JPanel {
     private CurrencyComboBox fromCurrency;
     private CurrencyComboBox toCurrency;
 
-    public Finance() {
+    public Finance(Connection connection) {
+        this.connection = connection;
         this.currentValue = pullCurrentValue();
         setSize(900, 500);
         setLayout(new BorderLayout());
@@ -30,9 +37,20 @@ public class Finance extends JPanel {
         add(addGraph());
     }
 
-    private double pullCurrentValue() {
-        //TODO: replace with DB call
-        return 10000;
+    private double pullCurrentValue()
+    {
+        double retVal = 10000;
+        try
+        {
+            Statement stmt = connection.createStatement();
+            ResultSet resultSet = stmt.executeQuery("Call spGetCurrentAmount ('" + HOME_CURRENCY + "');");
+            if (resultSet.next())
+            {
+                retVal = Double.parseDouble(resultSet.getString(1));
+            }
+        } catch (SQLException ignored)
+        {}
+        return retVal;
     }
 
     private JPanel doFinancePanel() {

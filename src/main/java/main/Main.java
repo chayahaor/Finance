@@ -5,10 +5,16 @@ import sandbox.Sandbox;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.*;
+import java.text.DecimalFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class Main extends JFrame
 {
     public static final String HOME_CURRENCY = "USD";
+    public double initialAmount = 10000;
     private Sandbox sandbox;
     private Finance finance;
 
@@ -28,22 +34,57 @@ public class Main extends JFrame
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setForeground(Color.BLACK);
 
-        // add all the tabs to the Main frame's JTabbedPane
+        // add Sandbox tab to Main frame's JTabbedPane
         sandbox = new Sandbox();
-
-        finance = new Finance();
-
         tabbedPane.add("Play in the Sandbox", sandbox);
-        tabbedPane.add("Finance Stuff", finance);
-        tabbedPane.setPreferredSize(new Dimension(950, 550));
 
+        try
+        {
+            // create database connection
+            Connection connection = createConnection();
+
+            // add finance tab to the Main frame's JTabbedPane if Connection is successful
+            finance = new Finance(connection);
+            tabbedPane.add("Finance Stuff", finance);
+        } catch (SQLException exception)
+        {
+            // otherwise notify user that something went wrong and only have a Sandbox tab
+            JOptionPane.showMessageDialog(this,
+                    "Something went wrong with the SQL connection: " + exception.getMessage());
+        }
+
+        // add the JTabbedPane to Main frame
+        tabbedPane.setPreferredSize(new Dimension(950, 550));
         add(tabbedPane);
+    }
+
+    private Connection createConnection() throws SQLException
+    {
+        String dbName = "finance";
+        int portNumber = 3306;
+        Connection connection = DriverManager.getConnection(
+                "jdbc:mysql://localhost:" + portNumber + "/" + dbName, "root", "");
+
+        Statement stmt = connection.createStatement();
+        ResultSet resultSet = stmt.executeQuery("Select * from maindata");
+        if (!resultSet.next()) // if there is no result set
+        {
+            JFormattedTextField defaultAmount
+                    = new JFormattedTextField(new DecimalFormat("####.00"));
+            defaultAmount.setValue(initialAmount);
+            defaultAmount.setColumns(7);
+            JOptionPane.showMessageDialog(this, defaultAmount,
+                    "Enter Initial Amount", JOptionPane.PLAIN_MESSAGE);
+            initialAmount = Double.parseDouble(defaultAmount.getText());
+            LocalDate today = LocalDate.now();
+            String formatted = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH).format(today);
+            stmt.executeQuery("Call spInitial (" + initialAmount + ", '" + HOME_CURRENCY + "', '" + formatted + "');");
+        }
+        return connection;
     }
 
     public static void main(String[] args)
     {
-        Font font = new Font("Lucida Sans Unicode", Font.PLAIN, 12);
-
         // update the UIManager to use the Nimbus Look and Feel
         try
         {
@@ -56,11 +97,10 @@ public class Main extends JFrame
                     break;
                 }
             }
-        } catch (Exception ignored)
-        {
-        }
+        } catch (Exception ignored) {}
 
         // change the font of the program
+        Font font = new Font("Lucida Sans Unicode", Font.PLAIN, 12);
         UIManager.put("Button.font", font);
         UIManager.put("Label.font", font);
         UIManager.put("TabbedPane.font", font);

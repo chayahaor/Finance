@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 23, 2022 at 01:35 AM
--- Server version: 10.4.25-MariaDB
--- PHP Version: 8.1.10
+-- Generation Time: Nov 29, 2022 at 08:26 PM
+-- Server version: 10.4.24-MariaDB
+-- PHP Version: 8.0.19
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,6 +24,23 @@ USE `Finance`;
 --
 -- Database: `finance`
 --
+
+DELIMITER $$
+--
+-- Procedures
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spGetCurrentAmount` (IN `HomeCurrency` VARCHAR(10))  COMMENT 'Currently incorrect - just for connecting to stored procedure' BEGIN
+select CurrentAmount from `maindata` where currency = HomeCurrency;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spInitial` (IN `InitialAmount` INT(11), IN `HomeCurrency` VARCHAR(10), IN `InitialDate` DATETIME)  DETERMINISTIC BEGIN
+insert into `maindata` (ActionDate, Action_Id, StartCurrency, EndCurrency,
+                        MaturityDate, Amount, FXRate, HomeCurrencyTotal)
+                        values (InitialDate, 5, HomeCurrency, HomeCurrency,
+                                InitialDate, InitialAmount, 1, InitialAmount);
+END$$
+
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -65,6 +82,13 @@ CREATE TABLE `maindata` (
   `HomeCurrencyTotal` float DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Dumping data for table `maindata`
+--
+
+INSERT INTO `maindata` (`ID`, `ActionDate`, `Action_Id`, `StartCurrency`, `EndCurrency`, `MaturityDate`, `Amount`, `FXRate`, `HomeCurrencyTotal`) VALUES
+(6, '2022-11-28 00:00:00', 5, 'USD', 'USD', '2022-11-28 00:00:00', 2000, 1, 2000);
+
 -- --------------------------------------------------------
 
 --
@@ -75,18 +99,6 @@ CREATE TABLE `pnl` (
   `ID` int(11) NOT NULL,
   `Date` datetime NOT NULL,
   `PNL` float NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `snapshot`
---
-
-CREATE TABLE `snapshot` (
-  `ID` int(11) NOT NULL,
-  `Currency` varchar(10) NOT NULL,
-  `CurrentAmount` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -113,12 +125,6 @@ ALTER TABLE `pnl`
   ADD PRIMARY KEY (`ID`);
 
 --
--- Indexes for table `snapshot`
---
-ALTER TABLE `snapshot`
-  ADD PRIMARY KEY (`ID`);
-
---
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -132,18 +138,12 @@ ALTER TABLE `action`
 -- AUTO_INCREMENT for table `maindata`
 --
 ALTER TABLE `maindata`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `pnl`
 --
 ALTER TABLE `pnl`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `snapshot`
---
-ALTER TABLE `snapshot`
   MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
