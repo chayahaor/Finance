@@ -26,29 +26,47 @@ public class Main extends JFrame
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new FlowLayout());
         setResizable(true);
-        try
-        {
-            setUpJTabbedPane();
-        } catch (SQLException exception)
-        {
-            JOptionPane.showMessageDialog(this,
-                    "Something went wrong with the SQL connection: " + exception.getMessage());
-            System.exit(0);
-        }
+        setUpJTabbedPane();
     }
 
-    public void setUpJTabbedPane() throws SQLException
+    public void setUpJTabbedPane()
     {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setForeground(Color.BLACK);
 
+        // add Sandbox tab to Main frame's JTabbedPane
+        sandbox = new Sandbox();
+        tabbedPane.add("Play in the Sandbox", sandbox);
+
+        try
+        {
+            // create database connection
+            Connection connection = createConnection();
+
+            // add finance tab to the Main frame's JTabbedPane if Connection is successful
+            finance = new Finance(connection);
+            tabbedPane.add("Finance Stuff", finance);
+        } catch (SQLException exception)
+        {
+            // otherwise notify user that something went wrong and only have a Sandbox tab
+            JOptionPane.showMessageDialog(this,
+                    "Something went wrong with the SQL connection: " + exception.getMessage());
+        }
+
+        // add the JTabbedPane to Main frame
+        tabbedPane.setPreferredSize(new Dimension(950, 550));
+        add(tabbedPane);
+    }
+
+    private Connection createConnection() throws SQLException
+    {
         String dbName = "finance";
         int portNumber = 3306;
         Connection connection = DriverManager.getConnection(
                 "jdbc:mysql://localhost:" + portNumber + "/" + dbName, "root", "");
 
         Statement stmt = connection.createStatement();
-        ResultSet resultSet = stmt.executeQuery("Select * from Snapshot");
+        ResultSet resultSet = stmt.executeQuery("Select * from maindata");
         if (!resultSet.next()) // if there is no result set
         {
             JFormattedTextField defaultAmount
@@ -62,23 +80,11 @@ public class Main extends JFrame
             String formatted = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH).format(today);
             stmt.executeQuery("Call spInitial (" + initialAmount + ", '" + HOME_CURRENCY + "', '" + formatted + "');");
         }
-
-        // add all the tabs to the Main frame's JTabbedPane
-        sandbox = new Sandbox();
-
-        finance = new Finance(connection);
-
-        tabbedPane.add("Play in the Sandbox", sandbox);
-        tabbedPane.add("Finance Stuff", finance);
-        tabbedPane.setPreferredSize(new Dimension(950, 550));
-
-        add(tabbedPane);
+        return connection;
     }
 
     public static void main(String[] args)
     {
-        Font font = new Font("Lucida Sans Unicode", Font.PLAIN, 12);
-
         // update the UIManager to use the Nimbus Look and Feel
         try
         {
@@ -91,11 +97,10 @@ public class Main extends JFrame
                     break;
                 }
             }
-        } catch (Exception ignored)
-        {
-        }
+        } catch (Exception ignored) {}
 
         // change the font of the program
+        Font font = new Font("Lucida Sans Unicode", Font.PLAIN, 12);
         UIManager.put("Button.font", font);
         UIManager.put("Label.font", font);
         UIManager.put("TabbedPane.font", font);
