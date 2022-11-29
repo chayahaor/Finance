@@ -33,6 +33,7 @@ public class CurrencyExchangePresenter
 
     private void onNext(CurrencyExchange currencyExchange)
     {
+        System.out.println(currencyExchange.getResult());
         viewProvider.get().setValue(currencyExchange.getResult());
     }
 
