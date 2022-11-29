@@ -7,38 +7,42 @@ import json.CurrencyExchangeService;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import javax.inject.Singleton;
-import java.util.Map;
 
-// There are three instances of CurrencyComboBox created despite the @Singleton tag
-@Singleton
 public class CurrencyExchangePresenter
 {
-    private final Provider<CurrencyComboBox> viewProvider;
+    private final Provider<CurrencyExchanger> viewProvider;
     private final CurrencyExchangeService model;
     private Disposable disposable;
 
     @Inject
     public CurrencyExchangePresenter(
-            Provider<CurrencyComboBox> viewProvider,
+            Provider<CurrencyExchanger> viewProvider,
             CurrencyExchangeService model)
     {
         this.viewProvider = viewProvider;
         this.model = model;
     }
 
-    public void loadResultFromQuery(double amount, String fromComboBox, String toComboBox)
+    public void loadResultFromQuery(double amount, String fromCurrency, String toCurrency)
     {
-        disposable = model.getCurrencyExchange(amount, fromComboBox, toComboBox)
+        disposable = model.getCurrencyExchange(amount, fromCurrency, toCurrency)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.newThread())
                 .subscribe(this::onNext, this::onError);
     }
 
 
-    private void onNext(CurrencyExchange currencyExchange) {}
+    private void onNext(CurrencyExchange currencyExchange)
+    {
+        double result = currencyExchange.getResult();
+        viewProvider.get().getCurrencyExchangeValue(result);
+    }
 
-    private void onError(Throwable throwable) {}
+    private void onError(Throwable throwable)
+    {
+        throwable.printStackTrace();
+        viewProvider.get().showError();
+    }
 
     public void cancel()
     {
@@ -48,17 +52,4 @@ public class CurrencyExchangePresenter
         }
     }
 
-    public void loadSymbolsChoices()
-    {
-        Disposable symbolsDisposable = model.getCurrencySymbols()
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.newThread())
-                .subscribe(this::onSymbolsNext);
-    }
-
-    private void onSymbolsNext(CurrencyExchange currencyExchange)
-    {
-        Map<String, CurrencyExchange.Symbol> symbols = currencyExchange.getSymbols();
-        viewProvider.get().setSymbolsChoices(symbols);
-    }
 }

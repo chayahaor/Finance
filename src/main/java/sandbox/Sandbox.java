@@ -1,5 +1,6 @@
 package sandbox;
 
+import dagger.DaggerCurrencyComboBoxComponent;
 import dagger.DaggerCurrencyExchangeComponent;
 import helpers.CurrencyComboBox;
 import helpers.DatePanel;
@@ -31,7 +32,7 @@ public class Sandbox extends JPanel
         setSize(900, 500);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        currencyComboBox = DaggerCurrencyExchangeComponent
+        currencyComboBox = DaggerCurrencyComboBoxComponent
                 .create()
                 .getCurrencyExchange();
         currencyComboBox.addSymbols();

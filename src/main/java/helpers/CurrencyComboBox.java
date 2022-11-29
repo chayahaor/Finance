@@ -13,9 +13,11 @@ import static main.Main.HOME_CURRENCY;
 @Singleton
 public class CurrencyComboBox extends JComboBox<String>
 {
-    private final CurrencyExchangePresenter presenter;
+    private final CurrencyComboBoxPresenter presenter;
+    private double result = 1;
+
     @Inject
-    public CurrencyComboBox(CurrencyExchangePresenter presenter)
+    public CurrencyComboBox(CurrencyComboBoxPresenter presenter)
     {
         this.presenter = presenter;
         new CurrencyExchangeServiceFactory();

@@ -1,9 +1,12 @@
 package finance;
 
+import dagger.DaggerCurrencyComboBoxComponent;
 import dagger.DaggerCurrencyExchangeComponent;
 import helpers.*;
+import json.CurrencyExchangeService;
 import org.jfree.chart.ChartPanel;
 
+import javax.inject.Provider;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,6 +15,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Currency;
 
 import static main.Main.HOME_CURRENCY;
 
@@ -39,18 +44,46 @@ public class Finance extends JPanel {
 
     private double pullCurrentValue()
     {
-        double retVal = 10000;
+        double retVal = 0;
         try
         {
             Statement stmt = connection.createStatement();
+            // spGetMainData has
             ResultSet resultSet = stmt.executeQuery("Call spGetMainData();");
+            ArrayList<Double> quantitiesPerCurrency = new ArrayList<>();
+            //TODO: Pull value from database
+            // Pull maindata table sorted by Currency
+            // Until the currency is different,
+            //      add up positive quantities from database
+            //      converted to USD using CurrencyExchangeAPI
+            //      unless current currency is HOME_CURRENCY
+            //      add value to quantitiesPerCurrency
+            // Loop through all doubles in quantitiesPerCurrency and add them up as retVal
             double sum = 0.0;
+            String currentCurrency = "";
+            double currentFX = 1;
             while (resultSet.next())
             {
+                currentCurrency = resultSet.getString("StartCurrency");
+                if (!currentCurrency.equals(HOME_CURRENCY))
+                {
+                    CurrencyExchanger currencyExchanger = DaggerCurrencyExchangeComponent.create().getCurrencyExchange();
+                    currencyExchanger.doTheCurrencyExchange(Double.parseDouble(resultSet.getString("Amount")),
+                            currentCurrency, HOME_CURRENCY);
+                    currentFX = currencyExchanger.calculateFXRate();
+                }
                 sum += Double.parseDouble(resultSet.getString(1));
             }
-        } catch (SQLException ignored)
-        {}
+
+            for (Double quantity : quantitiesPerCurrency)
+            {
+                retVal += quantity;
+            }
+        } catch (SQLException exception)
+        {
+            // if connection fails, use default
+            retVal = 10000;
+        }
         return retVal;
     }
 
@@ -84,10 +117,10 @@ public class Finance extends JPanel {
                 "Cover Short Position"});
         panel.add(action);
 
-        toCurrency = DaggerCurrencyExchangeComponent
+        toCurrency = DaggerCurrencyComboBoxComponent
                 .create()
                 .getCurrencyExchange();
-        fromCurrency = DaggerCurrencyExchangeComponent
+        fromCurrency = DaggerCurrencyComboBoxComponent
                 .create()
                 .getCurrencyExchange();
 
@@ -123,6 +156,7 @@ public class Finance extends JPanel {
         // a) Validate that if one is selected, other is USD - ONLY
         // b) Cannot allow yesterday maturity date
         // c) Buy or Sell as only two options -- REMOVE this combobox altogether
+        // d) Add labels to fields -- call FX Rate "Spot Price FX / " + HOME_CURRENCY
         // Database changes:
         // a) remove homecurrencytotal column,
         // b) remove endcurrency column,
