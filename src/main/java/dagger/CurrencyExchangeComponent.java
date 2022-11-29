@@ -9,5 +9,5 @@ import javax.inject.Singleton;
 
 public interface CurrencyExchangeComponent
 {
-    CurrencyExchanger getCurrencyExchange();
+    CurrencyExchanger getCurrencyExchanger();
 }

@@ -1,25 +1,23 @@
 package finance;
 
-import dagger.DaggerCurrencyComboBoxComponent;
-import dagger.DaggerCurrencyExchangeComponent;
+//import dagger.DaggerCurrencyComboBoxComponent;
+//import dagger.DaggerCurrencyExchangeComponent;
+
 import helpers.*;
 import org.jfree.chart.ChartPanel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import static main.Main.HOME_CURRENCY;
 
 
-public class Finance extends JPanel {
+public class Finance extends JPanel
+{
     private double currentValue;
     private JLabel userValue;
     private Connection connection;
@@ -28,11 +26,16 @@ public class Finance extends JPanel {
     private JFormattedTextField fxRate;
     private DatePanel maturityDate;
     private JButton doAction;
-    private CurrencyComboBox fromCurrency;
-    private CurrencyComboBox toCurrency;
+    private CurrencyExchanger exchanger;
 
-    public Finance(Connection connection) {
+    private JComboBox<String> fromCurrency;
+
+    private JComboBox<String> toCurrency;
+
+    public Finance(Connection connection, CurrencyExchanger exchanger)
+    {
         this.connection = connection;
+        this.exchanger = exchanger;
         this.currentValue = pullCurrentValue();
         setSize(900, 500);
         setLayout(new BorderLayout());
@@ -65,14 +68,15 @@ public class Finance extends JPanel {
                         ? 0.0 : quantitiesPerCurrency.get(currentCurrency);
                 if (!currentCurrency.equals(HOME_CURRENCY))
                 {
+                    /*
                     CurrencyExchanger currencyExchanger = DaggerCurrencyExchangeComponent
                             .create()
                             .getCurrencyExchange();
                     currencyExchanger.doTheCurrencyExchange(Double.parseDouble(resultSet.getString("Amount")),
                             currentCurrency, HOME_CURRENCY);
                     sum += currencyExchanger.getExchangedValue();
-                }
-                else
+                     */
+                } else
                 {
                     sum += Double.parseDouble(resultSet.getString("Amount"));
                 }
@@ -91,7 +95,8 @@ public class Finance extends JPanel {
         return retVal;
     }
 
-    private JPanel doFinancePanel() {
+    private JPanel doFinancePanel()
+    {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setSize(new Dimension(500, 200));
@@ -100,7 +105,8 @@ public class Finance extends JPanel {
         return panel;
     }
 
-    private JPanel addCurrentValue() {
+    private JPanel addCurrentValue()
+    {
         JPanel panel = new JPanel();
         NumberFormat moneyFormatter = NumberFormat.getCurrencyInstance();
         panel.add(new JLabel("Currently Have: "));
@@ -109,7 +115,8 @@ public class Finance extends JPanel {
         return panel;
     }
 
-    private JPanel addActionComponents() {
+    private JPanel addActionComponents()
+    {
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout());
 
@@ -121,18 +128,21 @@ public class Finance extends JPanel {
                 "Cover Short Position"});
         panel.add(action);
 
-        toCurrency = DaggerCurrencyComboBoxComponent
-                .create()
-                .getCurrencyExchange();
-        fromCurrency = DaggerCurrencyComboBoxComponent
-                .create()
-                .getCurrencyExchange();
+        JComboBox<String> currencies = exchanger.getCurrencies();
+        fromCurrency = new JComboBox<>();
+        toCurrency = new JComboBox<>();
+        for (int i = 0; i < currencies.getItemCount(); i++)
+        {
+            fromCurrency.addItem(currencies.getItemAt(i));
+            toCurrency.addItem(currencies.getItemAt(i));
+        }
+        fromCurrency.setEditable(false);
+        fromCurrency.setSelectedItem(HOME_CURRENCY);
+        toCurrency.setEditable(false);
+        toCurrency.setSelectedItem(HOME_CURRENCY);
 
-        panel.add(toCurrency);
         panel.add(fromCurrency);
-
-        toCurrency.addSymbols();
-        fromCurrency.addSymbols();
+        panel.add(toCurrency);
 
         amount = new JFormattedTextField();
         amount.setValue(500);
@@ -154,7 +164,8 @@ public class Finance extends JPanel {
         return panel;
     }
 
-    private void onClick(ActionEvent event) {
+    private void onClick(ActionEvent event)
+    {
         //TODO: Store values in DB
         // GUI changes:
         // a) Validate that if one is selected, other is USD - ONLY
@@ -174,7 +185,8 @@ public class Finance extends JPanel {
         // add into database one row negative 30 ILS
     }
 
-    public JPanel addGraph() {
+    public JPanel addGraph()
+    {
         PnL profitLoss = new PnL();
         JPanel graphPanel = new JPanel();
         graphPanel.setLayout(new BorderLayout());
