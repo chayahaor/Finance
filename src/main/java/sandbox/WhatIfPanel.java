@@ -86,9 +86,9 @@ public class WhatIfPanel extends JPanel
     {
         Date specified = specifiedDate.getDate();
 
-        // if maturity date - specified date is negative
+        // if (maturity date - specified date) is negative
         // specified date is later than maturity date -- you already have full amount
-        // else -- use specified date - today for linear accretion
+        // else -- use (specified date - today) for linear accretion
         // note that neither date can be before today (buying/selling date)
         // -- bad data is rejected before reaching this point
         long diff = maturityDate.dateDiffFromSpecifiedDate(specified) < 0
