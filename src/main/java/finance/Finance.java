@@ -53,7 +53,7 @@ public class Finance extends JPanel
             //TODO: Pull value from database
             // Pull maindata table sorted by Currency
             // Until the currency is different,
-            //      add up POSITIVE quantities from database
+            //      add up quantities from database
             //      converted to USD using CurrencyExchangeAPI
             //      based on maturity date
             //      unless current currency is HOME_CURRENCY
@@ -63,7 +63,7 @@ public class Finance extends JPanel
             String currentCurrency;
             while (resultSet.next())
             {
-                currentCurrency = resultSet.getString("StartCurrency");
+                currentCurrency = resultSet.getString("Currency");
                 sum = quantitiesPerCurrency.get(currentCurrency) == null
                         ? 0.0 : quantitiesPerCurrency.get(currentCurrency);
                 if (!currentCurrency.equals(HOME_CURRENCY))
@@ -71,14 +71,12 @@ public class Finance extends JPanel
                     double amount = Double.parseDouble(resultSet.getString("Amount"));
                     // TODO: somehow convert to current value from today - buy/sell date
                     //  OR maturity - buy/sell if today is later than maturity using formula * amount
-                    if (amount >= 0)
-                    {
-                        exchanger.exchange(amount, currentCurrency, HOME_CURRENCY);
-                    }
-                    sum += exchanger.getResult();
 
-                    // TODO: Are we sure we're only dealing with positive values? If not, probably should do:
-                    // sum = (amount < 0) ? sum - exchanger.getResult() : sum + exchanger.getResult();
+                    exchanger.exchange(amount, currentCurrency, HOME_CURRENCY);
+                   // sum += exchanger.getResult();
+
+                    // TODO: Convert all values in database to USD at specified maturity date and add those up
+                    sum = (amount < 0) ? sum - exchanger.getResult() : sum + exchanger.getResult();
                 } else
                 {
                     sum += Double.parseDouble(resultSet.getString("Amount"));
@@ -164,19 +162,19 @@ public class Finance extends JPanel
     {
         //TODO: Store values in DB
         // GUI changes:
-        // a) Validate that if one is selected, other is USD - ONLY
+        // a) Validate that if one is selected, other is USD - ONLY -- NO NEED, ONLY ONE CURRENCY ON GUI
         // b) Cannot allow yesterday maturity date
-        // c) Buy or Sell as only two options -- REMOVE this combobox altogether
+        // c) Buy or Sell as only two options
         // d) Add labels to fields -- call FX Rate "Spot Price FX / " + HOME_CURRENCY
         // Database changes:
         // a) remove homecurrencytotal column,
         // b) remove endcurrency column,
         // c) rename fromcurrency to be currency
         // Perform action is going to make two database inserts
-        // (Buy) 30 ILS - startcurrency is USD and endcurrency is ILS
+        // (Buy) 30 ILS - startcurrency is USD and endcurrency is ILS -- ONLY ILS IS NECESSARY
         // add into database one row negative (30 / fxRate) USD -- THIS ROW DOES NOT GO IN DATABASE
         // add into database one row positive 30 ILS
-        // (Sell) 30 ILS - startcurrency is ILS and endcurrency is USD
+        // (Sell) 30 ILS - startcurrency is ILS and endcurrency is USD -- ONLY ILS IS NECESSARY
         // add into database one row positive (30 / fxRate) USD -- THIS ROW DOES NOT GO IN DATABASE
         // add into database one row negative 30 ILS
         // NOTE: RACHEL must use API to exchange database row of currency to USD and add that up
