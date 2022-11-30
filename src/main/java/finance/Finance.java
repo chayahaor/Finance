@@ -73,9 +73,7 @@ public class Finance extends JPanel
                     //  OR maturity - buy/sell if today is later than maturity using formula * amount
 
                     exchanger.exchange(amount, currentCurrency, HOME_CURRENCY);
-                   // sum += exchanger.getResult();
-
-                    // TODO: Convert all values in database to USD at specified maturity date and add those up
+                    amount = resultSet.getString("Action").equals("Buy") ? amount : -amount;
                     sum = (amount < 0) ? sum - exchanger.getResult() : sum + exchanger.getResult();
                 } else
                 {
