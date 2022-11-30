@@ -1,8 +1,5 @@
 package finance;
 
-//import dagger.DaggerCurrencyComboBoxComponent;
-//import dagger.DaggerCurrencyExchangeComponent;
-
 import helpers.*;
 import org.jfree.chart.ChartPanel;
 
@@ -54,8 +51,9 @@ public class Finance extends JPanel
             //TODO: Pull value from database
             // Pull maindata table sorted by Currency
             // Until the currency is different,
-            //      add up positive quantities from database
+            //      add up POSITIVE quantities from database
             //      converted to USD using CurrencyExchangeAPI
+            //      based on maturity date
             //      unless current currency is HOME_CURRENCY
             //      add value to quantitiesPerCurrency
             // Loop through all doubles in quantitiesPerCurrency and add them up as retVal
@@ -68,14 +66,15 @@ public class Finance extends JPanel
                         ? 0.0 : quantitiesPerCurrency.get(currentCurrency);
                 if (!currentCurrency.equals(HOME_CURRENCY))
                 {
-                    /*
-                    CurrencyExchanger currencyExchanger = DaggerCurrencyExchangeComponent
-                            .create()
-                            .getCurrencyExchange();
-                    currencyExchanger.doTheCurrencyExchange(Double.parseDouble(resultSet.getString("Amount")),
-                            currentCurrency, HOME_CURRENCY);
-                    sum += currencyExchanger.getExchangedValue();
-                     */
+                    double amount = Double.parseDouble(resultSet.getString("Amount"));
+                    if (amount >= 0)
+                    {
+                        exchanger.exchange(amount, currentCurrency, HOME_CURRENCY);
+                    }
+                    sum += exchanger.getResult();
+
+                    // TODO: Are we sure we're only dealing with positive values? If not, probably should do:
+                    // sum = (amount < 0) ? sum - exchanger.getResult() : sum + exchanger.getResult();
                 } else
                 {
                     sum += Double.parseDouble(resultSet.getString("Amount"));
@@ -109,7 +108,7 @@ public class Finance extends JPanel
     {
         JPanel panel = new JPanel();
         NumberFormat moneyFormatter = NumberFormat.getCurrencyInstance();
-        panel.add(new JLabel("Currently Have: "));
+        panel.add(new JLabel("Current NPV: "));
         userValue = new JLabel(moneyFormatter.format(currentValue));
         panel.add(userValue);
         return panel;
@@ -128,19 +127,12 @@ public class Finance extends JPanel
                 "Cover Short Position"});
         panel.add(action);
 
-        JComboBox<String> currencies = exchanger.getCurrencies();
-        fromCurrency = new JComboBox<>();
-        toCurrency = new JComboBox<>();
-        for (int i = 0; i < currencies.getItemCount(); i++)
-        {
-            fromCurrency.addItem(currencies.getItemAt(i));
-            toCurrency.addItem(currencies.getItemAt(i));
-        }
+        fromCurrency = exchanger.getFromCurrency();
+        toCurrency = exchanger.getToCurrency();
         fromCurrency.setEditable(false);
         fromCurrency.setSelectedItem(HOME_CURRENCY);
         toCurrency.setEditable(false);
         toCurrency.setSelectedItem(HOME_CURRENCY);
-
         panel.add(fromCurrency);
         panel.add(toCurrency);
 

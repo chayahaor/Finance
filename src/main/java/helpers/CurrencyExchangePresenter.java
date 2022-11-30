@@ -28,11 +28,11 @@ public class CurrencyExchangePresenter
         this.model = model;
     }
 
-    public void loadResultFromQuery(double amount, String fromComboBox, String toComboBox)
+    public void loadResultFromQuery(double amount, String fromCurrency, String toCurrency)
     {
-        disposable = model.getCurrencyExchange(amount, fromComboBox, toComboBox)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.newThread())
+        disposable = model.getCurrencyExchange(amount, fromCurrency, toCurrency)
+                //.subscribeOn(Schedulers.io())
+                //.observeOn(Schedulers.newThread())
                 .subscribe(this::onNext, this::onError);
     }
 
@@ -46,8 +46,8 @@ public class CurrencyExchangePresenter
 
     private void onNext(CurrencyExchange currencyExchange)
     {
-        double result = currencyExchange.getResult();
-        viewProvider.get().setResult(result);
+        System.out.println(currencyExchange.getResult());
+        viewProvider.get().setResult(currencyExchange.getResult());
     }
 
     private void onError(Throwable throwable)
