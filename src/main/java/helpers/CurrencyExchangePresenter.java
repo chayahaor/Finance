@@ -64,9 +64,9 @@ public class CurrencyExchangePresenter
                 .subscribe(this::onSymbolsNext);
     }
 
-    private void onSymbolsNext(CurrencyExchange object)
+    private void onSymbolsNext(CurrencyExchange currencyExchange)
     {
-        Map<String, Symbol> symbols = object.getSymbols();
+        Map<String, Symbol> symbols = currencyExchange.getSymbols();
         viewProvider.get().setSymbolsChoices(symbols);
     }
 }

@@ -174,11 +174,15 @@ public class Finance extends JPanel
         // c) rename fromcurrency to be currency
         // Perform action is going to make two database inserts
         // (Buy) 30 ILS - startcurrency is USD and endcurrency is ILS
-        // add into database one row negative (30 / fxRate) USD
+        // add into database one row negative (30 / fxRate) USD -- THIS ROW DOES NOT GO IN DATABASE
         // add into database one row positive 30 ILS
         // (Sell) 30 ILS - startcurrency is ILS and endcurrency is USD
-        // add into database one row positive (30 / fxRate) USD
+        // add into database one row positive (30 / fxRate) USD -- THIS ROW DOES NOT GO IN DATABASE
         // add into database one row negative 30 ILS
+        // NOTE: RACHEL must use API to exchange database row of currency to USD and add that up
+        // REMOVE start and end currency - only one currency allowed
+        // buy/sell amount currency
+        // REMOVE PNL TABLE - PNL IS CALCULATED
     }
 
     public JPanel addGraph()
