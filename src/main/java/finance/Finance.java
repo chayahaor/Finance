@@ -162,10 +162,11 @@ public class Finance extends JPanel
     {
         //TODO: Store values in DB
         // GUI changes:
-        // a) Validate that if one is selected, other is USD - ONLY -- *** NO NEED, ONLY ONE CURRENCY ON GUI ***
+        // a) *** NO NEED, ONLY ONE CURRENCY ON GUI, NOT allowed to be USD ***
         // b) Cannot allow yesterday maturity date
         // c) Buy or Sell as only two options
         // d) Add labels to fields -- call FX Rate "Spot Price FX / " + HOME_CURRENCY
+        // e) USD is NOT allowed to be selected
         // Database changes:
         // a) remove homecurrencytotal column,
         // b) remove endcurrency column,
