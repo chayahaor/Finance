@@ -66,19 +66,19 @@ public class Finance extends JPanel
                 currentCurrency = resultSet.getString("Currency");
                 sum = quantitiesPerCurrency.get(currentCurrency) == null
                         ? 0.0 : quantitiesPerCurrency.get(currentCurrency);
+
+                double amount = Double.parseDouble(resultSet.getString("Amount"));
                 if (!currentCurrency.equals(HOME_CURRENCY))
                 {
-                    double amount = Double.parseDouble(resultSet.getString("Amount"));
                     // TODO: somehow convert to current value from today - buy/sell date
                     //  OR maturity - buy/sell if today is later than maturity using formula * amount
-
                     exchanger.exchange(amount, currentCurrency, HOME_CURRENCY);
                     amount = resultSet.getString("Action").equals("Buy") ? amount : -amount;
                     sum = (amount < 0) ? sum - exchanger.getResult() : sum + exchanger.getResult();
-                } else
-                {
-                    sum += Double.parseDouble(resultSet.getString("Amount"));
+                } else {
+                    sum = amount;
                 }
+
                 quantitiesPerCurrency.put(currentCurrency, sum);
             }
 
