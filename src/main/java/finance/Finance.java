@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.sql.*;
 import java.text.NumberFormat;
 import java.util.HashMap;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import static main.Main.HOME_CURRENCY;
 
@@ -67,6 +69,8 @@ public class Finance extends JPanel
                 if (!currentCurrency.equals(HOME_CURRENCY))
                 {
                     double amount = Double.parseDouble(resultSet.getString("Amount"));
+                    // TODO: somehow convert to current value from today - buy/sell date
+                    //  OR maturity - buy/sell if today is later than maturity using formula * amount
                     if (amount >= 0)
                     {
                         exchanger.exchange(amount, currentCurrency, HOME_CURRENCY);
