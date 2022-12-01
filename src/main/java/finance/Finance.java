@@ -7,7 +7,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.sql.*;
+import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -48,21 +51,15 @@ public class Finance extends JPanel
         try
         {
             Statement stmt = connection.createStatement();
+            // spGetMainData returns the `maindata` table sorted by currencies
             ResultSet resultSet = stmt.executeQuery("Call spGetMainData();");
             HashMap<String, Double> quantitiesPerCurrency = new HashMap<>();
-            //TODO: Pull value from database
-            // Pull maindata table sorted by Currency
-            // Until the currency is different,
-            //      add up quantities from database
-            //      converted to USD using CurrencyExchangeAPI
-            //      based on maturity date
-            //      unless current currency is HOME_CURRENCY
-            //      add value to quantitiesPerCurrency
-            // Loop through all doubles in quantitiesPerCurrency and add them up as retVal
             double sum;
-            String currentCurrency;
+            double currentRate = 1;
+            String currentCurrency = "";
             while (resultSet.next())
             {
+                boolean allSame = currentCurrency.equals(resultSet.getString("Currency"));
                 currentCurrency = resultSet.getString("Currency");
                 sum = quantitiesPerCurrency.get(currentCurrency) == null
                         ? 0.0 : quantitiesPerCurrency.get(currentCurrency);
@@ -70,12 +67,39 @@ public class Finance extends JPanel
                 double amount = Double.parseDouble(resultSet.getString("Amount"));
                 if (!currentCurrency.equals(HOME_CURRENCY))
                 {
-                    // TODO: somehow convert to current value from today - buy/sell date
-                    //  OR maturity - buy/sell if today is later than maturity using formula * amount
-                    exchanger.exchange(amount, currentCurrency, HOME_CURRENCY);
-                    amount = resultSet.getString("Action").equals("Buy") ? amount : -amount;
-                    sum = (amount < 0) ? sum - exchanger.getResult() : sum + exchanger.getResult();
+                    // get difference in days between today and action date
+                    // (or between maturity date and action date if maturity date already passed)
+                    Date actionDate = resultSet.getTimestamp("ActionDate");
+                    Date maturityDate = resultSet.getTimestamp("MaturityDate");
+                    Date today = new Date();
+                    long diffInMs = (maturityDate.getTime() - today.getTime() < 0)
+                            ? maturityDate.getTime() - actionDate.getTime()
+                            : today.getTime() - actionDate.getTime();
+                    double diffInDays = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
+
+                    if (allSame)
+                    {
+                        // use the already existing conversion
+                        amount *= currentRate;
+                        amount = resultSet.getString("Action").equals("Sell")
+                                ? -amount : amount;
+                    }
+                    else
+                    {
+                        // convert to currency
+                        exchanger.exchange(amount, currentCurrency, HOME_CURRENCY);
+                        amount = resultSet.getString("Action").equals("Sell")
+                                ? -(exchanger.getResult()) : exchanger.getResult();
+                        currentRate = exchanger.getRate();
+                    }
+
+                    // translate based on maturity date
+                    // TODO: GET THE RISK FREE RATE OF HOME_CURRENCY
+                    double riskFreeRate = 2.0;
+                    amount += amount * (1 + (diffInDays / 365.0) * riskFreeRate);
+                    sum += amount;
                 } else {
+                    // Home Currency can only be Action = Initial -- no exchange or maturity date calculation
                     sum = amount;
                 }
 

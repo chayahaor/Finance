@@ -20,6 +20,8 @@ public class CurrencyExchanger extends JComponent
     private JComboBox<String> fromCurrency;
     private double result = 1;
 
+    private double rate = 1;
+
     @Inject
     public CurrencyExchanger(CurrencyExchangePresenter presenter)
     {
@@ -78,6 +80,16 @@ public class CurrencyExchanger extends JComponent
     public double getResult()
     {
         return this.result;
+    }
+
+    public void setRate(double rate)
+    {
+        this.rate = rate;
+    }
+
+    public double getRate()
+    {
+        return this.rate;
     }
 
     public void showError()

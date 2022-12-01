@@ -46,6 +46,7 @@ public class CurrencyExchangePresenter
 
     private void onNext(CurrencyExchange currencyExchange)
     {
+        viewProvider.get().setRate(currencyExchange.getRate());
         viewProvider.get().setResult(currencyExchange.getResult());
     }
 
