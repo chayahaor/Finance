@@ -4,41 +4,37 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import json.CurrencyExchange;
 import json.CurrencyExchangeService;
+import json.Symbol;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.util.Map;
 
-// There are three instances of CurrencyComboBox created despite the @Singleton tag
 @Singleton
 public class CurrencyExchangePresenter
 {
-    private final Provider<CurrencyComboBox> viewProvider;
+    private final Provider<CurrencyExchanger> viewProvider;
     private final CurrencyExchangeService model;
     private Disposable disposable;
+    private Disposable symbolsDisposable;
 
     @Inject
     public CurrencyExchangePresenter(
-            Provider<CurrencyComboBox> viewProvider,
+            Provider<CurrencyExchanger> viewProvider,
             CurrencyExchangeService model)
     {
         this.viewProvider = viewProvider;
         this.model = model;
     }
 
-    public void loadResultFromQuery(double amount, String fromComboBox, String toComboBox)
+    public void loadResultFromQuery(double amount, String fromCurrency, String toCurrency)
     {
-        disposable = model.getCurrencyExchange(amount, fromComboBox, toComboBox)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.newThread())
+        disposable = model.getCurrencyExchange(amount, fromCurrency, toCurrency)
+                //.subscribeOn(Schedulers.io())
+                //.observeOn(Schedulers.newThread())
                 .subscribe(this::onNext, this::onError);
     }
-
-
-    private void onNext(CurrencyExchange currencyExchange) {}
-
-    private void onError(Throwable throwable) {}
 
     public void cancel()
     {
@@ -48,9 +44,20 @@ public class CurrencyExchangePresenter
         }
     }
 
+    private void onNext(CurrencyExchange currencyExchange)
+    {
+        viewProvider.get().setResult(currencyExchange.getResult());
+    }
+
+    private void onError(Throwable throwable)
+    {
+        throwable.printStackTrace();
+        viewProvider.get().showError();
+    }
+
     public void loadSymbolsChoices()
     {
-        Disposable symbolsDisposable = model.getCurrencySymbols()
+        symbolsDisposable = model.getCurrencySymbols()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.newThread())
                 .subscribe(this::onSymbolsNext);
@@ -58,7 +65,7 @@ public class CurrencyExchangePresenter
 
     private void onSymbolsNext(CurrencyExchange currencyExchange)
     {
-        Map<String, CurrencyExchange.Symbol> symbols = currencyExchange.getSymbols();
+        Map<String, Symbol> symbols = currencyExchange.getSymbols();
         viewProvider.get().setSymbolsChoices(symbols);
     }
 }

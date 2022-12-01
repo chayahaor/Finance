@@ -1,6 +1,8 @@
 package main;
 
+import dagger.DaggerCurrencyExchangeComponent;
 import finance.Finance;
+import helpers.CurrencyExchanger;
 import sandbox.Sandbox;
 
 import javax.swing.*;
@@ -34,8 +36,11 @@ public class Main extends JFrame
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setForeground(Color.BLACK);
 
+        CurrencyExchanger currencyExchanger = DaggerCurrencyExchangeComponent
+                .create().getCurrencyExchanger();
+
         // add Sandbox tab to Main frame's JTabbedPane
-        sandbox = new Sandbox();
+        sandbox = new Sandbox(currencyExchanger);
         tabbedPane.add("Play in the Sandbox", sandbox);
 
         try
@@ -44,7 +49,7 @@ public class Main extends JFrame
             Connection connection = createConnection();
 
             // add finance tab to the Main frame's JTabbedPane if Connection is successful
-            finance = new Finance(connection);
+            finance = new Finance(connection, currencyExchanger);
             tabbedPane.add("Finance Stuff", finance);
         } catch (SQLException exception)
         {

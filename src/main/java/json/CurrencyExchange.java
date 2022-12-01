@@ -2,57 +2,25 @@ package json;
 
 import java.util.Map;
 
-public class CurrencyExchange
-{
-    public class Info
-    {
-        double rate;
-    }
-
-    public class Symbol
-    {
-        String description;
-        String code;
-
-        public Symbol(String description, String code)
-        {
-            this.description = description;
-            this.code = code;
-        }
-
-        public String getDescription()
-        {
-            return description;
-        }
-
-        public String getCode()
-        {
-            return code;
-        }
-    }
-
+public class CurrencyExchange {
     String date;
     double result;
     Info info;
     Map<String, Symbol> symbols;
 
-    public double getRate()
-    {
+    public double getRate() {
         return info.rate;
     }
 
-    public String getDate()
-    {
+    public String getDate() {
         return date;
     }
 
-    public double getResult()
-    {
+    public double getResult() {
         return result;
     }
 
-    public Map<String, Symbol> getSymbols()
-    {
+    public Map<String, Symbol> getSymbols() {
         return symbols;
     }
 }

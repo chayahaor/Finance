@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 29, 2022 at 08:52 PM
+-- Generation Time: Nov 30, 2022 at 10:51 PM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.0.19
 
@@ -33,11 +33,14 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `spGetCurrentAmount` (IN `HomeCurren
 select CurrentAmount from `maindata` where currency = HomeCurrency;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spGetMainData` ()   BEGIN
+Select ActionDate, Action, Currency, MaturityDate, Amount from `maindata` inner join `action` on `maindata`.Action_Id = `action`.ID
+Where Action = 'Buy' or Action = 'Sell' or Action = 'Initial'
+Order by Currency;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `spInitial` (IN `InitialAmount` INT(11), IN `HomeCurrency` VARCHAR(10), IN `InitialDate` DATETIME)  DETERMINISTIC BEGIN
-insert into `maindata` (ActionDate, Action_Id, StartCurrency, EndCurrency,
-                        MaturityDate, Amount, FXRate, HomeCurrencyTotal)
-                        values (InitialDate, 5, HomeCurrency, HomeCurrency,
-                                InitialDate, InitialAmount, 1, InitialAmount);
+insert into `maindata` (ActionDate, Action_Id, Currency, MaturityDate, Amount, FXRate) values (InitialDate, 5, HomeCurrency,                        InitialDate, InitialAmount, 1);
 END$$
 
 DELIMITER ;
@@ -74,15 +77,11 @@ CREATE TABLE `maindata` (
   `ID` int(11) NOT NULL,
   `ActionDate` datetime NOT NULL DEFAULT current_timestamp(),
   `Action_Id` int(11) NOT NULL,
-  `StartCurrency` varchar(10) NOT NULL,
-  `EndCurrency` varchar(10) NOT NULL,
+  `Currency` varchar(10) NOT NULL,
   `MaturityDate` datetime NOT NULL,
   `Amount` float NOT NULL,
-  `FXRate` float NOT NULL,
-  `HomeCurrencyTotal` float DEFAULT NULL
+  `FXRate` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `pnl`

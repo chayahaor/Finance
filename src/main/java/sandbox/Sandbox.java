@@ -1,7 +1,6 @@
 package sandbox;
 
-import dagger.DaggerCurrencyExchangeComponent;
-import helpers.CurrencyComboBox;
+import helpers.CurrencyExchanger;
 import helpers.DatePanel;
 
 import javax.swing.*;
@@ -22,19 +21,15 @@ public class Sandbox extends JPanel
     private DatePanel specifiedDate;
     private NumberFormat moneyFormat;
     private JFormattedTextField defaultAmount;
-
     private JFormattedTextField rfr;
-    private final CurrencyComboBox currencyComboBox;
+    private JComboBox<String> currencies;
 
-    public Sandbox()
+    public Sandbox(CurrencyExchanger exchanger)
     {
         setSize(900, 500);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        currencyComboBox = DaggerCurrencyExchangeComponent
-                .create()
-                .getCurrencyExchange();
-        currencyComboBox.addSymbols();
+        currencies = exchanger.getCurrencies();
 
         addStartingRow();
 
@@ -146,7 +141,7 @@ public class Sandbox extends JPanel
         JPanel row = new JPanel(new BorderLayout());
         row.setMaximumSize(new Dimension(1000, 30));
 
-        WhatIfPanel whatIfPanel = new WhatIfPanel(currencyComboBox);
+        WhatIfPanel whatIfPanel = new WhatIfPanel(currencies);
         DeleteButton deleteButton = new DeleteButton(whatIfPanel);
         deleteButton.addActionListener(this::onClickDelete);
         row.add(deleteButton, BorderLayout.EAST);
