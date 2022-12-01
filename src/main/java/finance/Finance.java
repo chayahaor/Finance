@@ -9,8 +9,6 @@ import java.awt.event.ActionEvent;
 import java.sql.*;
 import java.text.NumberFormat;
 import java.util.HashMap;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 import static main.Main.HOME_CURRENCY;
 
@@ -27,9 +25,7 @@ public class Finance extends JPanel
     private JButton doAction;
     private CurrencyExchanger exchanger;
 
-    private JComboBox<String> fromCurrency;
-
-    private JComboBox<String> toCurrency;
+    private JComboBox<String> currency;
 
     public Finance(Connection connection, CurrencyExchanger exchanger)
     {
@@ -119,33 +115,31 @@ public class Finance extends JPanel
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout());
 
+        panel.add(new JLabel("Action:"));
         action = new JComboBox<>(new String[]{
-                "Buy Spot",
-                "Buy Forward",
-                "Sell Short",
-                "Sell Long",
-                "Cover Short Position"});
+                "Buy",
+                "Sell"});
         panel.add(action);
 
-        fromCurrency = exchanger.getFromCurrency();
-        toCurrency = exchanger.getToCurrency();
-        fromCurrency.setEditable(false);
-        fromCurrency.setSelectedItem(HOME_CURRENCY);
-        toCurrency.setEditable(false);
-        toCurrency.setSelectedItem(HOME_CURRENCY);
-        panel.add(fromCurrency);
-        panel.add(toCurrency);
+        panel.add(new JLabel("Currency:"));
+        currency = exchanger.getActionCurrency();
+        currency.setEditable(false);
+        currency.setSelectedItem(HOME_CURRENCY);
+        panel.add(currency);
 
+        panel.add(new JLabel("Quantity:"));
         amount = new JFormattedTextField();
         amount.setValue(500);
         amount.setColumns(5);
         panel.add(amount);
 
+        panel.add(new JLabel("Spot Price FX:"));
         fxRate = new JFormattedTextField();
         fxRate.setValue(3.5);
         fxRate.setColumns(5);
         panel.add(fxRate);
 
+        panel.add(new JLabel("Maturity Date:"));
         maturityDate = new DatePanel();
         panel.add(maturityDate);
 
@@ -162,9 +156,9 @@ public class Finance extends JPanel
         // GUI changes:
         // a) *** NO NEED, ONLY ONE CURRENCY ON GUI, NOT allowed to be USD ***
         // b) Cannot allow yesterday maturity date
-        // c) Buy or Sell as only two options
-        // d) Add labels to fields -- call FX Rate "Spot Price FX / " + HOME_CURRENCY
-        // e) USD is NOT allowed to be selected
+        // c) *Buy or Sell as only two options
+        // d) *Add labels to fields -- call FX Rate "Spot Price FX / " + HOME_CURRENCY
+        // e) * is NOT allowed to be selected **I changed the method in currency exchanger
         // Database changes:
         // a) remove homecurrencytotal column,
         // b) remove endcurrency column,
