@@ -1,5 +1,6 @@
 package main;
 
+import finance.Finance2;
 import sandbox.Sandbox2;
 
 import javax.swing.*;
@@ -15,7 +16,7 @@ public class Main2 extends JFrame {
     public static final String HOME_CURRENCY = "USD";
     public double initialAmount = 10000;
     private Sandbox2 sandbox2;
-    //private Finance finance;
+    private Finance2 finance;
 
     public Main2() throws IOException {
         setTitle("Finance Project");
@@ -33,13 +34,13 @@ public class Main2 extends JFrame {
         sandbox2 = new Sandbox2();
         tabbedPane.add("Play in the Sandbox", sandbox2);
 
-        /*try
+        try
         {
             // create database connection
             Connection connection = createConnection();
 
             // add finance tab to the Main frame's JTabbedPane if Connection is successful
-            finance = new Finance(connection, currencyExchanger);
+            finance = new Finance2(connection);
             tabbedPane.add("Finance Stuff", finance);
         } catch (SQLException exception)
         {
@@ -47,7 +48,6 @@ public class Main2 extends JFrame {
             JOptionPane.showMessageDialog(this,
                     "Something went wrong with the SQL connection: " + exception.getMessage());
         }
-*/
         // add the JTabbedPane to Main frame
         tabbedPane.setPreferredSize(new Dimension(950, 550));
         add(tabbedPane);
@@ -104,6 +104,7 @@ public class Main2 extends JFrame {
         UIManager.put("TextArea.font", font);
         UIManager.put("ComboBox.font", font);
 */
+
         // instantiate the Main frame
         Main2 frame = new Main2();
         frame.setVisible(true);

@@ -30,7 +30,7 @@ public class API {
         return object.get("result").getAsString();
     }
 
-    public String convert(String from, String to) throws IOException {
+    public double convert(String from, String to) throws IOException {
         String convert = url_base + "convert?from=" + from + "&to=" + to;
         URL url = new URL(convert);
         HttpURLConnection request = (HttpURLConnection) url.openConnection();
@@ -38,7 +38,7 @@ public class API {
         JsonElement root = JsonParser.parseReader(new InputStreamReader((InputStream) request.getContent()));
         JsonObject object = root.getAsJsonObject();
 
-        return object.get("result").getAsString();
+        return Double.parseDouble(object.get("result").getAsString());
     }
 
     public ArrayList<String> getSymbolResults() throws IOException {
