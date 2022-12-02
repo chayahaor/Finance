@@ -8,8 +8,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class Dates extends JFrame {
 
@@ -34,6 +37,14 @@ public class Dates extends JFrame {
         Calendar selectedValue = (Calendar) datePicker.getModel().getValue();
         Date selectedDate = selectedValue.getTime();
         System.out.println(selectedDate);
+
+        LocalDate localDate = LocalDate.now();
+        ZoneId defaultZoneId = ZoneId.systemDefault();
+        Date date = Date.from(localDate.atStartOfDay(defaultZoneId).toInstant());
+        long diffInMillies = date.getTime() - selectedDate.getTime();
+        System.out.println(TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS));
+        //returns negative if in future
+        //returns positive if in past
     }
 
 
