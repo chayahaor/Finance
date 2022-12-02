@@ -1,3 +1,4 @@
+/*
 package json;
 
 import io.reactivex.Single;
@@ -11,3 +12,4 @@ public interface CurrencyExchangeService {
     @GET("symbols")
     Single<CurrencyExchange> getCurrencySymbols();
 }
+*/

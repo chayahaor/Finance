@@ -1,3 +1,4 @@
+/*
 package helpers;
 
 import io.reactivex.disposables.Disposable;
@@ -69,3 +70,4 @@ public class CurrencyExchangePresenter
         viewProvider.get().setSymbolsChoices(symbols);
     }
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package dagger;
 
 import helpers.CurrencyExchanger;
@@ -10,4 +11,4 @@ import javax.inject.Singleton;
 public interface CurrencyExchangeComponent
 {
     CurrencyExchanger getCurrencyExchanger();
-}
+}*/

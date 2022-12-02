@@ -1,3 +1,4 @@
+/*
 package json;
 
 import java.util.Map;
@@ -24,3 +25,4 @@ public class CurrencyExchange {
         return symbols;
     }
 }
+*/

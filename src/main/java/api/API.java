@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class API {
     private final String url_base;
@@ -40,7 +41,8 @@ public class API {
         return object.get("result").getAsString();
     }
 
-    public void getSymbolResults() throws IOException {
+    public ArrayList<String> getSymbolResults() throws IOException {
+        ArrayList<String> output = new ArrayList<>();
         String urlSymbol = "https://api.exchangerate.host/symbols";
         URL url = new URL(urlSymbol);
         HttpURLConnection request = (HttpURLConnection) url.openConnection();
@@ -62,26 +64,14 @@ public class API {
                 {
                     if (code.length() <= 6)
                     {
-                        System.out.println(eachCurrency.get(code));
+                        output.add(String.valueOf(eachCurrency.get(code)));
                     }
                 }
             }
         }
 
+        return output;
 
     }
 
-    public static void main(String[] args) throws IOException {
-        String from = "USD";
-        String to = "ILS";
-        String date = "2022-12-01";
-
-        API api = new API();
-        String req_result = api.convert(from, to);
-        String req_result1 = api.convert(from, to, date);
-        System.out.println(req_result);
-        System.out.println(req_result1);
-        api.getSymbolResults(); //TODO: change from returning void (just printing) to be an array)
-
-    }
 }

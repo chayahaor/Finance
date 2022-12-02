@@ -1,3 +1,4 @@
+/*
 package json;
 
 import retrofit2.Retrofit;
@@ -22,3 +23,4 @@ public class CurrencyExchangeServiceFactory {
     }
 
 }
+*/

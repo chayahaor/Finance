@@ -1,3 +1,4 @@
+/*
 package json;
 
 public class Symbol {
@@ -17,3 +18,4 @@ public class Symbol {
         return code;
     }
 }
+*/

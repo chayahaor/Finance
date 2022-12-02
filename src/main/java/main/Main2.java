@@ -1,28 +1,23 @@
-/*
 package main;
 
-import dagger.DaggerCurrencyExchangeComponent;
-import finance.Finance;
-import helpers.CurrencyExchanger;
-import sandbox.Sandbox;
+import sandbox.Sandbox2;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 import java.sql.*;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-public class Main extends JFrame
-{
+public class Main2 extends JFrame {
     public static final String HOME_CURRENCY = "USD";
     public double initialAmount = 10000;
-    private Sandbox sandbox;
-    private Finance finance;
+    private Sandbox2 sandbox2;
+    //private Finance finance;
 
-    public Main()
-    {
+    public Main2() throws IOException {
         setTitle("Finance Project");
         setSize(1000, 600);
         setMinimumSize(new Dimension(1000, 600));
@@ -32,19 +27,13 @@ public class Main extends JFrame
         setUpJTabbedPane();
     }
 
-    public void setUpJTabbedPane()
-    {
+    public void setUpJTabbedPane() throws IOException {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setForeground(Color.BLACK);
+        sandbox2 = new Sandbox2();
+        tabbedPane.add("Play in the Sandbox", sandbox2);
 
-        CurrencyExchanger currencyExchanger = DaggerCurrencyExchangeComponent
-                .create().getCurrencyExchanger();
-
-        // add Sandbox tab to Main frame's JTabbedPane
-        sandbox = new Sandbox(currencyExchanger);
-        tabbedPane.add("Play in the Sandbox", sandbox);
-
-        try
+        /*try
         {
             // create database connection
             Connection connection = createConnection();
@@ -58,14 +47,13 @@ public class Main extends JFrame
             JOptionPane.showMessageDialog(this,
                     "Something went wrong with the SQL connection: " + exception.getMessage());
         }
-
+*/
         // add the JTabbedPane to Main frame
         tabbedPane.setPreferredSize(new Dimension(950, 550));
         add(tabbedPane);
     }
 
-    private Connection createConnection() throws SQLException
-    {
+    private Connection createConnection() throws SQLException {
         String dbName = "finance";
         int portNumber = 3306;
         Connection connection = DriverManager.getConnection(
@@ -89,9 +77,8 @@ public class Main extends JFrame
         return connection;
     }
 
-    public static void main(String[] args)
-    {
-        // update the UIManager to use the Nimbus Look and Feel
+    public static void main(String[] args) throws IOException {
+        /*// update the UIManager to use the Nimbus Look and Feel
         try
         {
             UIManager.LookAndFeelInfo[] lookAndFeels = UIManager.getInstalledLookAndFeels();
@@ -103,7 +90,9 @@ public class Main extends JFrame
                     break;
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored)
+        {
+        }
 
         // change the font of the program
         Font font = new Font("Lucida Sans Unicode", Font.PLAIN, 12);
@@ -114,10 +103,9 @@ public class Main extends JFrame
         UIManager.put("OptionPane.messageFont", font);
         UIManager.put("TextArea.font", font);
         UIManager.put("ComboBox.font", font);
-
+*/
         // instantiate the Main frame
-        Main frame = new Main();
+        Main2 frame = new Main2();
         frame.setVisible(true);
     }
 }
-*/

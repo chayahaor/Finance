@@ -1,6 +1,9 @@
 package DBTest;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 public class Connect {
 
@@ -21,8 +24,7 @@ public class Connect {
             // NOTE:
             // Strings MUST be enclosed in ''
             // DateTime MUST be in this format 'YYYY-MM-DD hh:mm:ss'
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             e.printStackTrace();
         }

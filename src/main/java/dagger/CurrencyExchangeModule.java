@@ -1,3 +1,4 @@
+/*
 package dagger;
 
 import json.CurrencyExchangeService;
@@ -15,3 +16,4 @@ public class CurrencyExchangeModule
         return factory.getInstance();
     }
 }
+*/

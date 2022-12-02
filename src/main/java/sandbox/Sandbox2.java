@@ -1,46 +1,57 @@
-/*
 package sandbox;
 
-import helpers.CurrencyExchanger;
-import helpers.DatePanel;
+import api.API;
+import org.jdatepicker.JDatePicker;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.text.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
-import static main.Main.HOME_CURRENCY;
 
-public class Sandbox extends JPanel
-{
-    private final ArrayList<WhatIfPanel> whatIfs = new ArrayList<>();
+public class Sandbox2 extends JPanel {
+    private static final String HOME_CURRENCY = "USD";
+    private final ArrayList<WhatIfPanel2> whatIfs = new ArrayList<>();
     private final JScrollPane scrollPane;
-    private final JPanel whatIf;
-    private DatePanel specifiedDate;
+    private final WhatIfPanel2 whatIf;
     private NumberFormat moneyFormat;
     private JFormattedTextField defaultAmount;
     private JFormattedTextField rfr;
-    private JComboBox<String> currencies;
+    private final ArrayList<String> currencyList;
+    private final JComboBox<String> currencies;
+    private JDatePicker specifiedDate;
 
-    public Sandbox(CurrencyExchanger exchanger)
-    {
+    public Sandbox2() throws IOException {
         setSize(900, 500);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-        currencies = exchanger.getCurrencies();
-
+        API api = new API();
+        currencyList = api.getSymbolResults();
+        currencies = new JComboBox<>();
+        for (String curr : currencyList)
+        {
+            currencies.addItem(curr);
+        }
         addStartingRow();
 
         addSecondaryStartingRow();
 
         addMiddleRow();
-
         add(new InstructionsPanel());
 
-        whatIf = new JPanel();
+        //TODO: fix formatting of first what if row.
+        // It is not included in any calculations and looks weird
+        whatIf = new WhatIfPanel2(currencies);
         whatIf.setLayout(new BoxLayout(whatIf, BoxLayout.Y_AXIS));
         whatIf.setMaximumSize(new Dimension(850, 450));
 
@@ -51,10 +62,10 @@ public class Sandbox extends JPanel
 
         setUpButtonPanel();
 
+        specifiedDate = new JDatePicker();
     }
 
-    private void addStartingRow()
-    {
+    private void addStartingRow() {
         JPanel startingRow = new JPanel();
         startingRow.setMaximumSize(new Dimension(850, 50));
 
@@ -69,8 +80,7 @@ public class Sandbox extends JPanel
         add(startingRow);
     }
 
-    private void addSecondaryStartingRow()
-    {
+    private void addSecondaryStartingRow() {
         JPanel panel = new JPanel();
         panel.setMaximumSize(new Dimension(850, 50));
         panel.add(new JLabel("Enter the " + HOME_CURRENCY + " risk free rate as a percentage"));
@@ -84,8 +94,7 @@ public class Sandbox extends JPanel
         add(panel);
     }
 
-    private void addMiddleRow()
-    {
+    private void addMiddleRow() {
         JPanel middleRow = new JPanel();
         middleRow.setMaximumSize(new Dimension(850, 50));
         LocalDate today = LocalDate.now();
@@ -94,42 +103,32 @@ public class Sandbox extends JPanel
         add(middleRow);
     }
 
-    private void setUpButtonPanel()
-    {
+    private void setUpButtonPanel() {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setMaximumSize(new Dimension(850, 100));
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 
         JPanel actionRow = new JPanel();
-
         generateButton("Add another what if row", this::onClickMore, actionRow);
-
         generateButton("Reset the Sandbox", this::onClickReset, actionRow);
+        buttonPanel.add(actionRow);
 
         JPanel calcRow = new JPanel();
-
         generateButton("Show NPV in " + HOME_CURRENCY + " today", this::onClickCurrent, calcRow);
-
         generateButton("Show NPV in " + HOME_CURRENCY + " at specified date", this::onClickFuture, calcRow);
-
-        specifiedDate = new DatePanel();
-
-        buttonPanel.add(actionRow);
         buttonPanel.add(calcRow);
 
         add(buttonPanel);
     }
 
-    private void generateButton(String text, ActionListener listener, JPanel panel)
-    {
+    private void generateButton(String text, ActionListener listener, JPanel panel) {
         JButton button = new JButton();
         button.setText(text);
         button.addActionListener(listener);
         panel.add(button);
     }
 
-    private void onClickReset(ActionEvent actionEvent)
-    {
+    private void onClickReset(ActionEvent actionEvent) {
         defaultAmount.setValue(10000.00);
         whatIfs.clear();
         whatIf.removeAll();
@@ -137,12 +136,11 @@ public class Sandbox extends JPanel
         this.revalidate();
     }
 
-    private void onClickMore(ActionEvent actionEvent)
-    {
+    private void onClickMore(ActionEvent actionEvent) {
         JPanel row = new JPanel(new BorderLayout());
         row.setMaximumSize(new Dimension(1000, 30));
 
-        WhatIfPanel whatIfPanel = new WhatIfPanel(currencies);
+        WhatIfPanel2 whatIfPanel = new WhatIfPanel2(currencies);
         DeleteButton deleteButton = new DeleteButton(whatIfPanel);
         deleteButton.addActionListener(this::onClickDelete);
         row.add(deleteButton, BorderLayout.EAST);
@@ -152,8 +150,7 @@ public class Sandbox extends JPanel
         this.revalidate();
     }
 
-    private void onClickDelete(ActionEvent actionEvent)
-    {
+    private void onClickDelete(ActionEvent actionEvent) {
         DeleteButton button = (DeleteButton) actionEvent.getSource();
         int option = JOptionPane.showConfirmDialog(scrollPane,
                 "You are about to delete an entry. Are you sure? ",
@@ -161,22 +158,25 @@ public class Sandbox extends JPanel
         if (option == JOptionPane.YES_OPTION)
         {
             whatIf.remove(button.getParent());
-            whatIfs.remove((WhatIfPanel) button.getComponentToBeDeleted());
+            whatIfs.remove((WhatIfPanel2) button.getComponentToBeDeleted());
             whatIf.revalidate();
             scrollPane.setViewportView(whatIf);
             scrollPane.revalidate();
         }
     }
 
-    private void onClickCurrent(ActionEvent actionEvent)
-    {
+    private void onClickCurrent(ActionEvent actionEvent) {
+        ZoneId defaultZoneId = ZoneId.systemDefault();
+        Date today = Date.from(LocalDate.now().atStartOfDay(defaultZoneId).toInstant());
+
         int yesterdayCount = 0;
         double sum = 0.0;
-        sum = getSum(sum);
-        for (WhatIfPanel possibility : whatIfs)
+        //TODO: add starting sum
+        for (WhatIfPanel2 possibility : whatIfs)
         {
-            DatePanel maturityDate = possibility.getMaturityDate();
-            long diff = maturityDate.dateDiffFromToday();
+
+            Date maturityDate = possibility.getMaturityDate();
+            long diff = daysBetween(maturityDate, today);
             if (diff >= 0)
             {
                 sum += possibility.getQuantity();
@@ -188,29 +188,35 @@ public class Sandbox extends JPanel
         displayResults(yesterdayCount, sum);
     }
 
-    private void onClickFuture(ActionEvent actionEvent)
-    {
-        JOptionPane.showMessageDialog(this, specifiedDate, "Enter specified date", JOptionPane.PLAIN_MESSAGE);
+    private void onClickFuture(ActionEvent actionEvent) {
+        ZoneId defaultZoneId = ZoneId.systemDefault();
+        Date today = Date.from(LocalDate.now().atStartOfDay(defaultZoneId).toInstant());
 
-        while (specifiedDate.dateDiffFromToday() < 0)
+        JOptionPane.showMessageDialog(this, specifiedDate, "Enter specified date", JOptionPane.PLAIN_MESSAGE);
+        Calendar selectedValue = (Calendar) specifiedDate.getModel().getValue();
+        Date specifiedDay = selectedValue.getTime();
+
+        while (daysBetween(specifiedDay, today) > 0)
         {
             JOptionPane.showMessageDialog(this, specifiedDate, "Specified date already occurred - try again", JOptionPane.INFORMATION_MESSAGE);
+            selectedValue = (Calendar) specifiedDate.getModel().getValue();
+            specifiedDay = selectedValue.getTime();
         }
 
         JOptionPane.showMessageDialog(this, specifiedDate.toString());
 
         int yesterdayCount = 0;
         double sum = 0.0;
-        sum = getSum(sum);
-        for (WhatIfPanel possibility : whatIfs)
+        //TODO: add starting sum
+        for (WhatIfPanel2 possibility : whatIfs)
         {
-            DatePanel maturityDate = possibility.getMaturityDate();
-            long diff = maturityDate.dateDiffFromToday();
+            Date maturityDate = possibility.getMaturityDate();
+            long diff = daysBetween(today, maturityDate);
             if (diff >= 0)
             {
                 // it is a percentage -- so divide by 100
                 double riskFreeRate = Double.parseDouble(rfr.getText()) / 100;
-                sum += possibility.getForwardQuantity(riskFreeRate, specifiedDate);
+                sum += possibility.getForwardQuantity(riskFreeRate, today, specifiedDay);
             } else
             {
                 yesterdayCount++;
@@ -220,27 +226,21 @@ public class Sandbox extends JPanel
         displayResults(yesterdayCount, sum);
     }
 
-    private double getSum(double sum)
-    {
-        try
-        {
-            sum = Double.parseDouble(moneyFormat.parse(defaultAmount.getText()).toString());
-        } catch (Exception ignored)
-        {
-        }
-        return sum;
-    }
 
-    private void displayResults(int yesterdayCount, double sum)
-    {
+    private void displayResults(int yesterdayCount, double sum) {
         if (yesterdayCount > 0)
         {
             JOptionPane.showMessageDialog(this,
                     "At least one maturity date happened already -- its value was ignored");
+            //TODO: Why was it ignored?
         }
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
         JOptionPane.showMessageDialog(this, decimalFormat.format(sum));
     }
 
+
+    public long daysBetween(Date today, Date other) {
+        long diffInMillies = other.getTime() - today.getTime();
+        return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS); //TODO: change order?
+    }
 }
-*/

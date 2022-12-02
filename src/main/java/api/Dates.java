@@ -1,3 +1,4 @@
+/*
 package api;
 
 import org.jdatepicker.JDatePicker;
@@ -15,8 +16,6 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class Dates extends JFrame {
-
-    private JDatePicker datePicker;
 
     public Dates() {
         setTitle("Date Picker");
@@ -47,9 +46,10 @@ public class Dates extends JFrame {
         //returns positive if in past
     }
 
-
-    public static void main(String[] args) {
-        Dates dates = new Dates();
-        dates.setVisible(true);
+    public int daysBetween(Date today, Date other){
+        long diffInMillies = today.getTime() - other.getTime();
+        return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS));
     }
+
 }
+*/

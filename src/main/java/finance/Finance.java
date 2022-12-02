@@ -1,3 +1,4 @@
+/*
 package finance;
 
 import helpers.*;
@@ -192,3 +193,4 @@ public class Finance extends JPanel
         return graphPanel;
     }
 }
+*/

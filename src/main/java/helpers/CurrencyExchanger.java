@@ -1,3 +1,4 @@
+/*
 package helpers;
 
 import json.CurrencyExchangeServiceFactory;
@@ -86,3 +87,4 @@ public class CurrencyExchanger extends JComponent
     }
 }
 
+*/
