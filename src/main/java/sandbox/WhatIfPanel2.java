@@ -27,7 +27,6 @@ public class WhatIfPanel2 extends JPanel {
         setMaximumSize(new Dimension(1000, 30));
 
         NumberFormatter twoDecimalFormatter = new NumberFormatter(new DecimalFormat("#.##"));
-        NumberFormatter sixDecimalFormatter = new NumberFormatter(new DecimalFormat("#.######"));
         int numColumns = 5;
 
         quantity = generateTextField(twoDecimalFormatter, numColumns, 100.00);
@@ -49,6 +48,7 @@ public class WhatIfPanel2 extends JPanel {
 
         add(maturityDate);
 
+        NumberFormatter sixDecimalFormatter = new NumberFormatter(new DecimalFormat("#.######"));
         spotPrice = generateTextField(sixDecimalFormatter, numColumns, 1.0);
         add(spotPrice);
 
@@ -61,7 +61,10 @@ public class WhatIfPanel2 extends JPanel {
         return (Date) maturityDate.getModel().getValue();
     }
 
-    public JFormattedTextField generateTextField(NumberFormatter formatter, int numColumns, double value) {
+    public JFormattedTextField generateTextField(
+            NumberFormatter formatter,
+            int numColumns,
+            double value) {
         JFormattedTextField textField = new JFormattedTextField(formatter);
         textField.setColumns(numColumns);
         textField.setValue(value);

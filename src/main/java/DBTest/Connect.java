@@ -1,3 +1,4 @@
+/*
 package DBTest;
 
 import java.sql.Connection;
@@ -31,3 +32,4 @@ public class Connect {
 
     }
 }
+*/

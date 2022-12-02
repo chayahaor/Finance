@@ -12,30 +12,32 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class API {
-    private final String url_base;
+    private final String urlBase;
 
     public API() {
-        url_base = "https://api.exchangerate.host/";
+        urlBase = "https://api.exchangerate.host/";
     }
 
     public String convert(String from, String to, String date) throws IOException {
-        String convert = url_base + "convert?from=" + from + "&to=" + to + "&date=" + date;
+        String convert = urlBase + "convert?from=" + from + "&to=" + to + "&date=" + date;
         URL url = new URL(convert);
         HttpURLConnection request = (HttpURLConnection) url.openConnection();
         request.connect();
 
-        JsonElement root = JsonParser.parseReader(new InputStreamReader((InputStream) request.getContent()));
+        JsonElement root = JsonParser.parseReader(
+                new InputStreamReader((InputStream) request.getContent()));
         JsonObject object = root.getAsJsonObject();
 
         return object.get("result").getAsString();
     }
 
     public double convert(String from, String to) throws IOException {
-        String convert = url_base + "convert?from=" + from + "&to=" + to;
+        String convert = urlBase + "convert?from=" + from + "&to=" + to;
         URL url = new URL(convert);
         HttpURLConnection request = (HttpURLConnection) url.openConnection();
         request.connect();
-        JsonElement root = JsonParser.parseReader(new InputStreamReader((InputStream) request.getContent()));
+        JsonElement root = JsonParser.parseReader(
+                new InputStreamReader((InputStream) request.getContent()));
         JsonObject object = root.getAsJsonObject();
 
         return Double.parseDouble(object.get("result").getAsString());
@@ -48,7 +50,8 @@ public class API {
         HttpURLConnection request = (HttpURLConnection) url.openConnection();
         request.connect();
 
-        JsonElement root = JsonParser.parseReader(new InputStreamReader((InputStream) request.getContent()));
+        JsonElement root = JsonParser.parseReader(
+                new InputStreamReader((InputStream) request.getContent()));
         JsonObject jsonObject = root.getAsJsonObject();
         JsonElement element = jsonObject.get("symbols");
         jsonObject = element.getAsJsonObject();

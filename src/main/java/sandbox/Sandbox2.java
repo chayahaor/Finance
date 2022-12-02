@@ -192,13 +192,16 @@ public class Sandbox2 extends JPanel {
         ZoneId defaultZoneId = ZoneId.systemDefault();
         Date today = Date.from(LocalDate.now().atStartOfDay(defaultZoneId).toInstant());
 
-        JOptionPane.showMessageDialog(this, specifiedDate, "Enter specified date", JOptionPane.PLAIN_MESSAGE);
+        JOptionPane.showMessageDialog(
+                this, specifiedDate,
+                "Enter specified date", JOptionPane.PLAIN_MESSAGE);
         Calendar selectedValue = (Calendar) specifiedDate.getModel().getValue();
         Date specifiedDay = selectedValue.getTime();
 
         while (daysBetween(specifiedDay, today) > 0)
         {
-            JOptionPane.showMessageDialog(this, specifiedDate, "Specified date already occurred - try again", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, specifiedDate,
+                    "Specified date already occurred - try again", JOptionPane.INFORMATION_MESSAGE);
             selectedValue = (Calendar) specifiedDate.getModel().getValue();
             specifiedDay = selectedValue.getTime();
         }

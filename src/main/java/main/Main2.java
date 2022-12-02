@@ -71,7 +71,9 @@ public class Main2 extends JFrame {
                     "Enter Initial Amount", JOptionPane.PLAIN_MESSAGE);
             initialAmount = Double.parseDouble(defaultAmount.getText());
             LocalDate today = LocalDate.now();
-            String formatted = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH).format(today);
+            String formatted = DateTimeFormatter
+                    .ofPattern("yyyy-MM-dd", Locale.ENGLISH)
+                    .format(today);
             stmt.executeQuery("Call spInitial (" + initialAmount + ", '" + HOME_CURRENCY + "', '" + formatted + "');");
         }
         return connection;
