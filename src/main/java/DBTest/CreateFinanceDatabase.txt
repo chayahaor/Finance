@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.1.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 30, 2022 at 10:51 PM
--- Server version: 10.4.24-MariaDB
--- PHP Version: 8.0.19
+-- Generation Time: Dec 04, 2022 at 04:43 PM
+-- Server version: 10.4.21-MariaDB
+-- PHP Version: 8.0.11
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -29,18 +29,22 @@ DELIMITER $$
 --
 -- Procedures
 --
-CREATE DEFINER=`root`@`localhost` PROCEDURE `spGetCurrentAmount` (IN `HomeCurrency` VARCHAR(10))  COMMENT 'Currently incorrect - just for connecting to stored procedure' BEGIN
-select CurrentAmount from `maindata` where currency = HomeCurrency;
-END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `spGetMainData` ()   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spGetMainData` ()  BEGIN
 Select ActionDate, Action, Currency, MaturityDate, Amount from `maindata` inner join `action` on `maindata`.Action_Id = `action`.ID
 Where Action = 'Buy' or Action = 'Sell' or Action = 'Initial'
 Order by Currency;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `spInitial` (IN `InitialAmount` INT(11), IN `HomeCurrency` VARCHAR(10), IN `InitialDate` DATETIME)  DETERMINISTIC BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spInitial` (IN `InitialAmount` INT(11), IN `HomeCurrency` VARCHAR(10), IN `InitialDate` DATETIME)  BEGIN
 insert into `maindata` (ActionDate, Action_Id, Currency, MaturityDate, Amount, FXRate) values (InitialDate, 5, HomeCurrency,                        InitialDate, InitialAmount, 1);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spInsertMainData` (IN `ActionDate` DATETIME, IN `ActionID` INT(11), IN `Currency` VARCHAR(10), IN `MaturityDate` DATETIME, IN `Quantity` FLOAT, IN `FXRate` FLOAT)  BEGIN
+
+	INSERT INTO `maindata` (ActionDate, Action_ID, Currency, MaturityDate, Amount, FXRate)
+    values (ActionDate, ActionID, Currency, MaturityDate, Quantity, FXRate);
+
 END$$
 
 DELIMITER ;
