@@ -95,7 +95,7 @@ public class Finance extends JPanel
                     Date today = new Date();
                     long diffInMs = (maturityDate.getTime() - today.getTime() < 0)
                             ? maturityDate.getTime() - actionDate.getTime()
-                            : maturityDate.getTime() - today.getTime();
+                            : today.getTime() - actionDate.getTime();
                     double diffInDays = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
                     System.out.println(actionDate);
                     System.out.println(maturityDate);
@@ -155,7 +155,6 @@ public class Finance extends JPanel
         top.add(new JLabel("Currency:"));
         currency = exchanger.getActionCurrency();
         currency.setEditable(false);
-        currency.setSelectedItem(HOME_CURRENCY);
         top.add(currency);
 
         DecimalFormat decimalFormat = new DecimalFormat("0.##");

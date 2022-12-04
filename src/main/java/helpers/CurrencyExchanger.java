@@ -45,6 +45,9 @@ public class CurrencyExchanger extends JComponent
             currencies.addItem(symbol);
             actionCurrency.addItem(symbol);
         }
+
+        currencies.removeItem(HOME_CURRENCY);
+        actionCurrency.removeItem(HOME_CURRENCY);
     }
 
     public JComboBox<String> getCurrencies()
@@ -54,7 +57,6 @@ public class CurrencyExchanger extends JComponent
 
     public JComboBox<String> getActionCurrency()
     {
-        this.actionCurrency.removeItem(HOME_CURRENCY);
         return this.actionCurrency;
     }
 

@@ -36,7 +36,6 @@ public class WhatIfPanel extends JPanel
         {
             currencies.addItem(currencyComboBox.getItemAt(i));
         }
-        currencies.setSelectedItem(HOME_CURRENCY);
         currencies.setEditable(false);
         currencies.setSize(35, 15);
         add(currencies);
