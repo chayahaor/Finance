@@ -7,47 +7,68 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.sql.*;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.Date;
+import java.util.Date; // Tells code to use java.util.Date rather than java.sql.Date
 
 import static main.Main.HOME_CURRENCY;
 
 public class Finance extends JPanel
 {
-    private double currentValue;
     private JFormattedTextField riskFreeRate;
-    private JLabel userValue;
     private Connection connection;
     private JComboBox<String> action;
-    private String[] actions = new String[]{"Buy", "Sell"};
+    private final String[] actions = new String[]{"Buy", "Sell"};
     private JFormattedTextField amount;
     private JFormattedTextField fxRate;
     private DatePanel maturityDate;
     private JButton doAction;
     private CurrencyExchanger exchanger;
-
     private JComboBox<String> currency;
 
     public Finance(Connection connection, CurrencyExchanger exchanger)
     {
         this.connection = connection;
         this.exchanger = exchanger;
-        this.currentValue = pullCurrentValue();
         setSize(900, 500);
         setLayout(new BorderLayout());
         add(doFinancePanel(), BorderLayout.NORTH);
         add(addGraph());
     }
 
-    private double pullCurrentValue()
+    private JPanel doFinancePanel()
     {
-        double retVal = 0;
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setSize(new Dimension(500, 300));
+        panel.add(addCurrentValue());
+        panel.add(addActionComponents());
+        return panel;
+    }
+
+    private JPanel addCurrentValue()
+    {
+        JPanel panel = new JPanel();
+        DecimalFormat decimalFormat = new DecimalFormat("0.######");
+        panel.add(new JLabel("Risk Free Rate of " + HOME_CURRENCY + ":"));
+        riskFreeRate = new JFormattedTextField(decimalFormat);
+        riskFreeRate.setValue(3.5);
+        riskFreeRate.setColumns(5);
+        panel.add(riskFreeRate);
+
+        JButton btnGetCurrentValue = new JButton("Get Current NPV");
+        btnGetCurrentValue.addActionListener(this::pullCurrentValue);
+        panel.add(btnGetCurrentValue);
+        return panel;
+    }
+
+    private void pullCurrentValue(ActionEvent actionEvent)
+    {
+        double currentValue = 0;
         try
         {
             Statement stmt = connection.createStatement();
@@ -74,9 +95,11 @@ public class Finance extends JPanel
                     Date today = new Date();
                     long diffInMs = (maturityDate.getTime() - today.getTime() < 0)
                             ? maturityDate.getTime() - actionDate.getTime()
-                            : today.getTime() - actionDate.getTime();
+                            : maturityDate.getTime() - today.getTime();
                     double diffInDays = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
-
+                    System.out.println(actionDate);
+                    System.out.println(maturityDate);
+                    System.out.println("Difference in days: " + diffInDays);
                     if (allSame)
                     {
                         // use the already existing conversion
@@ -93,10 +116,8 @@ public class Finance extends JPanel
                         currentRate = exchanger.getRate();
                     }
 
-                    // translate based on maturity date
-                    // TODO: GET THE RISK FREE RATE OF HOME_CURRENCY
-                    double riskFreeRate = 2.0;
-                    amount += amount * (1 + (diffInDays / 365.0) * riskFreeRate);
+                    System.out.println(1 + (diffInDays / 365.0) * Double.parseDouble(riskFreeRate.getText()));
+                    amount += amount * (1 + (diffInDays / 365.0) * Double.parseDouble(riskFreeRate.getText()));
                     sum += amount;
                 } else {
                     // Home Currency can only be Action = Initial -- no exchange or maturity date calculation
@@ -108,41 +129,16 @@ public class Finance extends JPanel
 
             for (String currency : quantitiesPerCurrency.keySet())
             {
-                retVal += quantitiesPerCurrency.get(currency);
+                currentValue += quantitiesPerCurrency.get(currency);
             }
         } catch (SQLException exception)
         {
             // if connection fails, use default
-            retVal = 10000;
+            currentValue = 10000;
         }
-        return retVal;
-    }
 
-    private JPanel doFinancePanel()
-    {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setSize(new Dimension(500, 300));
-        panel.add(addCurrentValue());
-        panel.add(addActionComponents());
-        return panel;
-    }
-
-    private JPanel addCurrentValue()
-    {
-        JPanel panel = new JPanel();
         NumberFormat moneyFormatter = NumberFormat.getCurrencyInstance();
-        panel.add(new JLabel("Current NPV: "));
-        userValue = new JLabel(moneyFormatter.format(currentValue));
-        panel.add(userValue);
-
-        panel.add(new JLabel("Risk Free Rate of " + HOME_CURRENCY + ":"));
-        riskFreeRate = new JFormattedTextField();
-        riskFreeRate.setValue(3.5);
-        riskFreeRate.setColumns(5);
-        panel.add(riskFreeRate);
-
-        return panel;
+        JOptionPane.showMessageDialog(this, "Current NPV: " + moneyFormatter.format(currentValue));
     }
 
     private JPanel addActionComponents()
@@ -162,14 +158,16 @@ public class Finance extends JPanel
         currency.setSelectedItem(HOME_CURRENCY);
         top.add(currency);
 
+        DecimalFormat decimalFormat = new DecimalFormat("0.##");
         top.add(new JLabel("Quantity:"));
-        amount = new JFormattedTextField();
+        amount = new JFormattedTextField(decimalFormat);
         amount.setValue(500);
         amount.setColumns(5);
         top.add(amount);
 
+        decimalFormat = new DecimalFormat("0.######");
         top.add(new JLabel("Spot Price FX / " + HOME_CURRENCY + ":"));
-        fxRate = new JFormattedTextField();
+        fxRate = new JFormattedTextField(decimalFormat);
         fxRate.setValue(3.5);
         fxRate.setColumns(5);
         top.add(fxRate);
