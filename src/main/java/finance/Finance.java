@@ -83,29 +83,22 @@ public class Finance extends JPanel
                         ? 0.0 : quantitiesPerCurrency.get(currentCurrency);
 
                 double quantity = Double.parseDouble(resultSet.getString("Amount"));
-                if (!currentCurrency.equals(HOME_CURRENCY))
-                {
-                    // get difference in days between today and action date
-                    // (or between maturity date and action date if maturity date already passed)
-                    Date actionDate = resultSet.getTimestamp("ActionDate");
-                    Date maturityDate = resultSet.getTimestamp("MaturityDate");
-                    Date today = new Date();
-                    long diffInMs = (maturityDate.getTime() - today.getTime() < 0)
-                            ? maturityDate.getTime() - actionDate.getTime()
-                            : today.getTime() - actionDate.getTime();
-                    double diffInDays = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
+                // get difference in days between today and action date
+                // (or between maturity date and action date if maturity date already passed)
+                Date actionDate = resultSet.getTimestamp("ActionDate");
+                Date maturityDate = resultSet.getTimestamp("MaturityDate");
+                Date today = new Date();
+                long diffInMs = (maturityDate.getTime() - today.getTime() < 0)
+                        ? maturityDate.getTime() - actionDate.getTime()
+                        : today.getTime() - actionDate.getTime();
+                double diffInDays = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
 
-                    // convert to currency and apply maturity date formula
-                    exchanger.exchange(quantity, currentCurrency, HOME_CURRENCY);
-                    double value = resultSet.getString("Action").equals("Sell") ?
-                            -(quantity / exchanger.getRate()) : (quantity / exchanger.getRate());
-                    sum += value * (1 + (diffInDays / 365.0) * Double.parseDouble(riskFreeRate.getText()));
+                // convert to currency and apply maturity date formula
+                exchanger.convert(currentCurrency, HOME_CURRENCY);
+                double value = resultSet.getString("Action").equals("Sell") ?
+                        -(quantity / exchanger.getRate()) : (quantity / exchanger.getRate());
+                sum += value * (1 + (diffInDays / 365.0) * Double.parseDouble(riskFreeRate.getText()));
 
-                } else
-                {
-                    // Home Currency can only be Action = Initial -- no exchange or maturity date calculation
-                    sum += quantity;
-                }
 
                 quantitiesPerCurrency.put(currentCurrency, sum);
             }

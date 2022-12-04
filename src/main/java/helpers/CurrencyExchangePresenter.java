@@ -28,9 +28,9 @@ public class CurrencyExchangePresenter
         this.model = model;
     }
 
-    public void loadResultFromQuery(double amount, String fromCurrency, String toCurrency)
+    public void loadResultFromQuery(String fromCurrency, String toCurrency)
     {
-        disposable = model.getCurrencyExchange(amount, fromCurrency, toCurrency)
+        disposable = model.getCurrencyExchange(fromCurrency, toCurrency)
                 //.subscribeOn(Schedulers.io())
                 //.observeOn(Schedulers.newThread())
                 .subscribe(this::onNext, this::onError);
@@ -47,7 +47,6 @@ public class CurrencyExchangePresenter
     private void onNext(CurrencyExchange currencyExchange)
     {
         viewProvider.get().setRate(currencyExchange.getRate());
-        viewProvider.get().setResult(currencyExchange.getResult());
     }
 
     private void onError(Throwable throwable)
