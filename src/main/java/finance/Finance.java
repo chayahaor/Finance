@@ -8,7 +8,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.sql.*;
 import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.Locale;
+import java.util.Objects;
 
 import static main.Main.HOME_CURRENCY;
 
@@ -16,9 +20,11 @@ import static main.Main.HOME_CURRENCY;
 public class Finance extends JPanel
 {
     private double currentValue;
+    private JFormattedTextField riskFreeRate;
     private JLabel userValue;
     private Connection connection;
     private JComboBox<String> action;
+    private String[] actions = new String[]{"Buy", "Sell"};
     private JFormattedTextField amount;
     private JFormattedTextField fxRate;
     private DatePanel maturityDate;
@@ -94,7 +100,7 @@ public class Finance extends JPanel
     {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setSize(new Dimension(500, 200));
+        panel.setSize(new Dimension(500, 300));
         panel.add(addCurrentValue());
         panel.add(addActionComponents());
         return panel;
@@ -107,73 +113,83 @@ public class Finance extends JPanel
         panel.add(new JLabel("Current NPV: "));
         userValue = new JLabel(moneyFormatter.format(currentValue));
         panel.add(userValue);
+
+        panel.add(new JLabel("Risk Free Rate of " + HOME_CURRENCY + ":"));
+        riskFreeRate = new JFormattedTextField();
+        riskFreeRate.setValue(3.5);
+        riskFreeRate.setColumns(5);
+        panel.add(riskFreeRate);
+
         return panel;
     }
 
     private JPanel addActionComponents()
     {
         JPanel panel = new JPanel();
-        panel.setLayout(new FlowLayout());
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        JPanel top = new JPanel();
+        JPanel bottom = new JPanel();
 
-        panel.add(new JLabel("Action:"));
-        action = new JComboBox<>(new String[]{
-                "Buy",
-                "Sell"});
-        panel.add(action);
+        top.add(new JLabel("Action:"));
+        action = new JComboBox<>(actions);
+        top.add(action);
 
-        panel.add(new JLabel("Currency:"));
+        top.add(new JLabel("Currency:"));
         currency = exchanger.getActionCurrency();
         currency.setEditable(false);
         currency.setSelectedItem(HOME_CURRENCY);
-        panel.add(currency);
+        top.add(currency);
 
-        panel.add(new JLabel("Quantity:"));
+        top.add(new JLabel("Quantity:"));
         amount = new JFormattedTextField();
         amount.setValue(500);
         amount.setColumns(5);
-        panel.add(amount);
+        top.add(amount);
 
-        panel.add(new JLabel("Spot Price FX:"));
+        top.add(new JLabel("Spot Price FX / " + HOME_CURRENCY + ":"));
         fxRate = new JFormattedTextField();
         fxRate.setValue(3.5);
         fxRate.setColumns(5);
-        panel.add(fxRate);
+        top.add(fxRate);
 
-        panel.add(new JLabel("Maturity Date:"));
+        bottom.add(new JLabel("Maturity Date:"));
         maturityDate = new DatePanel();
-        panel.add(maturityDate);
+        bottom.add(maturityDate);
 
         doAction = new JButton();
         doAction.setText("Perform Action");
         doAction.addActionListener(this::onClick);
-        panel.add(doAction);
+        bottom.add(doAction);
+
+        panel.add(top);
+        panel.add(bottom);
+
         return panel;
     }
 
     private void onClick(ActionEvent event)
     {
-        //TODO: Store values in DB
-        // GUI changes:
-        // a) *** NO NEED, ONLY ONE CURRENCY ON GUI, NOT allowed to be USD ***
-        // b) Cannot allow yesterday maturity date
-        // c) *Buy or Sell as only two options
-        // d) *Add labels to fields -- call FX Rate "Spot Price FX / " + HOME_CURRENCY
-        // e) * is NOT allowed to be selected **I changed the method in currency exchanger
-        // Database changes:
-        // a) remove homecurrencytotal column,
-        // b) remove endcurrency column,
-        // c) rename fromcurrency to be currency
-        // Perform action is going to make two database inserts -- NOT TRUE -> ONLY ONE
-        // (Buy) 30 ILS - startcurrency is USD and endcurrency is ILS -- ONLY ILS IS NECESSARY
-        // add into database one row negative (30 / fxRate) USD -- THIS ROW DOES NOT GO IN DATABASE
-        // add into database one row positive 30 ILS
-        // (Sell) 30 ILS - startcurrency is ILS and endcurrency is USD -- ONLY ILS IS NECESSARY
-        // add into database one row positive (30 / fxRate) USD -- THIS ROW DOES NOT GO IN DATABASE
-        // add into database one row negative 30 ILS
-        // NOTE: RACHEL must use API to exchange database row of currency to USD and add that up
-        // REMOVE start and end currency - only one currency allowed
-        // buy/sell amount currency
-        // REMOVE PNL TABLE - PNL IS CALCULATED
+        int actionID = (Objects.equals(action.getSelectedItem(), "Buy") ? 1 : 2);
+
+        try
+        {
+            LocalDate today = LocalDate.now();
+            String formatted = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH).format(today);
+
+            Statement stmt = connection.createStatement();
+            stmt.executeQuery("Call spInsertMainData ("
+                + "'" + formatted + "', " + actionID + ", '"
+                + currency.getSelectedItem() + "', '" + maturityDate.toString()
+                + "', " + Double.parseDouble(amount.getText())  + ", "
+                + Double.parseDouble(fxRate.getText()) + ")");
+
+            JOptionPane.showMessageDialog(this, "Row Inserted Successfully!");
+        }
+        catch (SQLException e)
+        {
+            JOptionPane.showMessageDialog(this, e);
+        }
+        //TODO: Cannot allow yesterday maturity date
     }
 
     public JPanel addGraph()
