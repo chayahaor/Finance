@@ -78,43 +78,47 @@ public class Finance extends JPanel
             double sum;
             while (resultSet.next())
             {
-                String currentCurrency = resultSet.getString("Currency");
-                sum = quantitiesPerCurrency.get(currentCurrency) == null
-                        ? 0.0 : quantitiesPerCurrency.get(currentCurrency);
-
-                double quantity = Double.parseDouble(resultSet.getString("Amount"));
-                // get difference in days between today and action date
-                // (or between maturity date and action date if maturity date already passed)
-                Date actionDate = resultSet.getTimestamp("ActionDate");
-                Date maturityDate = resultSet.getTimestamp("MaturityDate");
-                Date today = new Date();
-                long diffInMs = (maturityDate.getTime() - today.getTime() < 0)
-                        ? maturityDate.getTime() - actionDate.getTime()
-                        : today.getTime() - actionDate.getTime();
-                double diffInDays = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
-
-                // convert to currency and apply maturity date formula
-                exchanger.convert(currentCurrency, HOME_CURRENCY);
-                double value = resultSet.getString("Action").equals("Sell") ?
-                        -(quantity / exchanger.getRate()) : (quantity / exchanger.getRate());
-                sum += value * (1 + (diffInDays / 365.0) * Double.parseDouble(riskFreeRate.getText()));
-
-
-                quantitiesPerCurrency.put(currentCurrency, sum);
+                calculateRowCurrentValue(resultSet, quantitiesPerCurrency);
             }
 
             for (String currency : quantitiesPerCurrency.keySet())
             {
                 currentValue += quantitiesPerCurrency.get(currency);
             }
-        } catch (SQLException exception)
+        } catch (Exception exception)
         {
-            // if connection fails, use default
-            currentValue = 10000;
+            currentValue = 10000; // default value if something goes wrong
         }
 
         NumberFormat moneyFormatter = NumberFormat.getCurrencyInstance();
         JOptionPane.showMessageDialog(this, "Current NPV: " + moneyFormatter.format(currentValue));
+    }
+
+    private void calculateRowCurrentValue(ResultSet resultSet, HashMap<String, Double> quantitiesPerCurrency) throws SQLException
+    {
+        double sum;
+        String currentCurrency = resultSet.getString("Currency");
+        sum = quantitiesPerCurrency.get(currentCurrency) == null
+                ? 0.0 : quantitiesPerCurrency.get(currentCurrency);
+
+        double quantity = Double.parseDouble(resultSet.getString("Amount"));
+        // get difference in days between today and action date
+        // (or between maturity date and action date if maturity date already passed)
+        Date actionDate = resultSet.getTimestamp("ActionDate");
+        Date maturityDate = resultSet.getTimestamp("MaturityDate");
+        Date today = new Date();
+        long diffInMs = (maturityDate.getTime() - today.getTime() < 0)
+                ? maturityDate.getTime() - actionDate.getTime()
+                : today.getTime() - actionDate.getTime();
+        double diffInDays = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
+
+        // convert to currency and apply maturity date formula
+        exchanger.convert(currentCurrency, HOME_CURRENCY);
+        double value = resultSet.getString("Action").equals("Sell") ?
+                -(quantity / exchanger.getRate()) : (quantity / exchanger.getRate());
+        sum += value * (1 + (diffInDays / 365.0) * Double.parseDouble(riskFreeRate.getText()));
+
+        quantitiesPerCurrency.put(currentCurrency, sum);
     }
 
     private JPanel addActionComponents()
