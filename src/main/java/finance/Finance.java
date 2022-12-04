@@ -96,9 +96,8 @@ public class Finance extends JPanel
 
     private void calculateRowCurrentValue(ResultSet resultSet, HashMap<String, Double> quantitiesPerCurrency) throws SQLException
     {
-        double sum;
         String currentCurrency = resultSet.getString("Currency");
-        sum = quantitiesPerCurrency.get(currentCurrency) == null
+        double sum = quantitiesPerCurrency.get(currentCurrency) == null
                 ? 0.0 : quantitiesPerCurrency.get(currentCurrency);
 
         double quantity = Double.parseDouble(resultSet.getString("Amount"));
