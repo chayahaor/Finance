@@ -76,16 +76,13 @@ public class Finance extends JPanel
             ResultSet resultSet = stmt.executeQuery("Call spGetMainData();");
             HashMap<String, Double> quantitiesPerCurrency = new HashMap<>();
             double sum;
-            double currentRate = 1;
-            String currentCurrency = "";
             while (resultSet.next())
             {
-                boolean allSame = currentCurrency.equals(resultSet.getString("Currency"));
-                currentCurrency = resultSet.getString("Currency");
+                String currentCurrency = resultSet.getString("Currency");
                 sum = quantitiesPerCurrency.get(currentCurrency) == null
                         ? 0.0 : quantitiesPerCurrency.get(currentCurrency);
 
-                double amount = Double.parseDouble(resultSet.getString("Amount"));
+                double quantity = Double.parseDouble(resultSet.getString("Amount"));
                 if (!currentCurrency.equals(HOME_CURRENCY))
                 {
                     // get difference in days between today and action date
@@ -97,31 +94,17 @@ public class Finance extends JPanel
                             ? maturityDate.getTime() - actionDate.getTime()
                             : today.getTime() - actionDate.getTime();
                     double diffInDays = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
-                    System.out.println(actionDate);
-                    System.out.println(maturityDate);
-                    System.out.println("Difference in days: " + diffInDays);
-                    if (allSame)
-                    {
-                        // use the already existing conversion
-                        amount *= currentRate;
-                        amount = resultSet.getString("Action").equals("Sell")
-                                ? -amount : amount;
-                    }
-                    else
-                    {
-                        // convert to currency
-                        exchanger.exchange(amount, currentCurrency, HOME_CURRENCY);
-                        amount = resultSet.getString("Action").equals("Sell")
-                                ? -(exchanger.getResult()) : exchanger.getResult();
-                        currentRate = exchanger.getRate();
-                    }
 
-                    System.out.println(1 + (diffInDays / 365.0) * Double.parseDouble(riskFreeRate.getText()));
-                    amount += amount * (1 + (diffInDays / 365.0) * Double.parseDouble(riskFreeRate.getText()));
-                    sum += amount;
-                } else {
+                    // convert to currency and apply maturity date formula
+                    exchanger.exchange(quantity, currentCurrency, HOME_CURRENCY);
+                    double value = resultSet.getString("Action").equals("Sell") ?
+                            -(quantity / exchanger.getRate()) : (quantity / exchanger.getRate());
+                    sum += value * (1 + (diffInDays / 365.0) * Double.parseDouble(riskFreeRate.getText()));
+
+                } else
+                {
                     // Home Currency can only be Action = Initial -- no exchange or maturity date calculation
-                    sum = amount;
+                    sum += quantity;
                 }
 
                 quantitiesPerCurrency.put(currentCurrency, sum);
@@ -197,14 +180,13 @@ public class Finance extends JPanel
 
             Statement stmt = connection.createStatement();
             stmt.executeQuery("Call spInsertMainData ("
-                + "'" + formatted + "', " + actionID + ", '"
-                + currency.getSelectedItem() + "', '" + maturityDate.toString()
-                + "', " + Double.parseDouble(amount.getText())  + ", "
-                + Double.parseDouble(fxRate.getText()) + ")");
+                    + "'" + formatted + "', " + actionID + ", '"
+                    + currency.getSelectedItem() + "', '" + maturityDate.toString()
+                    + "', " + Double.parseDouble(amount.getText()) + ", "
+                    + Double.parseDouble(fxRate.getText()) + ")");
 
             JOptionPane.showMessageDialog(this, "Row Inserted Successfully!");
-        }
-        catch (SQLException e)
+        } catch (SQLException e)
         {
             JOptionPane.showMessageDialog(this, e);
         }

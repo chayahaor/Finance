@@ -75,7 +75,7 @@ public class Main extends JFrame
         if (!resultSet.next()) // if there is no result set
         {
             JFormattedTextField defaultAmount
-                    = new JFormattedTextField(new DecimalFormat("####.00"));
+                    = new JFormattedTextField(new DecimalFormat("###0.00"));
             defaultAmount.setValue(initialAmount);
             defaultAmount.setColumns(7);
             JOptionPane.showMessageDialog(this, defaultAmount,
