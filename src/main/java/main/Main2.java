@@ -80,7 +80,7 @@ public class Main2 extends JFrame {
     }
 
     public static void main(String[] args) throws IOException {
-        /*// update the UIManager to use the Nimbus Look and Feel
+        // update the UIManager to use the Nimbus Look and Feel
         try
         {
             UIManager.LookAndFeelInfo[] lookAndFeels = UIManager.getInstalledLookAndFeels();
@@ -105,7 +105,6 @@ public class Main2 extends JFrame {
         UIManager.put("OptionPane.messageFont", font);
         UIManager.put("TextArea.font", font);
         UIManager.put("ComboBox.font", font);
-*/
 
         // instantiate the Main frame
         Main2 frame = new Main2();
