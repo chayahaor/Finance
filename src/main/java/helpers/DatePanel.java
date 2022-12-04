@@ -373,6 +373,6 @@ public class DatePanel extends JPanel
         Date date = getDate();
         Instant instant = date.toInstant();
         LocalDateTime ldt = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
-        return DateTimeFormatter.ofPattern("MM-dd-yyyy", Locale.ENGLISH).format(ldt);
+        return DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH).format(ldt);
     }
 }*/

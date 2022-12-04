@@ -17,8 +17,7 @@ public class CurrencyExchanger extends JComponent
     private CurrencyExchangePresenter presenter;
 
     private JComboBox<String> currencies;
-    private JComboBox<String> toCurrency;
-    private JComboBox<String> fromCurrency;
+    private JComboBox<String> actionCurrency;
     private double result = 1;
 
     @Inject
@@ -29,8 +28,7 @@ public class CurrencyExchanger extends JComponent
         CurrencyExchangeServiceFactory factory = new CurrencyExchangeServiceFactory();
 
         currencies = new JComboBox<>();
-        toCurrency = new JComboBox<>();
-        fromCurrency = new JComboBox<>();
+        actionCurrency = new JComboBox<>();
 
         presenter.loadSymbolsChoices();
     }
@@ -40,14 +38,12 @@ public class CurrencyExchanger extends JComponent
         String[] symbolsArray = symbols.keySet().toArray(new String[0]);
 
         currencies.removeAllItems();
-        toCurrency.removeAllItems();
-        fromCurrency.removeAllItems();
+        actionCurrency.removeAllItems();
 
         for (String symbol : symbolsArray)
         {
             currencies.addItem(symbol);
-            toCurrency.addItem(symbol);
-            fromCurrency.addItem(symbol);
+            actionCurrency.addItem(symbol);
         }
     }
 
@@ -56,14 +52,10 @@ public class CurrencyExchanger extends JComponent
         return this.currencies;
     }
 
-    public JComboBox<String> getToCurrency()
+    public JComboBox<String> getActionCurrency()
     {
-        return this.toCurrency;
-    }
-
-    public JComboBox<String> getFromCurrency()
-    {
-        return this.fromCurrency;
+        this.actionCurrency.removeItem(HOME_CURRENCY);
+        return this.actionCurrency;
     }
 
     public void exchange(double amount, String fromCurrency, String toCurrency)
