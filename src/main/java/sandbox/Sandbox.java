@@ -237,8 +237,7 @@ public class Sandbox extends JPanel
             JOptionPane.showMessageDialog(this,
                     "At least one maturity date happened already -- its value was ignored");
         }
-        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        DecimalFormat decimalFormat = new DecimalFormat("#,##0.##");
         JOptionPane.showMessageDialog(this, decimalFormat.format(sum));
     }
-
 }

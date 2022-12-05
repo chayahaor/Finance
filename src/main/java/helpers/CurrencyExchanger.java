@@ -17,7 +17,7 @@ public class CurrencyExchanger extends JComponent
 
     private JComboBox<String> currencies;
     private JComboBox<String> actionCurrency;
-    private double result = 1;
+    private double rate = 1;
 
     @Inject
     public CurrencyExchanger(CurrencyExchangePresenter presenter)
@@ -44,6 +44,9 @@ public class CurrencyExchanger extends JComponent
             currencies.addItem(symbol);
             actionCurrency.addItem(symbol);
         }
+
+        currencies.removeItem(HOME_CURRENCY);
+        actionCurrency.removeItem(HOME_CURRENCY);
     }
 
     public JComboBox<String> getCurrencies()
@@ -53,23 +56,22 @@ public class CurrencyExchanger extends JComponent
 
     public JComboBox<String> getActionCurrency()
     {
-        this.actionCurrency.removeItem(HOME_CURRENCY);
         return this.actionCurrency;
     }
 
-    public void exchange(double amount, String fromCurrency, String toCurrency)
+    public void convert(String fromCurrency, String toCurrency)
     {
-        presenter.loadResultFromQuery(amount, fromCurrency, toCurrency);
+        presenter.loadResultFromQuery(fromCurrency, toCurrency);
     }
 
-    public void setResult(double result)
+    public void setRate(double rate)
     {
-        this.result = result;
+        this.rate = rate;
     }
 
-    public double getResult()
+    public double getRate()
     {
-        return this.result;
+        return this.rate;
     }
 
     public void showError()
