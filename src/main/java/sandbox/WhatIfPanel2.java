@@ -21,16 +21,16 @@ public class WhatIfPanel2 extends JPanel {
     private final JFormattedTextField spotPrice;
 
     public WhatIfPanel2(JComboBox<String> currencyComboBox) {
-        setLayout(new GridLayout(1,6));
+        setLayout(new GridLayout(1, 6));
         setMaximumSize(new Dimension(1000, 30));
 
-        NumberFormatter twoDecimalFormatter = new NumberFormatter(new DecimalFormat("#.##"));
-        int numColumns = 5;
 
         buyOrSell = new JComboBox<>(new String[]{"Buy", "Sell"});
         buyOrSell.setEditable(false);
         add(buyOrSell);
 
+        int numColumns = 5;
+        NumberFormatter twoDecimalFormatter = new NumberFormatter(new DecimalFormat("#.##"));
         quantity = generateTextField(twoDecimalFormatter, numColumns, 100.00);
         add(quantity);
 
@@ -99,6 +99,6 @@ public class WhatIfPanel2 extends JPanel {
 
     public long daysBetween(Date today, Date other) {
         long diffInMillies = other.getTime() - today.getTime();
-        return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS); //TODO: change order?
+        return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
     }
 }

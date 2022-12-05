@@ -13,99 +13,36 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 public class Finance2 extends JPanel {
     private static final String HOME_CURRENCY = "USD";
-    private double currentValue;
     private JFormattedTextField riskFreeRate;
-    private JLabel userValue;
     private Connection connection;
     private JComboBox<String> action;
+    private final String[] actions = new String[]{"Buy", "Sell"};
     private JFormattedTextField amount;
     private JFormattedTextField fxRate;
     private JDateChooser maturityDate;
     private JButton doAction;
     private API api;
 
-    private JComboBox<String> jComboCurrency;
+    private JComboBox<String> currencyCombobox;
 
 
     public Finance2(Connection connection) throws IOException {
         api = new API();
         this.connection = connection;
-        this.currentValue = pullCurrentValue();
         setSize(900, 500);
         setLayout(new BorderLayout());
         add(doFinancePanel(), BorderLayout.NORTH);
         add(addGraph());
-    }
-
-    private double pullCurrentValue() {
-        double retVal = 0;
-        try
-        {
-            Statement stmt = connection.createStatement();
-            ResultSet resultSet = stmt.executeQuery("Call spGetMainData();");
-            HashMap<String, Double> quantitiesPerCurrency = new HashMap<>();
-            //TODO: Pull value from database
-            // Pull maindata table sorted by Currency
-            // Until the currency is different,
-            //      add up quantities from database
-            //      converted to USD using CurrencyExchangeAPI
-            //      based on maturity date
-            //      unless current currency is HOME_CURRENCY
-            //      add value to quantitiesPerCurrency
-            // Loop through all doubles in quantitiesPerCurrency and add them up as retVal
-            double sum;
-            String currentCurrency;
-            while (resultSet.next())
-            {
-                currentCurrency = resultSet.getString("Currency");
-
-                //TODO: what is sum??
-                sum = quantitiesPerCurrency.get(currentCurrency) == null
-                        ? 0.0 : quantitiesPerCurrency.get(currentCurrency);
-
-                double amount = Double.parseDouble(resultSet.getString("Amount"));
-                if (!currentCurrency.equals(HOME_CURRENCY))
-                {
-                    // TODO: somehow convert to current value from today - buy/sell date
-                    //  OR maturity - buy/sell if today is later than maturity using formula * amount
-
-                    //TODO: call in different order if buying or selling.
-                    // With new DB, amount will be negative is selling
-                    amount = amount * api.convert(currentCurrency, HOME_CURRENCY);
-                    sum += amount;
-
-                    //amount = resultSet.getString("Action").equals("Buy") ? amount : -amount;
-                    //sum = (amount < 0) ? sum - exchanger.getResult() : sum + exchanger.getResult();
-                } else
-                {
-                    sum = amount;
-                }
-
-                quantitiesPerCurrency.put(currentCurrency, sum);
-            }
-
-            for (String currency : quantitiesPerCurrency.keySet())
-            {
-                retVal += quantitiesPerCurrency.get(currency);
-            }
-        } catch (SQLException exception)
-        {
-            // if connection fails, use default
-            retVal = 10000;
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        return retVal;
     }
 
     private JPanel doFinancePanel() throws IOException {
@@ -119,51 +56,106 @@ public class Finance2 extends JPanel {
 
     private JPanel addCurrentValue() {
         JPanel panel = new JPanel();
-        NumberFormat moneyFormatter = NumberFormat.getCurrencyInstance();
-        panel.add(new JLabel("Current NPV: "));
-        userValue = new JLabel(moneyFormatter.format(currentValue));
-        panel.add(userValue);
-
-        panel.add(new JLabel("Risk Free Rate of " + HOME_CURRENCY + ":"));
-        riskFreeRate = new JFormattedTextField();
+        DecimalFormat decimalFormat = new DecimalFormat("0.######");
+        panel.add(new JLabel("Risk Free Rate of: " + HOME_CURRENCY + ":"));
+        riskFreeRate = new JFormattedTextField(decimalFormat);
         riskFreeRate.setValue(3.5);
         riskFreeRate.setColumns(5);
         panel.add(riskFreeRate);
 
+        JButton btnGetCurrentValue = new JButton("Get Current NPV");
+        btnGetCurrentValue.addActionListener(this::pullCurrentValue);
+        panel.add(btnGetCurrentValue);
         return panel;
     }
 
+    private void pullCurrentValue(ActionEvent actionEvent) {
+        double currentValue = 0;
+        try
+        {
+            Statement stmt = connection.createStatement();
+            // spGetMainData returns the `maindata` table sorted by currencies
+            ResultSet resultSet = stmt.executeQuery("Call spGetMainData();");
+            HashMap<String, Double> quantitiesPerCurrency = new HashMap<>();
+            double sum;
+            while (resultSet.next())
+            {
+                calculateRowCurrentValue(resultSet, quantitiesPerCurrency);
+            }
+
+            for (String currency : quantitiesPerCurrency.keySet())
+            {
+                currentValue += quantitiesPerCurrency.get(currency);
+            }
+        } catch (Exception exception)
+        {
+            currentValue = 10000; // default value if something goes wrong
+        }
+
+        NumberFormat moneyFormatter = NumberFormat.getCurrencyInstance();
+        JOptionPane.showMessageDialog(this, "Current NPV: " + moneyFormatter.format(currentValue));
+    }
+
+    private void calculateRowCurrentValue(ResultSet resultSet,
+                                          HashMap<String, Double> quantitiesPerCurrency)
+            throws SQLException, IOException {
+        String currentCurrency = resultSet.getString("Currency");
+        double sum = quantitiesPerCurrency.get(currentCurrency) == null
+                ? 0.0 : quantitiesPerCurrency.get(currentCurrency);
+
+        double quantity = Double.parseDouble(resultSet.getString("Amount"));
+        // get difference in days between today and action date
+        // (or between maturity date and action date if maturity date already passed)
+        Date actionDate = resultSet.getTimestamp("ActionDate");
+        Date maturityDate = resultSet.getTimestamp("MaturityDate");
+        Date today = new Date();
+        long diffInMs = (maturityDate.getTime() - today.getTime() < 0)
+                ? maturityDate.getTime() - actionDate.getTime()
+                : today.getTime() - actionDate.getTime();
+        double diffInDays = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
+
+        //convert to currency and apply maturity date formula
+        double rate = api.convert(currentCurrency, HOME_CURRENCY);
+        double value = resultSet.getString("Action").equals("Sell")
+                ? -(quantity / rate)
+                : (quantity / rate);
+        sum += value * (1 + (diffInDays / 365.0) * Double.parseDouble(riskFreeRate.getText()));
+
+        quantitiesPerCurrency.put(currentCurrency, sum);
+    }
+
+
     private JPanel addActionComponents() throws IOException {
+        ArrayList<String> currencyList = api.getSymbolResults();
+        currencyCombobox = new JComboBox<>();
+        for (String curr : currencyList)
+        {
+            currencyCombobox.addItem(curr);
+        }
+        currencyCombobox.setEditable(false);
+
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         JPanel top = new JPanel();
         JPanel bottom = new JPanel();
 
         top.add(new JLabel("Action:"));
-        action = new JComboBox<>(new String[]{
-                "Buy",
-                "Sell"});
+        action = new JComboBox<>(actions);
         top.add(action);
 
         top.add(new JLabel("Currency:"));
+        top.add(currencyCombobox);
 
-        ArrayList<String> currencyList = api.getSymbolResults();
-        jComboCurrency = new JComboBox<>();
-        for (String curr : currencyList)
-        {
-            jComboCurrency.addItem(curr);
-        }
-        jComboCurrency.setEditable(false);
-        top.add(jComboCurrency);
-
+        DecimalFormat decimalFormat = new DecimalFormat("0.##");
         top.add(new JLabel("Quantity:"));
-        amount = new JFormattedTextField();
+        amount = new JFormattedTextField(decimalFormat);
         amount.setValue(500);
         amount.setColumns(5);
         top.add(amount);
 
+        decimalFormat = new DecimalFormat("0.######");
         top.add(new JLabel("Spot Price FX / " + HOME_CURRENCY + ":"));
-        fxRate = new JFormattedTextField();
+        fxRate = new JFormattedTextField(decimalFormat);
         fxRate.setValue(3.5);
         fxRate.setColumns(5);
         top.add(fxRate);
@@ -171,13 +163,13 @@ public class Finance2 extends JPanel {
         bottom.add(new JLabel("Maturity Date:"));
         maturityDate = new JDateChooser(new Date());
         maturityDate.setMinSelectableDate(new Date());
-
         bottom.add(maturityDate);
 
         doAction = new JButton();
         doAction.setText("Perform Action");
         doAction.addActionListener(this::onClick);
         bottom.add(doAction);
+
         panel.add(top);
         panel.add(bottom);
         return panel;
@@ -189,27 +181,24 @@ public class Finance2 extends JPanel {
         try
         {
             LocalDate today = LocalDate.now();
-            String formattedToday = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH).format(today);
+            String formatted = DateTimeFormatter
+                    .ofPattern("yyyy-MM-dd", Locale.ENGLISH)
+                    .format(today);
 
-            Date maturitySelected = maturityDate.getDate();
-            LocalDate mature = LocalDate.ofInstant(maturitySelected.toInstant(), ZoneId.systemDefault());
-
-            String formattedMaturity = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH)
-                    .format(mature);
-
-            System.out.println(formattedMaturity);
             Statement stmt = connection.createStatement();
             stmt.executeQuery("Call spInsertMainData ("
-                              + "'" + formattedToday + "', " + actionID + ", '"
-                              + jComboCurrency.getSelectedItem() + "', '" + formattedMaturity
+                              + "'" + formatted + "', " + actionID + ", '"
+                              + currencyCombobox.getSelectedItem() + "', '"
+                              + maturityDate.toString()
                               + "', " + Double.parseDouble(amount.getText()) + ", "
                               + Double.parseDouble(fxRate.getText()) + ")");
 
             JOptionPane.showMessageDialog(this, "Row Inserted Successfully!");
         } catch (SQLException e)
         {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            JOptionPane.showMessageDialog(this, e);
         }
+
     }
 
     public JPanel addGraph() {

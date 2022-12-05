@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
@@ -219,13 +218,13 @@ public class Sandbox2 extends JPanel {
 
 
     private void displayResults(double sum) {
-        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        DecimalFormat decimalFormat = new DecimalFormat("#,##0.##");
         JOptionPane.showMessageDialog(this, decimalFormat.format(sum));
     }
 
 
     public long daysBetween(Date today, Date other) {
         long diffInMillies = other.getTime() - today.getTime();
-        return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS); //TODO: change order?
+        return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
     }
 }

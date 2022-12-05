@@ -44,7 +44,7 @@ public class Main2 extends JFrame {
             tabbedPane.add("Finance Stuff", finance);
         } catch (SQLException exception)
         {
-            // otherwise notify user that something went wrong and only have a Sandbox tab
+            // otherwise, notify user that something went wrong and only have a Sandbox tab
             JOptionPane.showMessageDialog(this,
                     "Something went wrong with the SQL connection: " + exception.getMessage());
         }
@@ -65,7 +65,7 @@ public class Main2 extends JFrame {
         {
             //TODO: possibly delete and replace with hardcoded in 10,000
             JFormattedTextField defaultAmount
-                    = new JFormattedTextField(new DecimalFormat("####.00"));
+                    = new JFormattedTextField(new DecimalFormat("###0.00"));
             defaultAmount.setValue(initialAmount);
             defaultAmount.setColumns(7);
             JOptionPane.showMessageDialog(this, defaultAmount,
