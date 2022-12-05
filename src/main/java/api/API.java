@@ -66,7 +66,9 @@ public class API {
                 {
                     if (code.length() <= 6) //Each currency comes in with quotes, that get removed later
                     {
-                        output.add(String.valueOf(eachCurrency.get(code)).replace("\"",""));
+                        if(!String.valueOf(eachCurrency.get(code)).replace("\"", "").equals("USD")){
+                            output.add(String.valueOf(eachCurrency.get(code)).replace("\"",""));
+                        }
                     }
                 }
             }
