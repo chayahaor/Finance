@@ -56,7 +56,6 @@ public class API {
         JsonElement element = jsonObject.get("symbols");
         jsonObject = element.getAsJsonObject();
 
-        new JsonObject();
         JsonObject eachCurrency;
         for (String key : jsonObject.keySet())
         {
@@ -65,7 +64,7 @@ public class API {
                 eachCurrency = jsonObject.get(key).getAsJsonObject();
                 for (String code : eachCurrency.keySet())
                 {
-                    if (code.length() <= 6)
+                    if (code.length() <= 6) //Each currency comes in with quotes, that get removed later
                     {
                         output.add(String.valueOf(eachCurrency.get(code)).replace("\"",""));
                     }
