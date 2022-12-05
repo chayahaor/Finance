@@ -67,7 +67,7 @@ public class API {
                 {
                     if (code.length() <= 6)
                     {
-                        output.add(String.valueOf(eachCurrency.get(code)));
+                        output.add(String.valueOf(eachCurrency.get(code)).replace("\"",""));
                     }
                 }
             }

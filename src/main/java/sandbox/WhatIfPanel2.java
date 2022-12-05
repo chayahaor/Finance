@@ -1,13 +1,11 @@
 package sandbox;
 
-import org.jdatepicker.JDatePicker;
+import com.toedter.calendar.JDateChooser;
 
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.text.DecimalFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -19,7 +17,7 @@ public class WhatIfPanel2 extends JPanel {
     private final JFormattedTextField quantity;
     private final JComboBox<String> buyOrSell;
     private final JComboBox<String> currencies;
-    private final JDatePicker maturityDate;
+    private final JDateChooser maturityDate;
     private final JFormattedTextField spotPrice;
 
     public WhatIfPanel2(JComboBox<String> currencyComboBox) {
@@ -37,15 +35,12 @@ public class WhatIfPanel2 extends JPanel {
         {
             currencies.addItem(currencyComboBox.getItemAt(i));
         }
-        currencies.setSelectedItem(HOME_CURRENCY);
         currencies.setEditable(false);
         currencies.setSize(35, 15);
         add(currencies);
-        ZoneId defaultZoneId = ZoneId.systemDefault();
-        Date today = Date.from(LocalDate.now().atStartOfDay(defaultZoneId).toInstant());
 
-        maturityDate = new JDatePicker(today);
-
+        maturityDate = new JDateChooser(new Date());
+        maturityDate.setMinSelectableDate(new Date());
         add(maturityDate);
 
         NumberFormatter sixDecimalFormatter = new NumberFormatter(new DecimalFormat("#.######"));
@@ -58,7 +53,7 @@ public class WhatIfPanel2 extends JPanel {
     }
 
     public Date getMaturityDate() {
-        return (Date) maturityDate.getModel().getValue();
+        return maturityDate.getDate();
     }
 
     public JFormattedTextField generateTextField(

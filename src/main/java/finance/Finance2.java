@@ -151,9 +151,7 @@ public class Finance2 extends JPanel {
         jComboCurrency = new JComboBox<>();
         for (String curr : currencyList)
         {
-            if (!curr.equals("USD"))
-                jComboCurrency.addItem(curr);
-
+            jComboCurrency.addItem(curr);
         }
         jComboCurrency.setEditable(false);
         top.add(jComboCurrency);
@@ -171,7 +169,7 @@ public class Finance2 extends JPanel {
         top.add(fxRate);
 
         bottom.add(new JLabel("Maturity Date:"));
-        maturityDate = new JDateChooser();
+        maturityDate = new JDateChooser(new Date());
         maturityDate.setMinSelectableDate(new Date());
 
         bottom.add(maturityDate);
@@ -212,7 +210,6 @@ public class Finance2 extends JPanel {
         {
             JOptionPane.showMessageDialog(this, e.getMessage());
         }
-        //TODO: Cannot allow yesterday maturity date
     }
 
     public JPanel addGraph() {

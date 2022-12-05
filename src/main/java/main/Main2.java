@@ -63,6 +63,7 @@ public class Main2 extends JFrame {
         ResultSet resultSet = stmt.executeQuery("Select * from maindata");
         if (!resultSet.next()) // if there is no result set
         {
+            //TODO: possibly delete and replace with hardcoded in 10,000
             JFormattedTextField defaultAmount
                     = new JFormattedTextField(new DecimalFormat("####.00"));
             defaultAmount.setValue(initialAmount);
