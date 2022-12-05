@@ -2,7 +2,7 @@
 package finance;
 
 import api.API;
-import org.jdatepicker.JDatePicker;
+import com.toedter.calendar.JDateChooser;
 import org.jfree.chart.ChartPanel;
 
 import javax.swing.*;
@@ -13,9 +13,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DateFormat;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -31,7 +29,7 @@ public class Finance2 extends JPanel {
     private JComboBox<String> action;
     private JFormattedTextField amount;
     private JFormattedTextField fxRate;
-    private JDatePicker maturityDate;
+    private JDateChooser maturityDate;
     private JButton doAction;
     private API api;
 
@@ -173,7 +171,9 @@ public class Finance2 extends JPanel {
         top.add(fxRate);
 
         bottom.add(new JLabel("Maturity Date:"));
-        maturityDate = new JDatePicker();
+        maturityDate = new JDateChooser();
+        maturityDate.setMinSelectableDate(new Date());
+
         bottom.add(maturityDate);
 
         doAction = new JButton();
@@ -193,10 +193,8 @@ public class Finance2 extends JPanel {
             LocalDate today = LocalDate.now();
             String formattedToday = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH).format(today);
 
-            Calendar selectedValue = (Calendar) maturityDate.getModel().getValue();
-            Date selectedDate = selectedValue.getTime();
-            DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            LocalDate mature = LocalDate.ofInstant(selectedDate.toInstant(), ZoneId.systemDefault());
+            Date maturitySelected = maturityDate.getDate();
+            LocalDate mature = LocalDate.ofInstant(maturitySelected.toInstant(), ZoneId.systemDefault());
 
             String formattedMaturity = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH)
                     .format(mature);
