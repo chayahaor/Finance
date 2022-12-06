@@ -16,7 +16,7 @@ import java.util.Locale;
 public class Main extends JFrame {
     public static final String HOME_CURRENCY = "USD";
     public double initialAmount = 10000;
-    private Sandbox sandbox2;
+    private Sandbox sandbox;
     private Finance finance;
 
     public Main() throws IOException {
@@ -32,8 +32,8 @@ public class Main extends JFrame {
     public void setUpJTabbedPane() throws IOException {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setForeground(Color.BLACK);
-        sandbox2 = new Sandbox();
-        tabbedPane.add("Play in the Sandbox", sandbox2);
+        sandbox = new Sandbox();
+        tabbedPane.add("Play in the Sandbox", sandbox);
 
         try
         {
