@@ -112,7 +112,7 @@ public class Sandbox2 extends JPanel {
         generateButton("Show NPV in " + HOME_CURRENCY + " at specified date", this::onClickFuture, calcRow);
         buttonPanel.add(calcRow);
 
-        specifiedDate = new JDateChooser();
+        specifiedDate = new JDateChooser(new Date());
         specifiedDate.setMinSelectableDate(new Date());
 
 
@@ -196,7 +196,7 @@ public class Sandbox2 extends JPanel {
             specifiedDay = specifiedDate.getDate();
         }
 
-        JOptionPane.showMessageDialog(this, specifiedDate.toString());
+        JOptionPane.showMessageDialog(this, specifiedDate.getDate().toString());
 
         double sum = 0.0;
         //TODO: add starting sum

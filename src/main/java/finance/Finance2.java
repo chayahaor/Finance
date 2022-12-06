@@ -16,10 +16,10 @@ import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-
 
 public class Finance2 extends JPanel {
     private static final String HOME_CURRENCY = "USD";
@@ -77,7 +77,6 @@ public class Finance2 extends JPanel {
             // spGetMainData returns the `maindata` table sorted by currencies
             ResultSet resultSet = stmt.executeQuery("Call spGetMainData();");
             HashMap<String, Double> quantitiesPerCurrency = new HashMap<>();
-            double sum;
             while (resultSet.next())
             {
                 calculateRowCurrentValue(resultSet, quantitiesPerCurrency);
@@ -163,6 +162,7 @@ public class Finance2 extends JPanel {
         bottom.add(new JLabel("Maturity Date:"));
         maturityDate = new JDateChooser(new Date());
         maturityDate.setMinSelectableDate(new Date());
+        maturityDate.setPreferredSize(new Dimension(200, 35));
         bottom.add(maturityDate);
 
         doAction = new JButton();
@@ -185,11 +185,16 @@ public class Finance2 extends JPanel {
                     .ofPattern("yyyy-MM-dd", Locale.ENGLISH)
                     .format(today);
 
+            ZoneId defaultZoneId = ZoneId.systemDefault();
+            String maturityFormatted = DateTimeFormatter
+                    .ofPattern("yyyy-MM-dd",Locale.ENGLISH)
+                    .format(maturityDate.getDate().toInstant().atZone(defaultZoneId).toLocalDate());
+
             Statement stmt = connection.createStatement();
             stmt.executeQuery("Call spInsertMainData ("
                               + "'" + formatted + "', " + actionID + ", '"
                               + currencyCombobox.getSelectedItem() + "', '"
-                              + maturityDate.toString()
+                              + maturityFormatted
                               + "', " + Double.parseDouble(amount.getText()) + ", "
                               + Double.parseDouble(fxRate.getText()) + ")");
 
