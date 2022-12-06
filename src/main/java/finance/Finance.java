@@ -125,12 +125,7 @@ public class Finance extends JPanel {
 
 
     private JPanel addActionComponents() throws IOException {
-        ArrayList<String> currencyList = api.getSymbolResults();
-        currencyCombobox = new JComboBox<>();
-        for (String curr : currencyList)
-        {
-            currencyCombobox.addItem(curr);
-        }
+        currencyCombobox = api.getSymbolResults();
         currencyCombobox.setEditable(false);
 
         JPanel panel = new JPanel();

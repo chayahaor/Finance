@@ -4,12 +4,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 
 public class API {
     private final String urlBase;
@@ -43,8 +43,8 @@ public class API {
         return Double.parseDouble(object.get("result").getAsString());
     }
 
-    public ArrayList<String> getSymbolResults() throws IOException {
-        ArrayList<String> output = new ArrayList<>();
+    public JComboBox<String> getSymbolResults() throws IOException {
+        JComboBox<String> currency = new JComboBox<>();
         String urlSymbol = "https://api.exchangerate.host/symbols";
         URL url = new URL(urlSymbol);
         HttpURLConnection request = (HttpURLConnection) url.openConnection();
@@ -69,14 +69,14 @@ public class API {
                     {
                         if (!String.valueOf(eachCurrency.get(code)).replace("\"", "").equals("USD"))
                         {
-                            output.add(String.valueOf(eachCurrency.get(code)).replace("\"", ""));
+                            currency.addItem(String.valueOf(eachCurrency.get(code)).replace("\"", ""));
                         }
                     }
                 }
             }
         }
 
-        return output;
+        return currency;
 
     }
 

@@ -26,20 +26,17 @@ public class Sandbox extends JPanel {
     private NumberFormat moneyFormat;
     private JFormattedTextField defaultAmount;
     private JFormattedTextField rfr;
-    private final ArrayList<String> currencyList;
     private final JComboBox<String> currencies;
     private JDateChooser specifiedDate;
 
     public Sandbox() throws IOException {
         setSize(900, 500);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
         API api = new API();
-        currencyList = api.getSymbolResults();
-        currencies = new JComboBox<>();
-        for (String curr : currencyList)
-        {
-            currencies.addItem(curr);
-        }
+        currencies = api.getSymbolResults();
+        currencies.setEditable(false);
+
         addStartingRow();
 
         addSecondaryStartingRow();
