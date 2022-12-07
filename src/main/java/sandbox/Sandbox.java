@@ -171,18 +171,10 @@ public class Sandbox extends JPanel
 
     private void onClickCurrent(ActionEvent actionEvent)
     {
-        Date today = new Date();
-        double sum = 0.0;
-        sum = getSum(sum);
+        double sum = getInitial();
         for (WhatIfPanel possibility : whatIfs)
         {
-
-            Date maturityDate = possibility.getMaturityDate();
-            long diff = daysBetween(maturityDate, today);
-            if (diff >= 0)
-            {
-                sum += possibility.getQuantity();
-            }
+            sum += possibility.getQuantity();
         }
         displayResults(sum);
     }
@@ -196,33 +188,29 @@ public class Sandbox extends JPanel
                 "Enter specified date", JOptionPane.PLAIN_MESSAGE);
         Date specifiedDay = specifiedDate.getDate();
 
-        JOptionPane.showMessageDialog(this, specifiedDate.getDate().toString());
-
-        double sum = 0.0;
-        sum = getSum(sum);
+        double sum = getInitial();
         for (WhatIfPanel possibility : whatIfs)
         {
-            Date maturityDate = possibility.getMaturityDate();
-            long diff = daysBetween(today, maturityDate);
-            if (diff >= 0)
-            {
-                // it is a percentage -- so divide by 100
-                double riskFreeRate = Double.parseDouble(rfr.getText()) / 100;
-                sum += possibility.getForwardQuantity(riskFreeRate, today, specifiedDay);
-            }
+            // it is a percentage -- so divide by 100
+            double riskFreeRate = Double.parseDouble(rfr.getText()) / 100;
+            sum += possibility.getForwardQuantity(riskFreeRate, today, specifiedDay);
+
         }
 
         displayResults(sum);
     }
 
 
-    private double getSum(double sum)
+    private double getInitial()
     {
+        double sum;
         try
         {
             sum = Double.parseDouble(moneyFormat.parse(defaultAmount.getText()).toString());
-        } catch (Exception ignored)
+        } catch (Exception exception)
         {
+            // use default
+            sum = 10000;
         }
         return sum;
     }
@@ -231,12 +219,5 @@ public class Sandbox extends JPanel
     {
         DecimalFormat decimalFormat = new DecimalFormat("#,##0.##");
         JOptionPane.showMessageDialog(this, decimalFormat.format(sum));
-    }
-
-
-    public long daysBetween(Date thisDate, Date otherDate)
-    {
-        long diffInMs = thisDate.getTime() - otherDate.getTime();
-        return TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
     }
 }

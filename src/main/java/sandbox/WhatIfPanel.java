@@ -89,11 +89,10 @@ public class WhatIfPanel extends JPanel
 
     public double getForwardQuantity(double riskFreeRate, Date today, Date specifiedDate)
     {
+        // Today = buy/sell date
         // if (maturity date - specified date) is negative
         // specified date is later than maturity date -- you already have full amount
         // else -- use (specified date - today) for linear accretion
-        // note that neither date can be before today (buying/selling date)
-        // -- bad data is rejected before reaching this point
         long diff = daysBetween(getMaturityDate(), specifiedDate);
 
         long differance = diff < 0
