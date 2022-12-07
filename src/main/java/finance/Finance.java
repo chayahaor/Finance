@@ -1,47 +1,53 @@
+
 package finance;
 
-import helpers.*;
+import api.API;
+import com.toedter.calendar.JDateChooser;
 import org.jfree.chart.ChartPanel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.sql.*;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.Date; // Tells code to use java.util.Date rather than java.sql.Date
+import java.util.Date;
 
 import static main.Main.HOME_CURRENCY;
 
-public class Finance extends JPanel
-{
+public class Finance extends JPanel {
     private JFormattedTextField riskFreeRate;
     private Connection connection;
     private JComboBox<String> action;
     private final String[] actions = new String[]{"Buy", "Sell"};
     private JFormattedTextField amount;
     private JFormattedTextField fxRate;
-    private DatePanel maturityDate;
+    private JDateChooser maturityDate;
     private JButton doAction;
-    private CurrencyExchanger exchanger;
-    private JComboBox<String> currency;
+    private API api;
 
-    public Finance(Connection connection, CurrencyExchanger exchanger)
-    {
+    private JComboBox<String> currencyCombobox;
+
+
+    public Finance(Connection connection) throws IOException {
+        api = new API();
         this.connection = connection;
-        this.exchanger = exchanger;
         setSize(900, 500);
         setLayout(new BorderLayout());
         add(doFinancePanel(), BorderLayout.NORTH);
         add(addGraph());
     }
 
-    private JPanel doFinancePanel()
-    {
+    private JPanel doFinancePanel() throws IOException {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setSize(new Dimension(500, 300));
@@ -50,8 +56,7 @@ public class Finance extends JPanel
         return panel;
     }
 
-    private JPanel addCurrentValue()
-    {
+    private JPanel addCurrentValue() {
         JPanel panel = new JPanel();
         DecimalFormat decimalFormat = new DecimalFormat("0.######");
         panel.add(new JLabel("Risk Free Rate of " + HOME_CURRENCY + ":"));
@@ -66,8 +71,7 @@ public class Finance extends JPanel
         return panel;
     }
 
-    private void pullCurrentValue(ActionEvent actionEvent)
-    {
+    private void pullCurrentValue(ActionEvent actionEvent) {
         double currentValue = 0;
         try
         {
@@ -75,7 +79,6 @@ public class Finance extends JPanel
             // spGetMainData returns the `maindata` table sorted by currencies
             ResultSet resultSet = stmt.executeQuery("Call spGetMainData();");
             HashMap<String, Double> quantitiesPerCurrency = new HashMap<>();
-            double sum;
             while (resultSet.next())
             {
                 calculateRowCurrentValue(resultSet, quantitiesPerCurrency);
@@ -94,8 +97,9 @@ public class Finance extends JPanel
         JOptionPane.showMessageDialog(this, "Current NPV: " + moneyFormatter.format(currentValue));
     }
 
-    private void calculateRowCurrentValue(ResultSet resultSet, HashMap<String, Double> quantitiesPerCurrency) throws SQLException
-    {
+    private void calculateRowCurrentValue(ResultSet resultSet,
+                                          HashMap<String, Double> quantitiesPerCurrency)
+            throws SQLException, IOException {
         String currentCurrency = resultSet.getString("Currency");
         double sum = quantitiesPerCurrency.get(currentCurrency) == null
                 ? 0.0 : quantitiesPerCurrency.get(currentCurrency);
@@ -111,17 +115,22 @@ public class Finance extends JPanel
                 : today.getTime() - actionDate.getTime();
         double diffInDays = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
 
-        // convert to currency and apply maturity date formula
-        exchanger.convert(currentCurrency, HOME_CURRENCY);
-        double value = resultSet.getString("Action").equals("Sell") ?
-                -(quantity / exchanger.getRate()) : (quantity / exchanger.getRate());
+        //convert to currency and apply maturity date formula
+        double rate = api.convert(currentCurrency, HOME_CURRENCY);
+        double value = resultSet.getString("Action").equals("Sell")
+                ? -(quantity / rate)
+                : (quantity / rate);
         sum += value * (1 + (diffInDays / 365.0) * Double.parseDouble(riskFreeRate.getText()));
 
         quantitiesPerCurrency.put(currentCurrency, sum);
     }
 
-    private JPanel addActionComponents()
-    {
+
+    private JPanel addActionComponents() throws IOException {
+        currencyCombobox = api.getSymbolResults();
+        currencyCombobox.removeItem("USD");
+        currencyCombobox.setEditable(false);
+
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         JPanel top = new JPanel();
@@ -132,9 +141,7 @@ public class Finance extends JPanel
         top.add(action);
 
         top.add(new JLabel("Currency:"));
-        currency = exchanger.getActionCurrency();
-        currency.setEditable(false);
-        top.add(currency);
+        top.add(currencyCombobox);
 
         DecimalFormat decimalFormat = new DecimalFormat("0.##");
         top.add(new JLabel("Quantity:"));
@@ -151,7 +158,9 @@ public class Finance extends JPanel
         top.add(fxRate);
 
         bottom.add(new JLabel("Maturity Date:"));
-        maturityDate = new DatePanel();
+        maturityDate = new JDateChooser(new Date());
+        maturityDate.setMinSelectableDate(new Date());
+        maturityDate.setPreferredSize(new Dimension(200, 35));
         bottom.add(maturityDate);
 
         doAction = new JButton();
@@ -161,36 +170,41 @@ public class Finance extends JPanel
 
         panel.add(top);
         panel.add(bottom);
-
         return panel;
     }
 
-    private void onClick(ActionEvent event)
-    {
+    private void onClick(ActionEvent event) {
         int actionID = (Objects.equals(action.getSelectedItem(), "Buy") ? 1 : 2);
 
         try
         {
             LocalDate today = LocalDate.now();
-            String formatted = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH).format(today);
+            String formatted = DateTimeFormatter
+                    .ofPattern("yyyy-MM-dd", Locale.ENGLISH)
+                    .format(today);
+
+            ZoneId defaultZoneId = ZoneId.systemDefault();
+            String maturityFormatted = DateTimeFormatter
+                    .ofPattern("yyyy-MM-dd", Locale.ENGLISH)
+                    .format(maturityDate.getDate().toInstant().atZone(defaultZoneId).toLocalDate());
 
             Statement stmt = connection.createStatement();
             stmt.executeQuery("Call spInsertMainData ("
-                    + "'" + formatted + "', " + actionID + ", '"
-                    + currency.getSelectedItem() + "', '" + maturityDate.toString()
-                    + "', " + Double.parseDouble(amount.getText()) + ", "
-                    + Double.parseDouble(fxRate.getText()) + ")");
+                              + "'" + formatted + "', " + actionID + ", '"
+                              + currencyCombobox.getSelectedItem() + "', '"
+                              + maturityFormatted
+                              + "', " + Double.parseDouble(amount.getText()) + ", "
+                              + Double.parseDouble(fxRate.getText()) + ")");
 
             JOptionPane.showMessageDialog(this, "Row Inserted Successfully!");
         } catch (SQLException e)
         {
             JOptionPane.showMessageDialog(this, e);
         }
-        //TODO: Cannot allow yesterday maturity date
+
     }
 
-    public JPanel addGraph()
-    {
+    public JPanel addGraph() {
         PnL profitLoss = new PnL();
         JPanel graphPanel = new JPanel();
         graphPanel.setLayout(new BorderLayout());
@@ -199,3 +213,4 @@ public class Finance extends JPanel
         return graphPanel;
     }
 }
+
