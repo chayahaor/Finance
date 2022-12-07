@@ -10,9 +10,10 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import static main.Main.HOME_CURRENCY;
+
 
 public class WhatIfPanel extends JPanel {
-    private static final String HOME_CURRENCY = "USD";
 
     private final JFormattedTextField quantity;
     private final JComboBox<String> buyOrSell;
@@ -54,7 +55,7 @@ public class WhatIfPanel extends JPanel {
     }
 
     public Date getMaturityDate() {
-        return maturityDate.getDate();
+        return this.maturityDate.getDate();
     }
 
     public JFormattedTextField generateTextField(

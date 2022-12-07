@@ -20,9 +20,11 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.Date;
+
+import static main.Main.HOME_CURRENCY;
 
 public class Finance extends JPanel {
-    private static final String HOME_CURRENCY = "USD";
     private JFormattedTextField riskFreeRate;
     private Connection connection;
     private JComboBox<String> action;
@@ -57,7 +59,7 @@ public class Finance extends JPanel {
     private JPanel addCurrentValue() {
         JPanel panel = new JPanel();
         DecimalFormat decimalFormat = new DecimalFormat("0.######");
-        panel.add(new JLabel("Risk Free Rate of: " + HOME_CURRENCY + ":"));
+        panel.add(new JLabel("Risk Free Rate of " + HOME_CURRENCY + ":"));
         riskFreeRate = new JFormattedTextField(decimalFormat);
         riskFreeRate.setValue(3.5);
         riskFreeRate.setColumns(5);
@@ -126,6 +128,7 @@ public class Finance extends JPanel {
 
     private JPanel addActionComponents() throws IOException {
         currencyCombobox = api.getSymbolResults();
+        currencyCombobox.removeItem("USD");
         currencyCombobox.setEditable(false);
 
         JPanel panel = new JPanel();
@@ -182,7 +185,7 @@ public class Finance extends JPanel {
 
             ZoneId defaultZoneId = ZoneId.systemDefault();
             String maturityFormatted = DateTimeFormatter
-                    .ofPattern("yyyy-MM-dd",Locale.ENGLISH)
+                    .ofPattern("yyyy-MM-dd", Locale.ENGLISH)
                     .format(maturityDate.getDate().toInstant().atZone(defaultZoneId).toLocalDate());
 
             Statement stmt = connection.createStatement();

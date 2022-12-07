@@ -17,12 +17,13 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import static main.Main.HOME_CURRENCY;
+
 
 public class Sandbox extends JPanel {
-    private static final String HOME_CURRENCY = "USD";
     private final ArrayList<WhatIfPanel> whatIfs = new ArrayList<>();
     private final JScrollPane scrollPane;
-    private final JPanel whatIfPanel;
+    private final JPanel whatIfContainer;
     private NumberFormat moneyFormat;
     private JFormattedTextField defaultAmount;
     private JFormattedTextField rfr;
@@ -35,6 +36,7 @@ public class Sandbox extends JPanel {
 
         API api = new API();
         currencies = api.getSymbolResults();
+        currencies.removeItem("USD");
         currencies.setEditable(false);
 
         addStartingRow();
@@ -44,11 +46,11 @@ public class Sandbox extends JPanel {
         addMiddleRow();
         add(new InstructionsPanel());
 
-        whatIfPanel = new JPanel();
-        whatIfPanel.setLayout(new BoxLayout(whatIfPanel, BoxLayout.Y_AXIS));
-        whatIfPanel.setMaximumSize(new Dimension(850, 450));
+        whatIfContainer = new JPanel();
+        whatIfContainer.setLayout(new BoxLayout(whatIfContainer, BoxLayout.Y_AXIS));
+        whatIfContainer.setMaximumSize(new Dimension(850, 450));
 
-        scrollPane = new JScrollPane(whatIfPanel);
+        scrollPane = new JScrollPane(whatIfContainer);
         scrollPane.setPreferredSize(new Dimension(850, 0));
         scrollPane.setMaximumSize(new Dimension(850, 450));
         add(scrollPane);
@@ -126,8 +128,8 @@ public class Sandbox extends JPanel {
     private void onClickReset(ActionEvent actionEvent) {
         defaultAmount.setValue(10000.00);
         whatIfs.clear();
-        whatIfPanel.removeAll();
-        scrollPane.setViewportView(whatIfPanel);
+        whatIfContainer.removeAll();
+        scrollPane.setViewportView(whatIfContainer);
         this.revalidate();
     }
 
@@ -141,7 +143,7 @@ public class Sandbox extends JPanel {
         row.add(deleteButton, BorderLayout.EAST);
         row.add(whatIfPanel);
         whatIfs.add(whatIfPanel);
-        this.whatIfPanel.add(row);
+        whatIfContainer.add(row);
         this.revalidate();
     }
 
@@ -152,10 +154,10 @@ public class Sandbox extends JPanel {
                 "Warning!", JOptionPane.YES_NO_OPTION);
         if (option == JOptionPane.YES_OPTION)
         {
-            whatIfPanel.remove(button.getParent());
+            whatIfContainer.remove(button.getParent());
             whatIfs.remove((WhatIfPanel) button.getComponentToBeDeleted());
-            whatIfPanel.revalidate();
-            scrollPane.setViewportView(whatIfPanel);
+            whatIfContainer.revalidate();
+            scrollPane.setViewportView(whatIfContainer);
             scrollPane.revalidate();
         }
     }
@@ -184,13 +186,6 @@ public class Sandbox extends JPanel {
                 this, specifiedDate,
                 "Enter specified date", JOptionPane.PLAIN_MESSAGE);
         Date specifiedDay = specifiedDate.getDate();
-
-        while (daysBetween(specifiedDay, today) > 0)
-        {
-            JOptionPane.showMessageDialog(this, specifiedDate,
-                    "Specified date already occurred - try again", JOptionPane.INFORMATION_MESSAGE);
-            specifiedDay = specifiedDate.getDate();
-        }
 
         JOptionPane.showMessageDialog(this, specifiedDate.getDate().toString());
 
@@ -230,6 +225,7 @@ public class Sandbox extends JPanel {
 
 
     public long daysBetween(Date today, Date other) {
+        //TODO: Change order
         long diffInMillies = other.getTime() - today.getTime();
         return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
     }
