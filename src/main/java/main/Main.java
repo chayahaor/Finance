@@ -13,13 +13,15 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-public class Main extends JFrame {
+public class Main extends JFrame
+{
     public static final String HOME_CURRENCY = "USD";
     public double initialAmount = 10000;
     private Sandbox sandbox;
     private Finance finance;
 
-    public Main() throws IOException {
+    public Main() throws IOException
+    {
         setTitle("Finance Project");
         setSize(1000, 600);
         setMinimumSize(new Dimension(1000, 600));
@@ -29,9 +31,12 @@ public class Main extends JFrame {
         setUpJTabbedPane();
     }
 
-    public void setUpJTabbedPane() throws IOException {
+    public void setUpJTabbedPane() throws IOException
+    {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setForeground(Color.BLACK);
+
+        // add sandbox tab to the Main frame's JTabbedPane always
         sandbox = new Sandbox();
         tabbedPane.add("Play in the Sandbox", sandbox);
 
@@ -54,7 +59,8 @@ public class Main extends JFrame {
         add(tabbedPane);
     }
 
-    private Connection createConnection() throws SQLException {
+    private Connection createConnection() throws SQLException
+    {
         String dbName = "finance";
         int portNumber = 3306;
         Connection connection = DriverManager.getConnection(
@@ -81,7 +87,8 @@ public class Main extends JFrame {
         return connection;
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException
+    {
         // update the UIManager to use the Nimbus Look and Feel
         try
         {
