@@ -1,4 +1,4 @@
-/*
+
 package helpers;
 
 import javax.swing.*;
@@ -7,67 +7,48 @@ import java.awt.event.ActionEvent;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class DatePanel extends JPanel
-{
-    */
-/**
- * DatePanel displays the months and years in a dropdown
- * <p>
- * Method to set up the values for the month JComboBox
- * <p>
- * Method to set up the values for the year JComboBox
- * <p>
- * Every time a month or year is changed, the number of days also changes
- * Updates number of days and adds them again to the DatePanel
- *
- * @param actionEvent - the action of changing selected month or year
- * <p>
- * Set up days for the JComboBox
- * <p>
- * Method to set up the last day depending on the selected month and year
- * <p>
- * Getter for month dropdown
- * @return month JComboBox
- * <p>
- * Getter for year dropdown
- * @return year JComboBox
- * <p>
- * Getter for month dropdown
- * @return month JComboBox
- * <p>
- * Getter for year value
- * @return the year
- * <p>
- * Getter for selected month name
- * @return month name
- * <p>
- * Getter for month number (0 = January, 11 = December)
- * @return month number
- * <p>
- * Getter for day of month
- * @return day of month
- * <p>
- * Generate Date object from the year, month, and day
- * @return generated Date object
- * <p>
- * Get the number of days between today and Date in DatePanel
- * @return number of days
- * <p>
- * Get the number of days between specified Date object and Date in DatePanel
- * @param specifiedDate - the specified Date
- * @return number of days
- * <p>
- * toString() method - returns the Date in MM-dd-yyyy format
- * @return MM-dd-yyyy format of the Date in the DatePanel
- *//*
+public class DatePanel extends JPanel {
+
+    /**
+     * DatePanel displays the months and years in a dropdown  <p>
+     * Method to set up the values for the month JComboBox <p>
+     * Method to set up the values for the year JComboBox  <p>
+     * Every time a month or year is changed, the number of days also changes
+     * Updates number of days and adds them again to the DatePanel
+     *
+     * @param actionEvent - the action of changing selected month or year <p>
+     * Set up days for the JComboBox  <p>
+     * Method to set up the last day depending on the selected month and year <p>
+     * Getter for month dropdown
+     * @return month JComboBox <p>
+     * Getter for year dropdown
+     * @return year JComboBox <p>
+     * Getter for month dropdown
+     * @return month JComboBox <p>
+     * Getter for year value
+     * @return the year <p>
+     * Getter for selected month name
+     * @return month name <p>
+     * Getter for month number (0 = January, 11 = December)
+     * @return month number <p>
+     * Getter for day of month
+     * @return day of month <p>
+     * Generate Date object from the year, month, and day
+     * @return generated Date object <p>
+     * Get the number of days between today and Date in DatePanel
+     * @return number of days <p>
+     * Get the number of days between specified Date object and Date in DatePanel
+     * @param specifiedDate - the specified Date
+     * @return number of days <p>
+     * toString() method - returns the Date in MM-dd-yyyy format
+     * @return MM-dd-yyyy format of the Date in the DatePanel
+     */
 
     private JComboBox<String> month;
     private JComboBox<String> year;
@@ -76,8 +57,7 @@ public class DatePanel extends JPanel
     private final String[] monthNames = new String[]{"January", "February", "March", "April",
             "May", "June", "July", "August", "September", "October", "November", "December"};
 
-    public DatePanel()
-    {
+    public DatePanel() {
         setLayout(new FlowLayout());
 
         setSize(35, 15);
@@ -92,16 +72,13 @@ public class DatePanel extends JPanel
         setUpDay();
 
         add(year);
-
     }
 
-    */
-/**
- * Method to set up the values for the month JComboBox
- *//*
+    /**
+     * Method to set up the values for the month JComboBox
+     */
 
-    private void setUpMonth()
-    {
+    private void setUpMonth() {
         month = new JComboBox<>(monthNames);
         month.setEditable(false);
         DateFormat format = new SimpleDateFormat("MMMM");
@@ -109,13 +86,10 @@ public class DatePanel extends JPanel
         add(month);
     }
 
-    */
-/**
- * Method to set up the values for the year JComboBox
- *//*
-
-    private void setUpYear()
-    {
+    /**
+     * Method to set up the values for the year JComboBox
+     */
+    private void setUpYear() {
         year = new JComboBox<>();
         year.setEditable(false);
         for (int i = 1000; i < 6000; i++)
@@ -126,16 +100,13 @@ public class DatePanel extends JPanel
         year.setSelectedItem(format.format(new Date())); // set selected year to current year
     }
 
-    */
-/**
- * Every time a month or year is changed, the number of days also changes
- * Updates number of days and adds them again to the DatePanel
- *
- * @param actionEvent - the action of changing selected month or year
- *//*
-
-    private void onChange(ActionEvent actionEvent)
-    {
+    /**
+     * Every time a month or year is changed, the number of days also changes
+     * Updates number of days and adds them again to the DatePanel
+     *
+     * @param actionEvent - the action of changing selected month or year
+     */
+    private void onChange(ActionEvent actionEvent) {
         if (day != null)
         {
             remove(day);
@@ -146,13 +117,10 @@ public class DatePanel extends JPanel
         add(year);
     }
 
-    */
-/**
- * Set up days for the JComboBox
- *//*
-
-    private void setUpDay()
-    {
+    /**
+     * Set up days for the JComboBox
+     */
+    private void setUpDay() {
         int dayOfMonth;
         boolean alreadySet = (day != null);
         Date today = new Date();
@@ -180,13 +148,10 @@ public class DatePanel extends JPanel
         add(day);
     }
 
-    */
-/**
- * Method to set up the last day depending on the selected month and year
- *//*
-
-    public void validateNumberDays()
-    {
+    /**
+     * Method to set up the last day depending on the selected month and year
+     */
+    public void validateNumberDays() {
         // check if the selected year is a leap year
         int selectedYear = Integer.parseInt(Objects.requireNonNull(year.getSelectedItem()).toString());
         boolean leapYear;
@@ -224,75 +189,53 @@ public class DatePanel extends JPanel
         }
     }
 
-    */
-/**
- * Getter for month dropdown
- *
- * @return month JComboBox
- *//*
-
-    public JComboBox<String> getMonthComboBox()
-    {
+    /**
+     * Getter for month dropdown
+     * @return month JComboBox
+     */
+    public JComboBox<String> getMonthComboBox() {
         return month;
     }
 
-    */
-/**
- * Getter for year dropdown
- *
- * @return year JComboBox
- *//*
 
-    public JComboBox<String> getYearComboBox()
-    {
+    /**
+     * Getter for year dropdown
+     * @return year JComboBox
+     */
+    public JComboBox<String> getYearComboBox() {
         return year;
     }
 
-    */
-/**
- * Getter for month dropdown
- *
- * @return month JComboBox
- *//*
-
-    public JComboBox<String> getDayComboBox()
-    {
+    /**
+     * Getter for month dropdown
+     * @return month JComboBox
+     */
+    public JComboBox<String> getDayComboBox() {
         return day;
     }
 
-    */
-/**
- * Getter for year value
- *
- * @return the year
- *//*
-
-    public int getYear()
-    {
+    /**
+     * Getter for year value
+     * @return the year
+     */
+    public int getYear() {
         return Integer.parseInt(Objects.requireNonNull(getYearComboBox().getSelectedItem()).toString());
     }
 
-    */
-/**
- * Getter for selected month name
- *
- * @return month name
- *//*
+    /**
+     * Getter for selected month name
+     * @return month name
+     */
 
-    public String getMonthName()
-    {
+    public String getMonthName() {
         return Objects.requireNonNull(getMonthComboBox().getSelectedItem()).toString();
     }
 
-    */
-/**
- * Getter for month number (0 = January, 11 = December)
- *
- * @return month number
- *//*
-
-    public int getMonthNumber()
-    {
+    /**
+     * Getter for month number (0 = January, 11 = December)
+     * @return month number
+     */
+    public int getMonthNumber() {
         int monthNumber = 0;
         String monthName = getMonthName();
         for (int i = 0; i < monthNames.length; i++)
@@ -306,73 +249,53 @@ public class DatePanel extends JPanel
         return monthNumber;
     }
 
-    */
-/**
- * Getter for day of month
- *
- * @return day of month
- *//*
-
-    public int getDay()
-    {
+    /**
+     * Getter for day of month
+     * @return day of month
+     */
+    public int getDay() {
         return Integer.parseInt(Objects.requireNonNull(getDayComboBox().getSelectedItem()).toString());
     }
 
-    */
-/**
- * Generate Date object from the year, month, and day
- *
- * @return generated Date object
- *//*
-
-    public Date getDate()
-    {
+    /**
+     * Generate Date object from the year, month, and day
+     * @return generated Date object
+     */
+    public Date getDate() {
         return new GregorianCalendar(getYear(), getMonthNumber(), getDay()).getTime();
     }
 
-    */
-/**
- * Get the number of days between today and Date in DatePanel
- *
- * @return number of days
- *//*
-
-    public long dateDiffFromToday()
-    {
+    /**
+     * Get the number of days between today and Date in DatePanel
+     * @return number of days
+     */
+    public long dateDiffFromToday() {
         Date today = new Date();
         Date thisDate = getDate();
         long diffInMs = thisDate.getTime() - today.getTime();
         return TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
     }
 
-    */
-/**
- * Get the number of days between specified Date object and Date in DatePanel
- *
- * @param specifiedDate - the specified Date
- * @return number of days
- *//*
-
-    public long dateDiffFromSpecifiedDate(Date specifiedDate)
-    {
+    /**
+     * Get the number of days between specified Date object and Date in DatePanel
+     * @param specifiedDate - the specified Date
+     * @return number of days
+     */
+    public long dateDiffFromSpecifiedDate(Date specifiedDate) {
         Date thisDate = getDate();
         long diffInMs = thisDate.getTime() - specifiedDate.getTime();
         return TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
     }
 
-    */
-/**
- * toString() method - returns the Date in MM-dd-yyyy format
- *
- * @return MM-dd-yyyy format of the Date in the DatePanel
- *//*
-
+    /**
+     * toString() method - returns the Date in MM-dd-yyyy format
+     * @return MM-dd-yyyy format of the Date in the DatePanel
+     */
     @Override
-    public String toString()
-    {
+    public String toString() {
         Date date = getDate();
         Instant instant = date.toInstant();
         LocalDateTime ldt = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
         return DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH).format(ldt);
     }
-}*/
+}
