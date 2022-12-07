@@ -70,7 +70,7 @@ public class Finance extends JPanel
         riskFreeRate.setColumns(5);
         panel.add(riskFreeRate);
 
-        JButton btnGetCurrentValue = new JButton("Get Current NPV");
+        JButton btnGetCurrentValue = new JButton("Get Current NPV in " + HOME_CURRENCY);
         btnGetCurrentValue.addActionListener(this::pullCurrentValue);
         panel.add(btnGetCurrentValue);
         return panel;

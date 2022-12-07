@@ -103,9 +103,9 @@ public class WhatIfPanel extends JPanel
         return quantity * (1 + (differance / 365.0) * riskFreeRate);
     }
 
-    public long daysBetween(Date today, Date other)
+    public long daysBetween(Date thisDate, Date otherDate)
     {
-        long diffInMillies = other.getTime() - today.getTime();
-        return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+        long diffInMs = thisDate.getTime() - otherDate.getTime();
+        return TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
     }
 }

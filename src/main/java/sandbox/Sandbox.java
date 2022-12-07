@@ -234,10 +234,9 @@ public class Sandbox extends JPanel
     }
 
 
-    public long daysBetween(Date today, Date other)
+    public long daysBetween(Date thisDate, Date otherDate)
     {
-        //TODO: Change order
-        long diffInMillies = other.getTime() - today.getTime();
-        return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+        long diffInMs = thisDate.getTime() - otherDate.getTime();
+        return TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
     }
 }
