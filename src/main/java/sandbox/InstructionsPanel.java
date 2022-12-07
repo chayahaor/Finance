@@ -3,9 +3,10 @@ package sandbox;
 import javax.swing.*;
 import java.awt.*;
 
+import static main.Main.HOME_CURRENCY;
+
 
 public class InstructionsPanel extends JPanel {
-    private static final String HOME_CURRENCY = "USD";
 
     public InstructionsPanel() {
         setLayout(new GridLayout(1, 6));
