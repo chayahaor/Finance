@@ -11,14 +11,28 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class API {
+import static main.Main.HOME_CURRENCY;
+
+public class API
+{
     private final String urlBase;
 
-    public API() {
+    public API()
+    {
         urlBase = "https://api.exchangerate.host/";
     }
 
-    public String convert(String from, String to, String date) throws IOException {
+    /**
+     * Uses API to convert between two currencies at specific date and return the FX Rate
+     *
+     * @param from - the currency being converted
+     * @param to   - the currency the "from" currency is being converted to
+     * @param date - the date of the conversion
+     * @return the FX rate for the conversion
+     * @throws IOException - if connection to API fails
+     */
+    public String convert(String from, String to, String date) throws IOException
+    {
         String convert = urlBase + "convert?from=" + from + "&to=" + to + "&date=" + date;
         URL url = new URL(convert);
         HttpURLConnection request = (HttpURLConnection) url.openConnection();
@@ -31,7 +45,16 @@ public class API {
         return object.get("result").getAsString();
     }
 
-    public double convert(String from, String to) throws IOException {
+    /**
+     * Uses API to convert between two currencies today and return the FX Rate
+     *
+     * @param from - the currency being converted
+     * @param to   - the currency that the "from" currency is being converted to
+     * @return - the FX rate for the conversion
+     * @throws IOException - if connection to API fails
+     */
+    public double convert(String from, String to) throws IOException
+    {
         String convert = urlBase + "convert?from=" + from + "&to=" + to;
         URL url = new URL(convert);
         HttpURLConnection request = (HttpURLConnection) url.openConnection();
@@ -43,9 +66,16 @@ public class API {
         return Double.parseDouble(object.get("result").getAsString());
     }
 
-    public JComboBox<String> getSymbolResults() throws IOException {
+    /**
+     * Uses API to get all the currency symbols
+     *
+     * @return a JComboBox of all the currency symbols (minus HOME_CURRENCY)
+     * @throws IOException - if connection to API fails
+     */
+    public JComboBox<String> getSymbolResults() throws IOException
+    {
         JComboBox<String> currency = new JComboBox<>();
-        String urlSymbol = "https://api.exchangerate.host/symbols";
+        String urlSymbol = urlBase + "symbols";
         URL url = new URL(urlSymbol);
         HttpURLConnection request = (HttpURLConnection) url.openConnection();
         request.connect();
@@ -72,6 +102,9 @@ public class API {
                 }
             }
         }
+
+        currency.setEditable(false);
+        currency.removeItem(HOME_CURRENCY);
 
         return currency;
 

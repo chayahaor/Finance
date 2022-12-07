@@ -12,16 +12,16 @@ import java.util.concurrent.TimeUnit;
 
 import static main.Main.HOME_CURRENCY;
 
-
-public class WhatIfPanel extends JPanel {
-
+public class WhatIfPanel extends JPanel
+{
     private final JFormattedTextField quantity;
     private final JComboBox<String> buyOrSell;
     private final JComboBox<String> currencies;
     private final JDateChooser maturityDate;
     private final JFormattedTextField spotPrice;
 
-    public WhatIfPanel(JComboBox<String> currencyComboBox) {
+    public WhatIfPanel(JComboBox<String> currencyComboBox)
+    {
         setLayout(new GridLayout(1, 6));
         setMaximumSize(new Dimension(1000, 30));
 
@@ -54,27 +54,31 @@ public class WhatIfPanel extends JPanel {
 
     }
 
-    public Date getMaturityDate() {
+    public Date getMaturityDate()
+    {
         return this.maturityDate.getDate();
     }
 
     public JFormattedTextField generateTextField(
             NumberFormatter formatter,
             int numColumns,
-            double value) {
+            double value)
+    {
         JFormattedTextField textField = new JFormattedTextField(formatter);
         textField.setColumns(numColumns);
         textField.setValue(value);
         return textField;
     }
 
-    public double getQuantity() {
+    public double getQuantity()
+    {
         double val = getInHomeCurrency(Math.abs(Double.parseDouble(quantity.getText())));
         val = (Objects.equals(buyOrSell.getSelectedItem(), "Buy") ? val : -val);
         return val;
     }
 
-    private double getInHomeCurrency(double quantity) {
+    private double getInHomeCurrency(double quantity)
+    {
         if (!Objects.equals(currencies.getSelectedItem(), HOME_CURRENCY))
         {
             // if not home currency, convert to home currency
@@ -83,7 +87,8 @@ public class WhatIfPanel extends JPanel {
         return quantity;
     }
 
-    public double getForwardQuantity(double riskFreeRate, Date today, Date specifiedDate) {
+    public double getForwardQuantity(double riskFreeRate, Date today, Date specifiedDate)
+    {
         // if (maturity date - specified date) is negative
         // specified date is later than maturity date -- you already have full amount
         // else -- use (specified date - today) for linear accretion
@@ -98,7 +103,8 @@ public class WhatIfPanel extends JPanel {
         return quantity * (1 + (differance / 365.0) * riskFreeRate);
     }
 
-    public long daysBetween(Date today, Date other) {
+    public long daysBetween(Date today, Date other)
+    {
         long diffInMillies = other.getTime() - today.getTime();
         return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
     }

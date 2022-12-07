@@ -8,11 +8,12 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-
-public class PnL {
+public class PnL
+{
     private final JFreeChart chart;
 
-    public PnL() {
+    public PnL()
+    {
         chart = ChartFactory.createXYLineChart(
                 "Profit and Loss",
                 "Date",
@@ -24,11 +25,13 @@ public class PnL {
         chartPanel.setPreferredSize(new java.awt.Dimension(100, 100));
     }
 
-    public JFreeChart getChart() {
+    public JFreeChart getChart()
+    {
         return chart;
     }
 
-    private XYDataset createDataset() {
+    private XYDataset createDataset()
+    {
         //TODO: replace with DB call
         final XYSeries xy1 = new XYSeries("Series 1");
         xy1.add(1.0, 1.0);

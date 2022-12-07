@@ -1,4 +1,3 @@
-
 package finance;
 
 import api.API;
@@ -18,13 +17,16 @@ import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import static main.Main.HOME_CURRENCY;
 
-public class Finance extends JPanel {
+public class Finance extends JPanel
+{
     private JFormattedTextField riskFreeRate;
     private Connection connection;
     private JComboBox<String> action;
@@ -38,7 +40,8 @@ public class Finance extends JPanel {
     private JComboBox<String> currencyCombobox;
 
 
-    public Finance(Connection connection) throws IOException {
+    public Finance(Connection connection) throws IOException
+    {
         api = new API();
         this.connection = connection;
         setSize(900, 500);
@@ -47,7 +50,8 @@ public class Finance extends JPanel {
         add(addGraph());
     }
 
-    private JPanel doFinancePanel() throws IOException {
+    private JPanel doFinancePanel() throws IOException
+    {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setSize(new Dimension(500, 300));
@@ -56,10 +60,11 @@ public class Finance extends JPanel {
         return panel;
     }
 
-    private JPanel addCurrentValue() {
+    private JPanel addCurrentValue()
+    {
         JPanel panel = new JPanel();
         DecimalFormat decimalFormat = new DecimalFormat("0.######");
-        panel.add(new JLabel("Risk Free Rate of " + HOME_CURRENCY + ":"));
+        panel.add(new JLabel("Risk Free Rate of " + HOME_CURRENCY + " as a percentage:"));
         riskFreeRate = new JFormattedTextField(decimalFormat);
         riskFreeRate.setValue(3.5);
         riskFreeRate.setColumns(5);
@@ -71,7 +76,8 @@ public class Finance extends JPanel {
         return panel;
     }
 
-    private void pullCurrentValue(ActionEvent actionEvent) {
+    private void pullCurrentValue(ActionEvent actionEvent)
+    {
         double currentValue = 0;
         try
         {
@@ -99,7 +105,8 @@ public class Finance extends JPanel {
 
     private void calculateRowCurrentValue(ResultSet resultSet,
                                           HashMap<String, Double> quantitiesPerCurrency)
-            throws SQLException, IOException {
+            throws SQLException, IOException
+    {
         String currentCurrency = resultSet.getString("Currency");
         double sum = quantitiesPerCurrency.get(currentCurrency) == null
                 ? 0.0 : quantitiesPerCurrency.get(currentCurrency);
@@ -120,16 +127,18 @@ public class Finance extends JPanel {
         double value = resultSet.getString("Action").equals("Sell")
                 ? -(quantity / rate)
                 : (quantity / rate);
-        sum += value * (1 + (diffInDays / 365.0) * Double.parseDouble(riskFreeRate.getText()));
+
+        // risk-free rate is a percentage
+        double rfr = Double.parseDouble(riskFreeRate.getText()) / 100;
+        sum += value * (1 + (diffInDays / 365.0) * rfr);
 
         quantitiesPerCurrency.put(currentCurrency, sum);
     }
 
 
-    private JPanel addActionComponents() throws IOException {
+    private JPanel addActionComponents() throws IOException
+    {
         currencyCombobox = api.getSymbolResults();
-        currencyCombobox.removeItem("USD");
-        currencyCombobox.setEditable(false);
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -173,8 +182,9 @@ public class Finance extends JPanel {
         return panel;
     }
 
-    private void onClick(ActionEvent event) {
-        int actionID = (Objects.equals(action.getSelectedItem(), "Buy") ? 1 : 2);
+    private void onClick(ActionEvent event)
+    {
+        int actionId = (Objects.equals(action.getSelectedItem(), "Buy") ? 1 : 2);
 
         try
         {
@@ -190,21 +200,22 @@ public class Finance extends JPanel {
 
             Statement stmt = connection.createStatement();
             stmt.executeQuery("Call spInsertMainData ("
-                              + "'" + formatted + "', " + actionID + ", '"
-                              + currencyCombobox.getSelectedItem() + "', '"
-                              + maturityFormatted
-                              + "', " + Double.parseDouble(amount.getText()) + ", "
-                              + Double.parseDouble(fxRate.getText()) + ")");
+                    + "'" + formatted + "', " + actionId + ", '"
+                    + currencyCombobox.getSelectedItem() + "', '"
+                    + maturityFormatted
+                    + "', " + Double.parseDouble(amount.getText()) + ", "
+                    + Double.parseDouble(fxRate.getText()) + ")");
 
             JOptionPane.showMessageDialog(this, "Row Inserted Successfully!");
-        } catch (SQLException e)
+        } catch (SQLException exception)
         {
-            JOptionPane.showMessageDialog(this, e);
+            JOptionPane.showMessageDialog(this, "Something went wrong inserting the row: " + exception);
         }
 
     }
 
-    public JPanel addGraph() {
+    public JPanel addGraph()
+    {
         PnL profitLoss = new PnL();
         JPanel graphPanel = new JPanel();
         graphPanel.setLayout(new BorderLayout());
@@ -213,4 +224,3 @@ public class Finance extends JPanel {
         return graphPanel;
     }
 }
-

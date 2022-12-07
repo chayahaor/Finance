@@ -19,8 +19,8 @@ import java.util.concurrent.TimeUnit;
 
 import static main.Main.HOME_CURRENCY;
 
-
-public class Sandbox extends JPanel {
+public class Sandbox extends JPanel
+{
     private final ArrayList<WhatIfPanel> whatIfs = new ArrayList<>();
     private final JScrollPane scrollPane;
     private final JPanel whatIfContainer;
@@ -30,14 +30,13 @@ public class Sandbox extends JPanel {
     private final JComboBox<String> currencies;
     private JDateChooser specifiedDate;
 
-    public Sandbox() throws IOException {
+    public Sandbox() throws IOException
+    {
         setSize(900, 500);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         API api = new API();
         currencies = api.getSymbolResults();
-        currencies.removeItem("USD");
-        currencies.setEditable(false);
 
         addStartingRow();
 
@@ -58,7 +57,8 @@ public class Sandbox extends JPanel {
         setUpButtonPanel();
     }
 
-    private void addStartingRow() {
+    private void addStartingRow()
+    {
         JPanel startingRow = new JPanel();
         startingRow.setMaximumSize(new Dimension(850, 50));
 
@@ -73,7 +73,8 @@ public class Sandbox extends JPanel {
         add(startingRow);
     }
 
-    private void addSecondaryStartingRow() {
+    private void addSecondaryStartingRow()
+    {
         JPanel panel = new JPanel();
         panel.setMaximumSize(new Dimension(850, 50));
         panel.add(new JLabel("Enter the " + HOME_CURRENCY + " risk free rate as a percentage"));
@@ -87,7 +88,8 @@ public class Sandbox extends JPanel {
         add(panel);
     }
 
-    private void addMiddleRow() {
+    private void addMiddleRow()
+    {
         JPanel middleRow = new JPanel();
         middleRow.setMaximumSize(new Dimension(850, 50));
         LocalDate today = LocalDate.now();
@@ -96,7 +98,8 @@ public class Sandbox extends JPanel {
         add(middleRow);
     }
 
-    private void setUpButtonPanel() {
+    private void setUpButtonPanel()
+    {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setMaximumSize(new Dimension(850, 100));
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
@@ -118,14 +121,16 @@ public class Sandbox extends JPanel {
         add(buttonPanel);
     }
 
-    private void generateButton(String text, ActionListener listener, JPanel panel) {
+    private void generateButton(String text, ActionListener listener, JPanel panel)
+    {
         JButton button = new JButton();
         button.setText(text);
         button.addActionListener(listener);
         panel.add(button);
     }
 
-    private void onClickReset(ActionEvent actionEvent) {
+    private void onClickReset(ActionEvent actionEvent)
+    {
         defaultAmount.setValue(10000.00);
         whatIfs.clear();
         whatIfContainer.removeAll();
@@ -133,7 +138,8 @@ public class Sandbox extends JPanel {
         this.revalidate();
     }
 
-    private void onClickMore(ActionEvent actionEvent) {
+    private void onClickMore(ActionEvent actionEvent)
+    {
         JPanel row = new JPanel(new BorderLayout());
         row.setMaximumSize(new Dimension(1000, 30));
 
@@ -147,7 +153,8 @@ public class Sandbox extends JPanel {
         this.revalidate();
     }
 
-    private void onClickDelete(ActionEvent actionEvent) {
+    private void onClickDelete(ActionEvent actionEvent)
+    {
         DeleteButton button = (DeleteButton) actionEvent.getSource();
         int option = JOptionPane.showConfirmDialog(scrollPane,
                 "You are about to delete an entry. Are you sure? ",
@@ -162,7 +169,8 @@ public class Sandbox extends JPanel {
         }
     }
 
-    private void onClickCurrent(ActionEvent actionEvent) {
+    private void onClickCurrent(ActionEvent actionEvent)
+    {
         Date today = new Date();
         double sum = 0.0;
         sum = getSum(sum);
@@ -179,7 +187,8 @@ public class Sandbox extends JPanel {
         displayResults(sum);
     }
 
-    private void onClickFuture(ActionEvent actionEvent) {
+    private void onClickFuture(ActionEvent actionEvent)
+    {
         Date today = new Date();
 
         JOptionPane.showMessageDialog(
@@ -218,13 +227,15 @@ public class Sandbox extends JPanel {
         return sum;
     }
 
-    private void displayResults(double sum) {
+    private void displayResults(double sum)
+    {
         DecimalFormat decimalFormat = new DecimalFormat("#,##0.##");
         JOptionPane.showMessageDialog(this, decimalFormat.format(sum));
     }
 
 
-    public long daysBetween(Date today, Date other) {
+    public long daysBetween(Date today, Date other)
+    {
         //TODO: Change order
         long diffInMillies = other.getTime() - today.getTime();
         return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
