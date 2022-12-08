@@ -25,7 +25,6 @@ public class WhatIfPanel extends JPanel
         setLayout(new GridLayout(1, 6));
         setMaximumSize(new Dimension(1000, 30));
 
-
         buyOrSell = new JComboBox<>(new String[]{"Buy", "Sell"});
         buyOrSell.setEditable(false);
         add(buyOrSell);
@@ -51,7 +50,6 @@ public class WhatIfPanel extends JPanel
         NumberFormatter sixDecimalFormatter = new NumberFormatter(new DecimalFormat("#.######"));
         spotPrice = generateTextField(sixDecimalFormatter, numColumns, 1.0);
         add(spotPrice);
-
     }
 
     public Date getMaturityDate()
@@ -92,14 +90,19 @@ public class WhatIfPanel extends JPanel
         // Today = buy/sell date
         // if (maturity date - specified date) is negative
         // specified date is later than maturity date -- you already have full amount
-        // else -- use (specified date - today) for linear accretion
+        // TODO: CLARIFY
+        // [else -- use (specified date - today) for linear accretion] <-- original
+        // TODO: I think this version inverts the amount
+        // else use (maturity date - specified date) <-- time left until reaching maturity
+
         long diff = daysBetween(getMaturityDate(), specifiedDate);
 
-        long differance = diff < 0
+        long difference = diff < 0
                 ? daysBetween(getMaturityDate(), today)
-                : daysBetween(specifiedDate, today);
+                // : daysBetween(specifiedDate, today); <-- time since action occurred
+                : daysBetween(getMaturityDate(), specifiedDate);
         double quantity = getQuantity();
-        return quantity * (1 + (differance / 365.0) * riskFreeRate);
+        return quantity * (1 + (difference / 365.0) * riskFreeRate);
     }
 
     public long daysBetween(Date thisDate, Date otherDate)

@@ -15,8 +15,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
+import static main.Main.DEFAULT_VALUE;
 import static main.Main.HOME_CURRENCY;
 
 public class Sandbox extends JPanel
@@ -38,12 +38,10 @@ public class Sandbox extends JPanel
         API api = new API();
         currencies = api.getSymbolResults();
 
-        addStartingRow();
-
-        addSecondaryStartingRow();
-
-        addMiddleRow();
-        add(new InstructionsPanel());
+        addStartingValueRow();
+        addRiskFreeRateRow();
+        addInformativeRow();
+        addInstructionsPanelRow();
 
         whatIfContainer = new JPanel();
         whatIfContainer.setLayout(new BoxLayout(whatIfContainer, BoxLayout.Y_AXIS));
@@ -57,7 +55,23 @@ public class Sandbox extends JPanel
         setUpButtonPanel();
     }
 
-    private void addStartingRow()
+    private void addInstructionsPanelRow()
+    {
+        JPanel instructionPanel = new JPanel();
+        instructionPanel.setLayout(new GridLayout(1, 6));
+        instructionPanel.setMaximumSize(new Dimension(850, 100));
+
+        instructionPanel.add(new JLabel("Buy or Sell", SwingConstants.CENTER));
+        instructionPanel.add(new JLabel("Enter quantity", SwingConstants.CENTER));
+        instructionPanel.add(new JLabel("Select currency", SwingConstants.CENTER));
+        instructionPanel.add(new JLabel("Maturity date", SwingConstants.CENTER));
+        instructionPanel.add(new JLabel("Spot Price FX /" + HOME_CURRENCY, SwingConstants.CENTER));
+        instructionPanel.add(new JLabel("    "));
+
+        add(instructionPanel);
+    }
+
+    private void addStartingValueRow()
     {
         JPanel startingRow = new JPanel();
         startingRow.setMaximumSize(new Dimension(850, 50));
@@ -66,14 +80,14 @@ public class Sandbox extends JPanel
 
         moneyFormat = new DecimalFormat("#,##0.00");
         defaultAmount = new JFormattedTextField(moneyFormat);
-        defaultAmount.setValue(10000.00);
+        defaultAmount.setValue(DEFAULT_VALUE);
         defaultAmount.setColumns(7);
         startingRow.add(defaultAmount);
 
         add(startingRow);
     }
 
-    private void addSecondaryStartingRow()
+    private void addRiskFreeRateRow()
     {
         JPanel panel = new JPanel();
         panel.setMaximumSize(new Dimension(850, 50));
@@ -88,7 +102,7 @@ public class Sandbox extends JPanel
         add(panel);
     }
 
-    private void addMiddleRow()
+    private void addInformativeRow()
     {
         JPanel middleRow = new JPanel();
         middleRow.setMaximumSize(new Dimension(850, 50));
@@ -117,7 +131,6 @@ public class Sandbox extends JPanel
         specifiedDate = new JDateChooser(new Date());
         specifiedDate.setMinSelectableDate(new Date());
 
-
         add(buttonPanel);
     }
 
@@ -131,7 +144,7 @@ public class Sandbox extends JPanel
 
     private void onClickReset(ActionEvent actionEvent)
     {
-        defaultAmount.setValue(10000.00);
+        defaultAmount.setValue(DEFAULT_VALUE);
         whatIfs.clear();
         whatIfContainer.removeAll();
         scrollPane.setViewportView(whatIfContainer);
@@ -194,7 +207,6 @@ public class Sandbox extends JPanel
             // it is a percentage -- so divide by 100
             double riskFreeRate = Double.parseDouble(rfr.getText()) / 100;
             sum += possibility.getForwardQuantity(riskFreeRate, today, specifiedDay);
-
         }
 
         displayResults(sum);
@@ -209,8 +221,7 @@ public class Sandbox extends JPanel
             sum = Double.parseDouble(moneyFormat.parse(defaultAmount.getText()).toString());
         } catch (Exception exception)
         {
-            // use default
-            sum = 10000;
+            sum = DEFAULT_VALUE;
         }
         return sum;
     }

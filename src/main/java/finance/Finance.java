@@ -23,6 +23,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import static main.Main.DEFAULT_VALUE;
 import static main.Main.HOME_CURRENCY;
 
 public class Finance extends JPanel
@@ -96,7 +97,7 @@ public class Finance extends JPanel
             }
         } catch (Exception exception)
         {
-            currentValue = 10000; // default value if something goes wrong
+            currentValue = DEFAULT_VALUE; // default value if something goes wrong
         }
 
         NumberFormat moneyFormatter = NumberFormat.getCurrencyInstance();
@@ -112,21 +113,31 @@ public class Finance extends JPanel
                 ? 0.0 : quantitiesPerCurrency.get(currentCurrency);
 
         double quantity = Double.parseDouble(resultSet.getString("Amount"));
-        // get difference in days between today and action date
-        // (or between maturity date and action date if maturity date already passed)
+
         Date actionDate = resultSet.getTimestamp("ActionDate");
         Date maturityDate = resultSet.getTimestamp("MaturityDate");
         Date today = new Date();
+
+        /* TODO: clarify - original logic:
+        // get difference in days between today and action date
+        // (or between maturity date and action date if maturity date already passed)
+
         long diffInMs = (maturityDate.getTime() - today.getTime() < 0)
                 ? maturityDate.getTime() - actionDate.getTime()
                 : today.getTime() - actionDate.getTime();
         double diffInDays = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
+        */
+
+        // TODO: This logic feels wrong
+        long diffInMs = (maturityDate.getTime() - today.getTime() < 0)
+                ? 0 : maturityDate.getTime() - today.getTime();
+        double diffInDays = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
 
         //convert to currency and apply maturity date formula
-        double rate = api.convert(currentCurrency, HOME_CURRENCY);
+        double fxRate = api.convert(currentCurrency, HOME_CURRENCY);
         double value = resultSet.getString("Action").equals("Sell")
-                ? -(quantity / rate)
-                : (quantity / rate);
+                ? -(quantity / fxRate)
+                : (quantity / fxRate);
 
         // risk-free rate is a percentage
         double rfr = Double.parseDouble(riskFreeRate.getText()) / 100;
