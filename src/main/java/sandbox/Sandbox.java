@@ -21,13 +21,13 @@ import static main.Main.HOME_CURRENCY;
 
 public class Sandbox extends JPanel
 {
+    private final JComboBox<String> currencies;
     private final ArrayList<WhatIfPanel> whatIfs = new ArrayList<>();
-    private final JScrollPane scrollPane;
     private final JPanel whatIfContainer;
+    private final JScrollPane scrollPane;
     private NumberFormat moneyFormat;
     private JFormattedTextField defaultAmount;
     private JFormattedTextField rfr;
-    private final JComboBox<String> currencies;
     private JDateChooser specifiedDate;
 
     public Sandbox() throws IOException
@@ -211,7 +211,6 @@ public class Sandbox extends JPanel
 
         displayResults(sum);
     }
-
 
     private double getInitial()
     {

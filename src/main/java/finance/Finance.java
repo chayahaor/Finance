@@ -28,18 +28,14 @@ import static main.Main.HOME_CURRENCY;
 
 public class Finance extends JPanel
 {
+    private final API api;
+    private final Connection connection;
     private JFormattedTextField riskFreeRate;
-    private Connection connection;
     private JComboBox<String> action;
-    private final String[] actions = new String[]{"Buy", "Sell"};
-    private JFormattedTextField amount;
+    private JComboBox<String> currencyCombobox;
+    private JFormattedTextField quantity;
     private JFormattedTextField fxRate;
     private JDateChooser maturityDate;
-    private JButton doAction;
-    private API api;
-
-    private JComboBox<String> currencyCombobox;
-
 
     public Finance(Connection connection) throws IOException
     {
@@ -97,7 +93,7 @@ public class Finance extends JPanel
             }
         } catch (Exception exception)
         {
-            currentValue = DEFAULT_VALUE; // default value if something goes wrong
+            currentValue = DEFAULT_VALUE;
         }
 
         NumberFormat moneyFormatter = NumberFormat.getCurrencyInstance();
@@ -112,7 +108,7 @@ public class Finance extends JPanel
         double sum = quantitiesPerCurrency.get(currentCurrency) == null
                 ? 0.0 : quantitiesPerCurrency.get(currentCurrency);
 
-        double quantity = Double.parseDouble(resultSet.getString("Amount"));
+        double quantityFromRow = Double.parseDouble(resultSet.getString("Amount"));
 
         Date actionDate = resultSet.getTimestamp("ActionDate");
         Date maturityDate = resultSet.getTimestamp("MaturityDate");
@@ -136,8 +132,8 @@ public class Finance extends JPanel
         //convert to currency and apply maturity date formula
         double fxRate = api.convert(currentCurrency, HOME_CURRENCY);
         double value = resultSet.getString("Action").equals("Sell")
-                ? -(quantity / fxRate)
-                : (quantity / fxRate);
+                ? -(quantityFromRow / fxRate)
+                : (quantityFromRow / fxRate);
 
         // risk-free rate is a percentage
         double rfr = Double.parseDouble(riskFreeRate.getText()) / 100;
@@ -149,26 +145,25 @@ public class Finance extends JPanel
 
     private JPanel addActionComponents() throws IOException
     {
-        currencyCombobox = api.getSymbolResults();
-
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         JPanel top = new JPanel();
         JPanel bottom = new JPanel();
 
         top.add(new JLabel("Action:"));
-        action = new JComboBox<>(actions);
+        action = new JComboBox<>(new String[]{"Buy", "Sell"});
         top.add(action);
 
         top.add(new JLabel("Currency:"));
+        currencyCombobox = api.getSymbolResults();
         top.add(currencyCombobox);
 
         DecimalFormat decimalFormat = new DecimalFormat("0.##");
         top.add(new JLabel("Quantity:"));
-        amount = new JFormattedTextField(decimalFormat);
-        amount.setValue(500);
-        amount.setColumns(5);
-        top.add(amount);
+        quantity = new JFormattedTextField(decimalFormat);
+        quantity.setValue(500);
+        quantity.setColumns(5);
+        top.add(quantity);
 
         decimalFormat = new DecimalFormat("0.######");
         top.add(new JLabel("Spot Price FX / " + HOME_CURRENCY + ":"));
@@ -183,7 +178,7 @@ public class Finance extends JPanel
         maturityDate.setPreferredSize(new Dimension(200, 35));
         bottom.add(maturityDate);
 
-        doAction = new JButton();
+        JButton doAction = new JButton();
         doAction.setText("Perform Action");
         doAction.addActionListener(this::onClick);
         bottom.add(doAction);
@@ -214,7 +209,7 @@ public class Finance extends JPanel
                     + "'" + formatted + "', " + actionId + ", '"
                     + currencyCombobox.getSelectedItem() + "', '"
                     + maturityFormatted
-                    + "', " + Double.parseDouble(amount.getText()) + ", "
+                    + "', " + Double.parseDouble(quantity.getText()) + ", "
                     + Double.parseDouble(fxRate.getText()) + ")");
 
             JOptionPane.showMessageDialog(this, "Row Inserted Successfully!");
@@ -222,7 +217,6 @@ public class Finance extends JPanel
         {
             JOptionPane.showMessageDialog(this, "Something went wrong inserting the row: " + exception);
         }
-
     }
 
     public JPanel addGraph()

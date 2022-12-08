@@ -14,8 +14,8 @@ import static main.Main.HOME_CURRENCY;
 
 public class WhatIfPanel extends JPanel
 {
-    private final JFormattedTextField quantity;
     private final JComboBox<String> buyOrSell;
+    private final JFormattedTextField quantity;
     private final JComboBox<String> currencies;
     private final JDateChooser maturityDate;
     private final JFormattedTextField spotPrice;
