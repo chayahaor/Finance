@@ -85,24 +85,17 @@ public class WhatIfPanel extends JPanel
         return quantity;
     }
 
-    public double getForwardQuantity(double riskFreeRate, Date today, Date specifiedDate)
+    public double getForwardQuantity(double riskFreeRate, Date actionDate, Date specifiedDate)
     {
-        // Today = buy/sell date
         // if (maturity date - specified date) is negative
         // specified date is later than maturity date -- you already have full amount
-        // TODO: CLARIFY
-        // [else -- use (specified date - today) for linear accretion] <-- original
-        // TODO: I think this version inverts the amount
-        // else use (maturity date - specified date) <-- time left until reaching maturity
+        // else -- use (specified date - action date) for linear accretion
 
-        long diff = daysBetween(getMaturityDate(), specifiedDate);
-
-        long difference = diff < 0
-                ? daysBetween(getMaturityDate(), today)
-                // : daysBetween(specifiedDate, today); <-- time since action occurred
-                : daysBetween(getMaturityDate(), specifiedDate);
+        long diffInDays = daysBetween(getMaturityDate(), specifiedDate) < 0
+                ? daysBetween(getMaturityDate(), actionDate)
+                : daysBetween(specifiedDate, actionDate); // <-- time since action occurred
         double quantity = getQuantity();
-        return quantity * (1 + (difference / 365.0) * riskFreeRate);
+        return quantity * (1 + (diffInDays / 365.0) * riskFreeRate);
     }
 
     public long daysBetween(Date thisDate, Date otherDate)

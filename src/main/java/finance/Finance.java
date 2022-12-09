@@ -112,21 +112,13 @@ public class Finance extends JPanel
 
         Date actionDate = resultSet.getTimestamp("ActionDate");
         Date maturityDate = resultSet.getTimestamp("MaturityDate");
-        Date today = new Date();
+        Date specifiedDate = new Date();
 
-        /* TODO: clarify - original logic:
-        // get difference in days between today and action date
+        // get difference in days between specifiedDate and action date
         // (or between maturity date and action date if maturity date already passed)
-
-        long diffInMs = (maturityDate.getTime() - today.getTime() < 0)
+        long diffInMs = (maturityDate.getTime() - specifiedDate.getTime() < 0)
                 ? maturityDate.getTime() - actionDate.getTime()
-                : today.getTime() - actionDate.getTime();
-        double diffInDays = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
-        */
-
-        // TODO: This logic feels wrong
-        long diffInMs = (maturityDate.getTime() - today.getTime() < 0)
-                ? 0 : maturityDate.getTime() - today.getTime();
+                : specifiedDate.getTime() - actionDate.getTime();
         double diffInDays = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
 
         //convert to currency and apply maturity date formula
@@ -137,6 +129,8 @@ public class Finance extends JPanel
 
         // risk-free rate is a percentage
         double rfr = Double.parseDouble(riskFreeRate.getText()) / 100;
+
+        // given spot price of action date in database, apply this formula
         sum += value * (1 + (diffInDays / 365.0) * rfr);
 
         quantitiesPerCurrency.put(currentCurrency, sum);
