@@ -14,8 +14,8 @@ import static main.Main.HOME_CURRENCY;
 
 public class WhatIfPanel extends JPanel
 {
-    private final JFormattedTextField quantity;
     private final JComboBox<String> buyOrSell;
+    private final JFormattedTextField quantity;
     private final JComboBox<String> currencies;
     private final JDateChooser maturityDate;
     private final JFormattedTextField spotPrice;
@@ -24,7 +24,6 @@ public class WhatIfPanel extends JPanel
     {
         setLayout(new GridLayout(1, 6));
         setMaximumSize(new Dimension(1000, 30));
-
 
         buyOrSell = new JComboBox<>(new String[]{"Buy", "Sell"});
         buyOrSell.setEditable(false);
@@ -51,7 +50,6 @@ public class WhatIfPanel extends JPanel
         NumberFormatter sixDecimalFormatter = new NumberFormatter(new DecimalFormat("#.######"));
         spotPrice = generateTextField(sixDecimalFormatter, numColumns, 1.0);
         add(spotPrice);
-
     }
 
     public Date getMaturityDate()
@@ -87,19 +85,17 @@ public class WhatIfPanel extends JPanel
         return quantity;
     }
 
-    public double getForwardQuantity(double riskFreeRate, Date today, Date specifiedDate)
+    public double getForwardQuantity(double riskFreeRate, Date actionDate, Date specifiedDate)
     {
-        // Today = buy/sell date
         // if (maturity date - specified date) is negative
         // specified date is later than maturity date -- you already have full amount
-        // else -- use (specified date - today) for linear accretion
-        long diff = daysBetween(getMaturityDate(), specifiedDate);
+        // else -- use (specified date - action date) for linear accretion
 
-        long differance = diff < 0
-                ? daysBetween(getMaturityDate(), today)
-                : daysBetween(specifiedDate, today);
+        long diffInDays = daysBetween(getMaturityDate(), specifiedDate) < 0
+                ? daysBetween(getMaturityDate(), actionDate)
+                : daysBetween(specifiedDate, actionDate); // <-- time since action occurred
         double quantity = getQuantity();
-        return quantity * (1 + (differance / 365.0) * riskFreeRate);
+        return quantity * (1 + (diffInDays / 365.0) * riskFreeRate);
     }
 
     public long daysBetween(Date thisDate, Date otherDate)

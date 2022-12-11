@@ -16,7 +16,7 @@ import java.util.Locale;
 public class Main extends JFrame
 {
     public static final String HOME_CURRENCY = "USD";
-    public double initialAmount = 10000;
+    public static final double DEFAULT_VALUE = 10000;
     private Sandbox sandbox;
     private Finance finance;
 
@@ -70,14 +70,14 @@ public class Main extends JFrame
         ResultSet resultSet = stmt.executeQuery("Select * from maindata");
         if (!resultSet.next()) // if there is no result set
         {
-            //TODO: possibly delete and replace with hardcoded in 10,000
+            //TODO: possibly delete and replace with hardcoded in DEFAULT_VALUE
             JFormattedTextField defaultAmount
                     = new JFormattedTextField(new DecimalFormat("###0.00"));
-            defaultAmount.setValue(initialAmount);
+            defaultAmount.setValue(DEFAULT_VALUE);
             defaultAmount.setColumns(7);
             JOptionPane.showMessageDialog(this, defaultAmount,
                     "Enter Initial Amount", JOptionPane.PLAIN_MESSAGE);
-            initialAmount = Double.parseDouble(defaultAmount.getText());
+            double initialAmount = Double.parseDouble(defaultAmount.getText());
             LocalDate today = LocalDate.now();
             String formatted = DateTimeFormatter
                     .ofPattern("yyyy-MM-dd", Locale.ENGLISH)
@@ -87,6 +87,7 @@ public class Main extends JFrame
         return connection;
     }
 
+    //TODO: main is not allowed to throw an Exception
     public static void main(String[] args) throws IOException
     {
         // update the UIManager to use the Nimbus Look and Feel
