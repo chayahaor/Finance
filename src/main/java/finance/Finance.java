@@ -114,8 +114,10 @@ public class Finance extends JPanel
         Date maturityDate = resultSet.getTimestamp("MaturityDate");
         Date specifiedDate = new Date();
 
-        // TODO: Which price is being used? From database (forward price)
+        // TODO: Which price is being used?
+        //  From database (forward price)
         //  or from API (spot price at specifiedDate)
+
         // get difference in days between maturity date and specified date
         // (or between maturity date and action date if maturity date already passed)
         long diffInMs = (maturityDate.getTime() - specifiedDate.getTime() < 0)
