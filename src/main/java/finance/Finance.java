@@ -119,8 +119,7 @@ public class Finance extends JPanel
                 : maturityDate.getTime() - specifiedDate.getTime(); // <-- time until maturity date
         double diffInDays = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
 
-        //convert to currency and apply maturity date formula
-        // double fxRate = api.convert(currentCurrency, HOME_CURRENCY);
+        //convert to currency
         double fxRate = Double.parseDouble(resultSet.getString("ForwardPrice"));
         double quantityFromRow = Double.parseDouble(resultSet.getString("Quantity"));
         double quantityInHomeCurrency = resultSet.getString("Action").equals("Sell")
@@ -130,7 +129,7 @@ public class Finance extends JPanel
         // risk-free rate is a percentage
         double rfr = Double.parseDouble(riskFreeRate.getText()) / 100;
 
-        // given forward price of action date in database, apply this formula
+        // apply maturity formula
         sum += quantityInHomeCurrency / (1 + (diffInDays / 365.0) * rfr);
 
         quantitiesPerCurrency.put(currentCurrency, sum);
