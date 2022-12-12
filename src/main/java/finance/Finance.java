@@ -102,21 +102,15 @@ public class Finance extends JPanel
 
     private void calculateRowCurrentValue(ResultSet resultSet,
                                           HashMap<String, Double> quantitiesPerCurrency)
-            throws SQLException, IOException
+            throws SQLException
     {
         String currentCurrency = resultSet.getString("Currency");
         double sum = quantitiesPerCurrency.get(currentCurrency) == null
                 ? 0.0 : quantitiesPerCurrency.get(currentCurrency);
 
-        double quantityFromRow = Double.parseDouble(resultSet.getString("Quantity"));
-
         Date actionDate = resultSet.getTimestamp("ActionDate");
         Date maturityDate = resultSet.getTimestamp("MaturityDate");
         Date specifiedDate = new Date();
-
-        // TODO: Which price is being used?
-        //  From database (forward price)
-        //  or from API (spot price at specifiedDate)
 
         // get difference in days between maturity date and specified date
         // (or between maturity date and action date if maturity date already passed)
@@ -126,8 +120,10 @@ public class Finance extends JPanel
         double diffInDays = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
 
         //convert to currency and apply maturity date formula
-        double fxRate = api.convert(currentCurrency, HOME_CURRENCY);
-        double value = resultSet.getString("Action").equals("Sell")
+        // double fxRate = api.convert(currentCurrency, HOME_CURRENCY);
+        double fxRate = Double.parseDouble(resultSet.getString("ForwardPrice"));
+        double quantityFromRow = Double.parseDouble(resultSet.getString("Quantity"));
+        double quantityInHomeCurrency = resultSet.getString("Action").equals("Sell")
                 ? -(quantityFromRow / fxRate)
                 : (quantityFromRow / fxRate);
 
@@ -135,7 +131,7 @@ public class Finance extends JPanel
         double rfr = Double.parseDouble(riskFreeRate.getText()) / 100;
 
         // given forward price of action date in database, apply this formula
-        sum += value * (1 + (diffInDays / 365.0) * rfr);
+        sum += quantityInHomeCurrency / (1 + (diffInDays / 365.0) * rfr);
 
         quantitiesPerCurrency.put(currentCurrency, sum);
     }

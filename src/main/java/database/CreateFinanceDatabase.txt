@@ -30,7 +30,7 @@ DELIMITER $$
 -- Procedures
 --
 CREATE DEFINER=`root`@`localhost` PROCEDURE `spGetMainDataByCurrency` ()   BEGIN
-Select ActionDate, Action, Currency, MaturityDate, Amount from `maindata` inner join `action` on `maindata`.Action_Id = `action`.ID
+Select ActionDate, Action, Currency, MaturityDate, Quantity, ForwardPrice from `maindata` inner join `action` on `maindata`.Action_Id = `action`.ID
 Where Action = 'Buy' or Action = 'Sell' or Action = 'Initial'
 Order by Currency;
 END$$
