@@ -18,7 +18,7 @@ public class WhatIfPanel extends JPanel
     private final JFormattedTextField quantity;
     private final JComboBox<String> currencies;
     private final JDateChooser maturityDate;
-    private final JFormattedTextField spotPrice;
+    private final JFormattedTextField forwardPrice;
 
     public WhatIfPanel(JComboBox<String> currencyComboBox)
     {
@@ -48,8 +48,8 @@ public class WhatIfPanel extends JPanel
         add(maturityDate);
 
         NumberFormatter sixDecimalFormatter = new NumberFormatter(new DecimalFormat("#.######"));
-        spotPrice = generateTextField(sixDecimalFormatter, numColumns, 1.0);
-        add(spotPrice);
+        forwardPrice = generateTextField(sixDecimalFormatter, numColumns, 1.0);
+        add(forwardPrice);
     }
 
     public Date getMaturityDate()
@@ -68,34 +68,22 @@ public class WhatIfPanel extends JPanel
         return textField;
     }
 
-    public double getQuantity()
-    {
-        double val = getInHomeCurrency(Math.abs(Double.parseDouble(quantity.getText())));
-        val = (Objects.equals(buyOrSell.getSelectedItem(), "Buy") ? val : -val);
-        return val;
-    }
-
-    private double getInHomeCurrency(double quantity)
-    {
-        if (!Objects.equals(currencies.getSelectedItem(), HOME_CURRENCY))
-        {
-            // if not home currency, convert to home currency
-            quantity = quantity / Double.parseDouble(spotPrice.getText());
-        }
-        return quantity;
-    }
-
-    public double getForwardQuantity(double riskFreeRate, Date actionDate, Date specifiedDate)
+    public double getQuantity(double riskFreeRate, Date actionDate, Date specifiedDate)
     {
         // if (maturity date - specified date) is negative
         // specified date is later than maturity date -- you already have full amount
-        // else -- use (specified date - action date) for linear accretion
-
+        // else -- use (maturity date - specified date) for linear accretion
         long diffInDays = daysBetween(getMaturityDate(), specifiedDate) < 0
                 ? daysBetween(getMaturityDate(), actionDate)
-                : daysBetween(specifiedDate, actionDate); // <-- time since action occurred
-        double quantity = getQuantity();
-        return quantity * (1 + (diffInDays / 365.0) * riskFreeRate);
+                : daysBetween(getMaturityDate(), specifiedDate); // <-- time until maturity
+
+        // get quantity (pos if buying, neg if selling) in home currency
+        double quantity = Math.abs(Double.parseDouble(this.quantity.getText()));
+        quantity = (Objects.equals(buyOrSell.getSelectedItem(), "Buy") ? quantity : -quantity);
+        double quantityInHomeCurrency = quantity / Double.parseDouble(forwardPrice.getText());
+
+        // apply formula given risk-free rate in home currency and forward price
+        return (quantityInHomeCurrency + 0.0) / (1 + (diffInDays / 365.0) * riskFreeRate);
     }
 
     public long daysBetween(Date thisDate, Date otherDate)

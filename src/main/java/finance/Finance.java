@@ -80,7 +80,7 @@ public class Finance extends JPanel
         {
             Statement stmt = connection.createStatement();
             // spGetMainData returns the `maindata` table sorted by currencies
-            ResultSet resultSet = stmt.executeQuery("Call spGetMainData();");
+            ResultSet resultSet = stmt.executeQuery("Call spGetMainDataByCurrency();");
             HashMap<String, Double> quantitiesPerCurrency = new HashMap<>();
             while (resultSet.next())
             {
@@ -108,17 +108,19 @@ public class Finance extends JPanel
         double sum = quantitiesPerCurrency.get(currentCurrency) == null
                 ? 0.0 : quantitiesPerCurrency.get(currentCurrency);
 
-        double quantityFromRow = Double.parseDouble(resultSet.getString("Amount"));
+        double quantityFromRow = Double.parseDouble(resultSet.getString("Quantity"));
 
         Date actionDate = resultSet.getTimestamp("ActionDate");
         Date maturityDate = resultSet.getTimestamp("MaturityDate");
         Date specifiedDate = new Date();
 
-        // get difference in days between specifiedDate and action date
+        // TODO: Which price is being used? From database (forward price)
+        //  or from API (spot price at specifiedDate)
+        // get difference in days between maturity date and specified date
         // (or between maturity date and action date if maturity date already passed)
         long diffInMs = (maturityDate.getTime() - specifiedDate.getTime() < 0)
                 ? maturityDate.getTime() - actionDate.getTime()
-                : specifiedDate.getTime() - actionDate.getTime();
+                : maturityDate.getTime() - specifiedDate.getTime(); // <-- time until maturity date
         double diffInDays = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
 
         //convert to currency and apply maturity date formula
@@ -130,7 +132,7 @@ public class Finance extends JPanel
         // risk-free rate is a percentage
         double rfr = Double.parseDouble(riskFreeRate.getText()) / 100;
 
-        // given spot price of action date in database, apply this formula
+        // given forward price of action date in database, apply this formula
         sum += value * (1 + (diffInDays / 365.0) * rfr);
 
         quantitiesPerCurrency.put(currentCurrency, sum);
@@ -160,7 +162,7 @@ public class Finance extends JPanel
         top.add(quantity);
 
         decimalFormat = new DecimalFormat("0.######");
-        top.add(new JLabel("Spot Price FX / " + HOME_CURRENCY + ":"));
+        top.add(new JLabel("Forward Price FX / " + HOME_CURRENCY + ":"));
         fxRate = new JFormattedTextField(decimalFormat);
         fxRate.setValue(3.5);
         fxRate.setColumns(5);
