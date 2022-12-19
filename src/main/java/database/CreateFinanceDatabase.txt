@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.1.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 04, 2022 at 04:43 PM
--- Server version: 10.4.21-MariaDB
--- PHP Version: 8.0.11
+-- Generation Time: Dec 12, 2022 at 08:19 PM
+-- Server version: 10.4.27-MariaDB
+-- PHP Version: 8.1.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -29,21 +29,20 @@ DELIMITER $$
 --
 -- Procedures
 --
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `spGetMainData` ()  BEGIN
-Select ActionDate, Action, Currency, MaturityDate, Amount from `maindata` inner join `action` on `maindata`.Action_Id = `action`.ID
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spGetMainDataByCurrency` ()   BEGIN
+Select ActionDate, Action, Currency, MaturityDate, Quantity, ForwardPrice from `maindata` inner join `action` on `maindata`.Action_Id = `action`.ID
 Where Action = 'Buy' or Action = 'Sell' or Action = 'Initial'
 Order by Currency;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `spInitial` (IN `InitialAmount` INT(11), IN `HomeCurrency` VARCHAR(10), IN `InitialDate` DATETIME)  BEGIN
-insert into `maindata` (ActionDate, Action_Id, Currency, MaturityDate, Amount, FXRate) values (InitialDate, 5, HomeCurrency,                        InitialDate, InitialAmount, 1);
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spInitial` (IN `InitialAmount` INT(11), IN `HomeCurrency` VARCHAR(10), IN `InitialDate` DATETIME)   BEGIN
+insert into `maindata` (ActionDate, Action_Id, Currency, MaturityDate, Quantity, ForwardPrice) values (InitialDate, 5, HomeCurrency, InitialDate, InitialAmount, 1);
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `spInsertMainData` (IN `ActionDate` DATETIME, IN `ActionID` INT(11), IN `Currency` VARCHAR(10), IN `MaturityDate` DATETIME, IN `Quantity` FLOAT, IN `FXRate` FLOAT)  BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spInsertMainData` (IN `ActionDate` DATETIME, IN `ActionID` INT(11), IN `Currency` VARCHAR(10), IN `MaturityDate` DATETIME, IN `Quantity` FLOAT, IN `ForwardPrice` FLOAT)   BEGIN
 
-	INSERT INTO `maindata` (ActionDate, Action_ID, Currency, MaturityDate, Amount, FXRate)
-    values (ActionDate, ActionID, Currency, MaturityDate, Quantity, FXRate);
+	INSERT INTO `maindata` (ActionDate, Action_ID, Currency, MaturityDate, Quantity, ForwardPrice)
+    values (ActionDate, ActionID, Currency, MaturityDate, Quantity, ForwardPrice);
 
 END$$
 
@@ -58,7 +57,7 @@ DELIMITER ;
 CREATE TABLE `action` (
   `ID` int(11) NOT NULL,
   `Action` varchar(15) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `action`
@@ -83,9 +82,9 @@ CREATE TABLE `maindata` (
   `Action_Id` int(11) NOT NULL,
   `Currency` varchar(10) NOT NULL,
   `MaturityDate` datetime NOT NULL,
-  `Amount` float NOT NULL,
-  `FXRate` float NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `Quantity` float NOT NULL,
+  `ForwardPrice` float NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Table structure for table `pnl`
@@ -95,7 +94,7 @@ CREATE TABLE `pnl` (
   `ID` int(11) NOT NULL,
   `Date` datetime NOT NULL,
   `PNL` float NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Indexes for dumped tables

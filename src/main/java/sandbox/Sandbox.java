@@ -65,7 +65,7 @@ public class Sandbox extends JPanel
         instructionPanel.add(new JLabel("Enter quantity", SwingConstants.CENTER));
         instructionPanel.add(new JLabel("Select currency", SwingConstants.CENTER));
         instructionPanel.add(new JLabel("Maturity date", SwingConstants.CENTER));
-        instructionPanel.add(new JLabel("Spot Price FX /" + HOME_CURRENCY, SwingConstants.CENTER));
+        instructionPanel.add(new JLabel("Forward Price FX /" + HOME_CURRENCY, SwingConstants.CENTER));
         instructionPanel.add(new JLabel("    "));
 
         add(instructionPanel);
@@ -184,12 +184,9 @@ public class Sandbox extends JPanel
 
     private void onClickCurrent(ActionEvent actionEvent)
     {
-        double sum = getInitial();
-        for (WhatIfPanel possibility : whatIfs)
-        {
-            sum += possibility.getQuantity();
-        }
-        displayResults(sum);
+        Date today = new Date();
+
+        calculate(today, today);
     }
 
     private void onClickFuture(ActionEvent actionEvent)
@@ -201,15 +198,20 @@ public class Sandbox extends JPanel
                 "Enter specified date", JOptionPane.PLAIN_MESSAGE);
         Date specifiedDay = specifiedDate.getDate();
 
+        calculate(today, specifiedDay);
+    }
+
+    private void calculate(Date today, Date specifiedDay)
+    {
         double sum = getInitial();
         for (WhatIfPanel possibility : whatIfs)
         {
             // it is a percentage -- so divide by 100
             double riskFreeRate = Double.parseDouble(rfr.getText()) / 100;
-            sum += possibility.getForwardQuantity(riskFreeRate, today, specifiedDay);
+            sum += possibility.getQuantity(riskFreeRate, today, specifiedDay);
         }
-
-        displayResults(sum);
+        DecimalFormat decimalFormat = new DecimalFormat("#,##0.##");
+        JOptionPane.showMessageDialog(this, decimalFormat.format(sum));
     }
 
     private double getInitial()
@@ -225,9 +227,4 @@ public class Sandbox extends JPanel
         return sum;
     }
 
-    private void displayResults(double sum)
-    {
-        DecimalFormat decimalFormat = new DecimalFormat("#,##0.##");
-        JOptionPane.showMessageDialog(this, decimalFormat.format(sum));
-    }
 }
