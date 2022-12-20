@@ -35,8 +35,24 @@ Where Action = 'Buy' or Action = 'Sell' or Action = 'Initial'
 Order by Currency;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spGetMainDataByDate` ()   BEGIN
+Select ActionDate, Action, Currency, MaturityDate, Quantity, ForwardPrice from `maindata` inner join `action` on `maindata`.Action_Id = `action`.ID
+Where Action = 'Buy' or Action = 'Sell' or Action = 'Initial'
+Order by ActionDate;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spGetPnL` ()   BEGIN
+Select Date, PNL from `pnl`
+Order by Date;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `spInitial` (IN `InitialAmount` INT(11), IN `HomeCurrency` VARCHAR(10), IN `InitialDate` DATETIME)   BEGIN
 insert into `maindata` (ActionDate, Action_Id, Currency, MaturityDate, Quantity, ForwardPrice) values (InitialDate, 5, HomeCurrency, InitialDate, InitialAmount, 1);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spInsertIntoPnL` (IN `Date` DATETIME, IN `Quantity` FLOAT)   BEGIN
+INSERT INTO `pnl` (Date, PNL)
+    values (Date, Quantity);
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `spInsertMainData` (IN `ActionDate` DATETIME, IN `ActionID` INT(11), IN `Currency` VARCHAR(10), IN `MaturityDate` DATETIME, IN `Quantity` FLOAT, IN `ForwardPrice` FLOAT)   BEGIN
