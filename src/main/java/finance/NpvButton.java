@@ -77,7 +77,8 @@ public class NpvButton extends JButton
                 ? -(quantityFromRow / fxRate)
                 : (quantityFromRow / fxRate);
 
-        // TODO: FIGURE THIS OUT:
+        // travel up three JPanels until Finance panel is reached
+        // and get the current risk-free rate from the Finance tab
         double rfr = ((Finance)this.getParent().getParent().getParent()).getRiskFreeRate();
 
         // apply maturity formula
