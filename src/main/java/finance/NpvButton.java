@@ -1,6 +1,7 @@
 package finance;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -77,13 +78,23 @@ public class NpvButton extends JButton
                 ? -(quantityFromRow / fxRate)
                 : (quantityFromRow / fxRate);
 
-        // travel up three JPanels until Finance panel is reached
-        // and get the current risk-free rate from the Finance tab
-        double rfr = ((Finance)this.getParent().getParent().getParent()).getRiskFreeRate();
+        // get the current risk-free rate from the Finance tab
+        double rfr = getFinanceParent().getRiskFreeRate();
 
         // apply maturity formula
         sum += quantityInHomeCurrency / (1 + (diffInDays / 365.0) * rfr);
 
         quantitiesPerCurrency.put(currentCurrency, sum);
+    }
+
+    private Finance getFinanceParent()
+    {
+        // travel up JPanels until Finance panel is reached
+        Container parent = this.getParent();
+        while (!(parent instanceof Finance))
+        {
+            parent = parent.getParent();
+        }
+        return (Finance)parent;
     }
 }
