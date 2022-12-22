@@ -26,8 +26,7 @@ import java.util.concurrent.TimeUnit;
 import static main.Main.DEFAULT_VALUE;
 import static main.Main.HOME_CURRENCY;
 
-public class Finance extends JPanel
-{
+public class Finance extends JPanel {
     private final API api;
     private final Connection connection;
     private JFormattedTextField riskFreeRate;
@@ -37,18 +36,22 @@ public class Finance extends JPanel
     private JFormattedTextField fxRate;
     private JDateChooser maturityDate;
 
-    public Finance(Connection connection) throws IOException
-    {
+    public Finance(Connection connection) throws IOException {
         api = new API();
         this.connection = connection;
         setSize(900, 500);
         setLayout(new BorderLayout());
         add(doFinancePanel(), BorderLayout.NORTH);
-        add(addGraph());
+        try
+        {
+            add(addGraph());
+        } catch (Exception ignored)
+        {
+
+        }
     }
 
-    private JPanel doFinancePanel() throws IOException
-    {
+    private JPanel doFinancePanel() throws IOException {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setSize(new Dimension(500, 300));
@@ -57,8 +60,7 @@ public class Finance extends JPanel
         return panel;
     }
 
-    private JPanel addCurrentValue()
-    {
+    private JPanel addCurrentValue() {
         JPanel panel = new JPanel();
         DecimalFormat decimalFormat = new DecimalFormat("0.######");
         panel.add(new JLabel("Risk Free Rate of " + HOME_CURRENCY + " as a percentage:"));
@@ -73,8 +75,7 @@ public class Finance extends JPanel
         return panel;
     }
 
-    private void pullCurrentValue(ActionEvent actionEvent)
-    {
+    private void pullCurrentValue(ActionEvent actionEvent) {
         double currentValue = 0;
         try
         {
@@ -102,8 +103,7 @@ public class Finance extends JPanel
 
     private void calculateRowCurrentValue(ResultSet resultSet,
                                           HashMap<String, Double> quantitiesPerCurrency)
-            throws SQLException
-    {
+            throws SQLException {
         String currentCurrency = resultSet.getString("Currency");
         double sum = quantitiesPerCurrency.get(currentCurrency) == null
                 ? 0.0 : quantitiesPerCurrency.get(currentCurrency);
@@ -136,8 +136,7 @@ public class Finance extends JPanel
     }
 
 
-    private JPanel addActionComponents() throws IOException
-    {
+    private JPanel addActionComponents() throws IOException {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         JPanel top = new JPanel();
@@ -181,8 +180,7 @@ public class Finance extends JPanel
         return panel;
     }
 
-    private void onClick(ActionEvent event)
-    {
+    private void onClick(ActionEvent event) {
         int actionId = (Objects.equals(action.getSelectedItem(), "Buy") ? 1 : 2);
 
         try
@@ -199,11 +197,11 @@ public class Finance extends JPanel
 
             Statement stmt = connection.createStatement();
             stmt.executeQuery("Call spInsertMainData ("
-                    + "'" + formatted + "', " + actionId + ", '"
-                    + currencyCombobox.getSelectedItem() + "', '"
-                    + maturityFormatted
-                    + "', " + Double.parseDouble(quantity.getText()) + ", "
-                    + Double.parseDouble(fxRate.getText()) + ")");
+                              + "'" + formatted + "', " + actionId + ", '"
+                              + currencyCombobox.getSelectedItem() + "', '"
+                              + maturityFormatted
+                              + "', " + Double.parseDouble(quantity.getText()) + ", "
+                              + Double.parseDouble(fxRate.getText()) + ")");
 
             JOptionPane.showMessageDialog(this, "Row Inserted Successfully!");
         } catch (SQLException exception)
@@ -212,9 +210,8 @@ public class Finance extends JPanel
         }
     }
 
-    public JPanel addGraph()
-    {
-        PnL profitLoss = new PnL();
+    public JPanel addGraph() throws SQLException {
+        PnL profitLoss = new PnL(connection);
         JPanel graphPanel = new JPanel();
         graphPanel.setLayout(new BorderLayout());
         ChartPanel chartPanel = new ChartPanel(profitLoss.getChart());
