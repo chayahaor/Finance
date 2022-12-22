@@ -87,8 +87,7 @@ public class Main extends JFrame
         return connection;
     }
 
-    //TODO: main is not allowed to throw an Exception
-    public static void main(String[] args) throws IOException
+    public static void main(String[] args)
     {
         // update the UIManager to use the Nimbus Look and Feel
         try
@@ -117,7 +116,16 @@ public class Main extends JFrame
         UIManager.put("ComboBox.font", font);
 
         // instantiate the Main frame
-        Main frame = new Main();
-        frame.setVisible(true);
+        try
+        {
+            Main frame = new Main();
+            frame.setVisible(true);
+        } catch (Exception exception)
+        {
+            // Something went wrong, show error message and exit
+            JOptionPane.showMessageDialog(new JPanel(),
+                    "Unfortunately something went wrong instantiating the program.",
+                    "Error!", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }
