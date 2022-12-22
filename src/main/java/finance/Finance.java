@@ -210,7 +210,7 @@ public class Finance extends JPanel {
         }
     }
 
-    public JPanel addGraph() throws SQLException {
+    public JPanel addGraph() throws SQLException, IOException {
         PnL profitLoss = new PnL(connection);
         JPanel graphPanel = new JPanel();
         graphPanel.setLayout(new BorderLayout());
