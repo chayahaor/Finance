@@ -13,8 +13,7 @@ import java.net.URL;
 
 import static main.Main.HOME_CURRENCY;
 
-public class API
-{
+public class API {
     private final String urlBase;
 
     public API()

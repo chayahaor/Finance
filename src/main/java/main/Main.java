@@ -13,8 +13,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-public class Main extends JFrame
-{
+public class Main extends JFrame {
     public static final String HOME_CURRENCY = "USD";
     public static final double DEFAULT_VALUE = 10000;
     private Sandbox sandbox;

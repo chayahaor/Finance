@@ -21,12 +21,14 @@ public class PnL {
     private Connection connection;
     private API api;
 
-    public PnL(Connection connection) {
+    public PnL(Connection connection)
+    {
         this.connection = connection;
         api = new API();
     }
 
-    public JFreeChart getChart() throws SQLException, IOException {
+    public JFreeChart getChart() throws SQLException, IOException
+    {
         updatePnL();
         chart = ChartFactory.createXYLineChart(
                 "Profit and Loss",
@@ -41,9 +43,9 @@ public class PnL {
         return chart;
     }
 
-    private void updatePnL() throws SQLException, IOException {
+    private void updatePnL() throws SQLException, IOException
+    {
         //TODO:
-        // look at todos throughout this method
         // confirm dates are sent/received in the same manner
         // decide if we want to throw exceptions in methods or put in try catch
         // Make a party if this works because it did not take long :)
@@ -52,23 +54,27 @@ public class PnL {
         Statement stmt = connection.createStatement();
         ResultSet resultSet = stmt.executeQuery("Call spGetMainDataByCurrency();");
         Date today = new Date();
-        for (Date dayLookingAt = mostRecent; dayLookingAt.before(today); dayLookingAt = new Date(dayLookingAt.getTime() + (1000 * 60 * 60 * 24)))
+        for (Date dayLookingAt = mostRecent;
+             dayLookingAt.before(today);
+             dayLookingAt = new Date(dayLookingAt.getTime() + (1000 * 60 * 60 * 24)))
+        {
             while (resultSet.next())
             {
                 double totalPnL = 0;
                 double pnl = 0;
-                Date transactionDate = resultSet.getDate(0); //TODO: confirm start with 0/1
-                String currency = resultSet.getString(2); //TODO: confirm start with 0/1
-                Date maturityDate = resultSet.getDate(3); //TODO: confirm start with 0/1
-                double quantity = resultSet.getDouble(4); //TODO: confirm start with 0/1
-                double forwardPrice = resultSet.getDouble(5); //TODO: confirm start with 0/1
+                Date transactionDate = resultSet.getDate("ActionDate");
+                String currency = resultSet.getString("Currency");
+                Date maturityDate = resultSet.getDate("MaturityDate");
+                double quantity = resultSet.getDouble("Quantity");
+                double forwardPrice = resultSet.getDouble("ForwardPrice");
                 if (transactionDate.equals(dayLookingAt))
                 {
                     String day = dayLookingAt.toString();
                     pnl = forwardPrice - Double.parseDouble(api.convert(currency, "USD", day));
                 } else
                 {
-                    String day = new Date(dayLookingAt.getTime() + (1000 * 60 * 60 * 24)).toString();
+                    String day = new Date(dayLookingAt.getTime()
+                                          + (1000 * 60 * 60 * 24)).toString();
                     pnl = Double.parseDouble(api.convert(currency, "USD", day));
                 }
                 double transactionPnL = pnl * quantity;
@@ -85,10 +91,12 @@ public class PnL {
                 Statement stmtInsert = connection.createStatement();
                 stmtInsert.executeQuery("Call spInsertIntoPnL(" + dayLookingAt + ", " + totalPnL + ");");
             }
+        }
 
     }
 
-    private XYDataset createDataset() throws SQLException {
+    private XYDataset createDataset() throws SQLException
+    {
         XYSeries pnlData = new XYSeries("Profit and Loss");
         Statement stmt = connection.createStatement();
         ResultSet resultSet = stmt.executeQuery("Call spGetPnL();");

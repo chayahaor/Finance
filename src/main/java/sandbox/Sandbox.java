@@ -19,8 +19,7 @@ import java.util.Locale;
 import static main.Main.DEFAULT_VALUE;
 import static main.Main.HOME_CURRENCY;
 
-public class Sandbox extends JPanel
-{
+public class Sandbox extends JPanel {
     private final JComboBox<String> currencies;
     private final ArrayList<WhatIfPanel> whatIfs = new ArrayList<>();
     private final JPanel whatIfContainer;

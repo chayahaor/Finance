@@ -3,8 +3,7 @@ package sandbox;
 import javax.swing.*;
 import java.awt.*;
 
-public class DeleteButton extends JButton
-{
+public class DeleteButton extends JButton {
     private final JComponent componentToBeDeleted;
 
     public DeleteButton(JComponent componentToBeDeleted)
