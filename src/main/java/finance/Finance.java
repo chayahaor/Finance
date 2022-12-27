@@ -32,14 +32,22 @@ public class Finance extends JPanel
     private JFormattedTextField fxRate;
     private JDateChooser maturityDate;
 
-    public Finance(Connection connection) throws IOException
+    public Finance(Connection connection)
     {
         api = new API();
         this.connection = connection;
         setSize(900, 500);
         setLayout(new BorderLayout());
-        add(doFinancePanel(), BorderLayout.NORTH);
-        add(addGraph());
+        try
+        {
+            add(doFinancePanel(), BorderLayout.NORTH);
+            add(addGraph());
+        } catch (Exception exception)
+        {
+            JOptionPane.showMessageDialog(this,
+                    "Something went wrong: " + exception.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private JPanel doFinancePanel() throws IOException
@@ -65,7 +73,6 @@ public class Finance extends JPanel
         panel.add(new NpvButton(connection));
         return panel;
     }
-
 
     private JPanel addActionComponents() throws IOException
     {
@@ -130,22 +137,23 @@ public class Finance extends JPanel
 
             Statement stmt = connection.createStatement();
             stmt.executeQuery("Call spInsertMainData ("
-                    + "'" + formatted + "', " + actionId + ", '"
-                    + currencyCombobox.getSelectedItem() + "', '"
-                    + maturityFormatted
-                    + "', " + Double.parseDouble(quantity.getText()) + ", "
-                    + Double.parseDouble(fxRate.getText()) + ")");
+                              + "'" + formatted + "', " + actionId + ", '"
+                              + currencyCombobox.getSelectedItem() + "', '"
+                              + maturityFormatted
+                              + "', " + Double.parseDouble(quantity.getText()) + ", "
+                              + Double.parseDouble(fxRate.getText()) + ")");
 
             JOptionPane.showMessageDialog(this, "Row Inserted Successfully!");
         } catch (SQLException exception)
         {
-            JOptionPane.showMessageDialog(this, "Something went wrong inserting the row: " + exception);
+            JOptionPane.showMessageDialog(this,
+                    "Something went wrong inserting the row: " + exception);
         }
     }
 
-    public JPanel addGraph()
+    public JPanel addGraph() throws SQLException, IOException
     {
-        PnL profitLoss = new PnL();
+        PnL profitLoss = new PnL(connection);
         JPanel graphPanel = new JPanel();
         graphPanel.setLayout(new BorderLayout());
         ChartPanel chartPanel = new ChartPanel(profitLoss.getChart());

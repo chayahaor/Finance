@@ -17,7 +17,7 @@ import static main.Main.HOME_CURRENCY;
 
 public class NpvButton extends JButton
 {
-    private Connection connection;
+    private final Connection connection;
 
     public NpvButton(Connection connection)
     {
@@ -95,6 +95,6 @@ public class NpvButton extends JButton
         {
             parent = parent.getParent();
         }
-        return (Finance)parent;
+        return (Finance) parent;
     }
 }

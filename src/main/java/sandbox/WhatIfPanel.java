@@ -10,8 +10,6 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static main.Main.HOME_CURRENCY;
-
 public class WhatIfPanel extends JPanel
 {
     private final JComboBox<String> buyOrSell;

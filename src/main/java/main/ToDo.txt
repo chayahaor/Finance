@@ -1,0 +1,4 @@
+TODO:
+README - Sara
+Fix RFR in PnL class by adding JOptionPane instead of text field - Rachel
+Add Java doc - Rachel

@@ -17,10 +17,8 @@ public class Main extends JFrame
 {
     public static final String HOME_CURRENCY = "USD";
     public static final double DEFAULT_VALUE = 10000;
-    private Sandbox sandbox;
-    private Finance finance;
 
-    public Main() throws IOException
+    public Main()
     {
         setTitle("Finance Project");
         setSize(1000, 600);
@@ -28,7 +26,15 @@ public class Main extends JFrame
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new FlowLayout());
         setResizable(true);
-        setUpJTabbedPane();
+        try
+        {
+            setUpJTabbedPane();
+        } catch (Exception exception)
+        {
+            JOptionPane.showMessageDialog(this,
+                    "Something went wrong: " + exception.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public void setUpJTabbedPane() throws IOException
@@ -37,7 +43,7 @@ public class Main extends JFrame
         tabbedPane.setForeground(Color.BLACK);
 
         // add sandbox tab to the Main frame's JTabbedPane always
-        sandbox = new Sandbox();
+        Sandbox sandbox = new Sandbox();
         tabbedPane.add("Play in the Sandbox", sandbox);
 
         try
@@ -46,7 +52,7 @@ public class Main extends JFrame
             Connection connection = createConnection();
 
             // add finance tab to the Main frame's JTabbedPane if Connection is successful
-            finance = new Finance(connection);
+            Finance finance = new Finance(connection);
             tabbedPane.add("Finance Stuff", finance);
         } catch (SQLException exception)
         {
@@ -70,7 +76,6 @@ public class Main extends JFrame
         ResultSet resultSet = stmt.executeQuery("Select * from maindata");
         if (!resultSet.next()) // if there is no result set
         {
-            //TODO: possibly delete and replace with hardcoded in DEFAULT_VALUE
             JFormattedTextField defaultAmount
                     = new JFormattedTextField(new DecimalFormat("###0.00"));
             defaultAmount.setValue(DEFAULT_VALUE);
@@ -82,7 +87,10 @@ public class Main extends JFrame
             String formatted = DateTimeFormatter
                     .ofPattern("yyyy-MM-dd", Locale.ENGLISH)
                     .format(today);
-            stmt.executeQuery("Call spInitial (" + initialAmount + ", '" + HOME_CURRENCY + "', '" + formatted + "');");
+            stmt.executeQuery("Call spInitial ("
+                              + initialAmount + ", '"
+                              + HOME_CURRENCY + "', '"
+                              + formatted + "');");
         }
         return connection;
     }

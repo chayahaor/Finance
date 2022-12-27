@@ -65,7 +65,8 @@ public class Sandbox extends JPanel
         instructionPanel.add(new JLabel("Enter quantity", SwingConstants.CENTER));
         instructionPanel.add(new JLabel("Select currency", SwingConstants.CENTER));
         instructionPanel.add(new JLabel("Maturity date", SwingConstants.CENTER));
-        instructionPanel.add(new JLabel("Forward Price FX /" + HOME_CURRENCY, SwingConstants.CENTER));
+        instructionPanel.add(new JLabel("Forward Price FX /" + HOME_CURRENCY,
+                SwingConstants.CENTER));
         instructionPanel.add(new JLabel("    "));
 
         add(instructionPanel);
@@ -124,8 +125,10 @@ public class Sandbox extends JPanel
         buttonPanel.add(actionRow);
 
         JPanel calcRow = new JPanel();
-        generateButton("Show NPV in " + HOME_CURRENCY + " today", this::onClickCurrent, calcRow);
-        generateButton("Show NPV in " + HOME_CURRENCY + " at specified date", this::onClickFuture, calcRow);
+        generateButton("Show NPV in " + HOME_CURRENCY + " today",
+                this::onClickCurrent, calcRow);
+        generateButton("Show NPV in " + HOME_CURRENCY + " at specified date",
+                this::onClickFuture, calcRow);
         buttonPanel.add(calcRow);
 
         specifiedDate = new JDateChooser(new Date());
