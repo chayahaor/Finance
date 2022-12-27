@@ -2,3 +2,5 @@ TODO:
 README - Sara
 Fix RFR in PnL class by adding JOptionPane instead of text field - Rachel
 Add Java doc - Rachel
+Forbid quantity from entering GUI as negative - Chaya
+Most recent date - Chaya

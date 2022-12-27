@@ -127,7 +127,7 @@ public class Finance extends JPanel
                     + "'" + formatted + "', " + actionId + ", '"
                     + currencyCombobox.getSelectedItem() + "', '"
                     + maturityFormatted
-                    + "', " + Double.parseDouble(quantity.getText()) + ", "
+                    + "', " + Math.abs(Double.parseDouble(quantity.getText())) + ", "
                     + Double.parseDouble(fxRate.getText()) + ")");
 
             JOptionPane.showMessageDialog(this, "Row Inserted Successfully!");

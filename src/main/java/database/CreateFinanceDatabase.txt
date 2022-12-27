@@ -41,6 +41,10 @@ Where Action = 'Buy' or Action = 'Sell' or Action = 'Initial'
 Order by ActionDate;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spGetMostRecentDate` ()   BEGIN
+Select Date from pnl Order by Date DESC;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `spGetPnL` ()   BEGIN
 Select Date, PNL from `pnl`
 Order by Date;
