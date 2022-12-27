@@ -51,6 +51,11 @@ public class Finance extends JPanel
         }
     }
 
+    /**
+     * Adds JPanel with NpvButton and database action components
+     * @return JPanel being added to the tab
+     * @throws IOException - if connection to API fails
+     */
     private JPanel doFinancePanel() throws IOException
     {
         JPanel panel = new JPanel();
@@ -61,6 +66,11 @@ public class Finance extends JPanel
         return panel;
     }
 
+    /**
+     * Adds JPanel with database action components
+     * @return JPanel being added to the tab
+     * @throws IOException - if connection to API fails
+     */
     private JPanel addActionComponents() throws IOException
     {
         JPanel panel = new JPanel();
@@ -106,6 +116,10 @@ public class Finance extends JPanel
         return panel;
     }
 
+    /**
+     * Insert current GUI values into the database
+     * @param event - on click Perform Action button
+     */
     private void onClick(ActionEvent event)
     {
         int actionId = (Objects.equals(action.getSelectedItem(), "Buy") ? 1 : 2);
@@ -138,6 +152,12 @@ public class Finance extends JPanel
         }
     }
 
+    /**
+     * Add PnL graph to the tab
+     * @return JPanel containing the graph to be added to the tab
+     * @throws SQLException - in case SQL Connection fails
+     * @throws IOException - in case connection to API fails
+     */
     public JPanel addGraph() throws SQLException, IOException
     {
         PnL profitLoss = new PnL(connection, riskFreeRate);

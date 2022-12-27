@@ -35,6 +35,12 @@ public class PnL
         this.riskFreeRate = riskFreeRate;
     }
 
+    /**
+     * Updates and gets the PnL chart
+     * @return the PnL chart
+     * @throws SQLException - if SQL Connection fails
+     * @throws IOException - if connection to API fails
+     */
     public JFreeChart getChart() throws SQLException, IOException
     {
         updatePnL();
@@ -51,6 +57,11 @@ public class PnL
         return chart;
     }
 
+    /**
+     * Update PnL table in database
+     * @throws SQLException - if SQL Connection fails
+     * @throws IOException - if connection to API fails
+     */
     private void updatePnL() throws SQLException, IOException
     {
         Statement getRecentPnL = connection.createStatement();
@@ -124,6 +135,11 @@ public class PnL
 
     }
 
+    /**
+     * Create XY dataset to be used to populate PnL Chart based on PnL table in database
+     * @return the XYDataset
+     * @throws SQLException - if SQL Connection fails
+     */
     private XYDataset createDataset() throws SQLException
     {
         XYSeries pnlData = new XYSeries("Profit and Loss");

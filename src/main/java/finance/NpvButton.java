@@ -17,7 +17,7 @@ import static main.Main.HOME_CURRENCY;
 public class NpvButton extends JButton
 {
     private final Connection connection;
-    private double riskFreeRate;
+    private final double riskFreeRate;
 
     public NpvButton(Connection connection, double riskFreeRate)
     {
@@ -27,6 +27,10 @@ public class NpvButton extends JButton
         this.addActionListener(this::pullCurrentValue);
     }
 
+    /**
+     * Pulls current value from database
+     * @param actionEvent - on click Get Current NPV button
+     */
     private void pullCurrentValue(ActionEvent actionEvent)
     {
         double currentValue = 0;
@@ -53,6 +57,12 @@ public class NpvButton extends JButton
         JOptionPane.showMessageDialog(this, "Current NPV: " + moneyFormatter.format(currentValue));
     }
 
+    /**
+     * Update the quantity/currency HashMap with the data from specific row in database
+     * @param resultSet - the current row in the database
+     * @param quantitiesPerCurrency - the HashMap being updated with the results
+     * @throws SQLException - if SQL Connection fails
+     */
     private void calculateRowCurrentValue(ResultSet resultSet,
                                           HashMap<String, Double> quantitiesPerCurrency)
             throws SQLException
