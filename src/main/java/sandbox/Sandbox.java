@@ -63,6 +63,59 @@ public class Sandbox extends JPanel
         setUpButtonPanel();
     }
 
+    /**
+     * Add JPanel containing starting value to the tab
+     */
+    private void addStartingValueRow()
+    {
+        JPanel startingRow = new JPanel();
+        startingRow.setMaximumSize(new Dimension(850, 50));
+
+        startingRow.add(new JLabel("Enter the starting value (in " + HOME_CURRENCY + ")     $"));
+
+        moneyFormat = new DecimalFormat("#,##0.00");
+        defaultAmount = new JFormattedTextField(moneyFormat);
+        defaultAmount.setValue(DEFAULT_VALUE);
+        defaultAmount.setColumns(7);
+        startingRow.add(defaultAmount);
+
+        add(startingRow);
+    }
+
+    /**
+     * Add JPanel containing risk-free rate to the tab
+     */
+    private void addRiskFreeRateRow()
+    {
+        JPanel panel = new JPanel();
+        panel.setMaximumSize(new Dimension(850, 50));
+        panel.add(new JLabel("Enter the " + HOME_CURRENCY + " risk free rate as a percentage"));
+
+        DecimalFormat formatter = new DecimalFormat("#.######");
+        rfr = new JFormattedTextField(formatter);
+        rfr.setColumns(7);
+        rfr.setValue(4);
+        panel.add(rfr);
+
+        add(panel);
+    }
+
+    /**
+     * Add JPanel informing user that buying and selling is only allowed for today
+     */
+    private void addInformativeRow()
+    {
+        JPanel middleRow = new JPanel();
+        middleRow.setMaximumSize(new Dimension(850, 50));
+        LocalDate today = LocalDate.now();
+        String formatted = DateTimeFormatter.ofPattern("MM-dd-yyyy", Locale.ENGLISH).format(today);
+        middleRow.add(new JLabel(" *** Play with buying or selling on " + formatted + " ***"));
+        add(middleRow);
+    }
+
+    /**
+     * Add JPanel containing the instructions to the tab
+     */
     private void addInstructionsPanelRow()
     {
         JPanel instructionPanel = new JPanel();
@@ -80,47 +133,9 @@ public class Sandbox extends JPanel
         add(instructionPanel);
     }
 
-    private void addStartingValueRow()
-    {
-        JPanel startingRow = new JPanel();
-        startingRow.setMaximumSize(new Dimension(850, 50));
-
-        startingRow.add(new JLabel("Enter the starting value (in " + HOME_CURRENCY + ")     $"));
-
-        moneyFormat = new DecimalFormat("#,##0.00");
-        defaultAmount = new JFormattedTextField(moneyFormat);
-        defaultAmount.setValue(DEFAULT_VALUE);
-        defaultAmount.setColumns(7);
-        startingRow.add(defaultAmount);
-
-        add(startingRow);
-    }
-
-    private void addRiskFreeRateRow()
-    {
-        JPanel panel = new JPanel();
-        panel.setMaximumSize(new Dimension(850, 50));
-        panel.add(new JLabel("Enter the " + HOME_CURRENCY + " risk free rate as a percentage"));
-
-        DecimalFormat formatter = new DecimalFormat("#.######");
-        rfr = new JFormattedTextField(formatter);
-        rfr.setColumns(7);
-        rfr.setValue(4);
-        panel.add(rfr);
-
-        add(panel);
-    }
-
-    private void addInformativeRow()
-    {
-        JPanel middleRow = new JPanel();
-        middleRow.setMaximumSize(new Dimension(850, 50));
-        LocalDate today = LocalDate.now();
-        String formatted = DateTimeFormatter.ofPattern("MM-dd-yyyy", Locale.ENGLISH).format(today);
-        middleRow.add(new JLabel(" *** Play with buying or selling on " + formatted + " ***"));
-        add(middleRow);
-    }
-
+    /**
+     * Set up JPanel containing all the Sandbox buttons to the tab
+     */
     private void setUpButtonPanel()
     {
         JPanel buttonPanel = new JPanel();
@@ -145,6 +160,12 @@ public class Sandbox extends JPanel
         add(buttonPanel);
     }
 
+    /**
+     * Generate a sandbox button given parameters
+     * @param text - the text of the JButton
+     * @param listener - the action listener of the JButton
+     * @param panel - the JPanel to add the JButton to
+     */
     private void generateButton(String text, ActionListener listener, JPanel panel)
     {
         JButton button = new JButton();
@@ -153,6 +174,10 @@ public class Sandbox extends JPanel
         panel.add(button);
     }
 
+    /**
+     * Resets the Sandbox
+     * @param actionEvent - when clicking on reset button
+     */
     private void onClickReset(ActionEvent actionEvent)
     {
         defaultAmount.setValue(DEFAULT_VALUE);
@@ -162,6 +187,10 @@ public class Sandbox extends JPanel
         this.revalidate();
     }
 
+    /**
+     * Adds another WhatIfPanel to the SandBox
+     * @param actionEvent - on clicking the add more button
+     */
     private void onClickMore(ActionEvent actionEvent)
     {
         JPanel row = new JPanel(new BorderLayout());
@@ -177,6 +206,10 @@ public class Sandbox extends JPanel
         this.revalidate();
     }
 
+    /**
+     * Deletes a specific row from the Sandbox
+     * @param actionEvent - when clicking the DeleteButton associated with that row
+     */
     private void onClickDelete(ActionEvent actionEvent)
     {
         DeleteButton button = (DeleteButton) actionEvent.getSource();
@@ -193,6 +226,10 @@ public class Sandbox extends JPanel
         }
     }
 
+    /**
+     * Shows the NPV for today
+     * @param actionEvent - on clicking Show NPV Today button
+     */
     private void onClickCurrent(ActionEvent actionEvent)
     {
         Date today = new Date();
@@ -200,6 +237,10 @@ public class Sandbox extends JPanel
         calculate(today, today);
     }
 
+    /**
+     * Prompts user for a specific date and shows the NPV for that date
+     * @param actionEvent - on clicking Show NPV for Specified Date button
+     */
     private void onClickFuture(ActionEvent actionEvent)
     {
         Date today = new Date();
@@ -212,6 +253,11 @@ public class Sandbox extends JPanel
         calculate(today, specifiedDay);
     }
 
+    /**
+     * Calculate the total NPV between today and a specified date
+     * @param today - today's date
+     * @param specifiedDay - the specified date
+     */
     private void calculate(Date today, Date specifiedDay)
     {
         double sum = getInitial();
@@ -225,6 +271,10 @@ public class Sandbox extends JPanel
         JOptionPane.showMessageDialog(this, decimalFormat.format(sum));
     }
 
+    /**
+     * Get the initial amount user specified in GUI
+     * @return initial amount (or default if something goes wrong)
+     */
     private double getInitial()
     {
         double sum;

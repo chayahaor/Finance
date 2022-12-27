@@ -50,11 +50,13 @@ public class WhatIfPanel extends JPanel
         add(forwardPrice);
     }
 
-    public Date getMaturityDate()
-    {
-        return this.maturityDate.getDate();
-    }
-
+    /**
+     * Generates a new JFormattedTextField given parameters
+     * @param formatter - the formatter to apply
+     * @param numColumns - the number of columns in text field
+     * @param value - the default value in the text field
+     * @return - the generated JFormattedTextField
+     */
     public JFormattedTextField generateTextField(
             NumberFormatter formatter,
             int numColumns,
@@ -66,6 +68,23 @@ public class WhatIfPanel extends JPanel
         return textField;
     }
 
+    /**
+     * Getter for maturity date
+     * @return - Date object from selected maturity date
+     */
+    public Date getMaturityDate()
+    {
+        return this.maturityDate.getDate();
+    }
+
+
+    /**
+     * Calculates the quantity today adjusted to HOME_CURRENCY, buy/sell, forward price, and maturity date
+     * @param riskFreeRate - the risk-free rate needed for the formula
+     * @param actionDate - the date of the buy/sell action
+     * @param specifiedDate - the specified date
+     * @return the quantity
+     */
     public double getQuantity(double riskFreeRate, Date actionDate, Date specifiedDate)
     {
         // if (maturity date - specified date) is negative
@@ -84,6 +103,12 @@ public class WhatIfPanel extends JPanel
         return (quantityInHomeCurrency + 0.0) / (1 + (diffInDays / 365.0) * riskFreeRate);
     }
 
+    /**
+     * Calculate the days between two dates
+     * @param thisDate - the first date
+     * @param otherDate - the second date
+     * @return the difference in days
+     */
     public long daysBetween(Date thisDate, Date otherDate)
     {
         long diffInMs = thisDate.getTime() - otherDate.getTime();
