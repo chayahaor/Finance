@@ -7,7 +7,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -21,7 +20,7 @@ import static main.Main.HOME_CURRENCY;
 
 public class Sandbox extends JPanel
 {
-    private final JComboBox<String> currencies;
+    private JComboBox<String> currencies = new JComboBox<>();
     private final ArrayList<WhatIfPanel> whatIfs = new ArrayList<>();
     private final JPanel whatIfContainer;
     private final JScrollPane scrollPane;
@@ -30,13 +29,22 @@ public class Sandbox extends JPanel
     private JFormattedTextField rfr;
     private JDateChooser specifiedDate;
 
-    public Sandbox() throws IOException
+    public Sandbox()
     {
         setSize(900, 500);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         API api = new API();
-        currencies = api.getSymbolResults();
+        try
+        {
+            currencies = api.getSymbolResults();
+        } catch (Exception exception)
+        {
+            JOptionPane.showMessageDialog(this,
+                    "Something went wrong getting the currencies: "
+                            + exception.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
 
         addStartingValueRow();
         addRiskFreeRateRow();

@@ -25,17 +25,18 @@ public class Finance extends JPanel
 {
     private final API api;
     private final Connection connection;
-    private JFormattedTextField riskFreeRate;
+    private final double riskFreeRate;
     private JComboBox<String> action;
     private JComboBox<String> currencyCombobox;
     private JFormattedTextField quantity;
     private JFormattedTextField fxRate;
     private JDateChooser maturityDate;
 
-    public Finance(Connection connection)
+    public Finance(Connection connection, double riskFreeRate)
     {
         api = new API();
         this.connection = connection;
+        this.riskFreeRate = riskFreeRate;
         setSize(900, 500);
         setLayout(new BorderLayout());
         try
@@ -55,22 +56,8 @@ public class Finance extends JPanel
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setSize(new Dimension(500, 300));
-        panel.add(addCurrentValue());
+        panel.add(new NpvButton(connection, riskFreeRate));
         panel.add(addActionComponents());
-        return panel;
-    }
-
-    private JPanel addCurrentValue()
-    {
-        JPanel panel = new JPanel();
-        DecimalFormat decimalFormat = new DecimalFormat("0.######");
-        panel.add(new JLabel("Risk Free Rate of " + HOME_CURRENCY + " as a percentage:"));
-        riskFreeRate = new JFormattedTextField(decimalFormat);
-        riskFreeRate.setValue(3.5);
-        riskFreeRate.setColumns(5);
-        panel.add(riskFreeRate);
-
-        panel.add(new NpvButton(connection));
         return panel;
     }
 
@@ -137,11 +124,11 @@ public class Finance extends JPanel
 
             Statement stmt = connection.createStatement();
             stmt.executeQuery("Call spInsertMainData ("
-                              + "'" + formatted + "', " + actionId + ", '"
-                              + currencyCombobox.getSelectedItem() + "', '"
-                              + maturityFormatted
-                              + "', " + Double.parseDouble(quantity.getText()) + ", "
-                              + Double.parseDouble(fxRate.getText()) + ")");
+                    + "'" + formatted + "', " + actionId + ", '"
+                    + currencyCombobox.getSelectedItem() + "', '"
+                    + maturityFormatted
+                    + "', " + Double.parseDouble(quantity.getText()) + ", "
+                    + Double.parseDouble(fxRate.getText()) + ")");
 
             JOptionPane.showMessageDialog(this, "Row Inserted Successfully!");
         } catch (SQLException exception)
@@ -153,17 +140,11 @@ public class Finance extends JPanel
 
     public JPanel addGraph() throws SQLException, IOException
     {
-        PnL profitLoss = new PnL(connection);
+        PnL profitLoss = new PnL(connection, riskFreeRate);
         JPanel graphPanel = new JPanel();
         graphPanel.setLayout(new BorderLayout());
         ChartPanel chartPanel = new ChartPanel(profitLoss.getChart());
         graphPanel.add(chartPanel, BorderLayout.CENTER);
         return graphPanel;
-    }
-
-    public double getRiskFreeRate()
-    {
-        // risk-free rate is a percentage
-        return Double.parseDouble(riskFreeRate.getText()) / 100;
     }
 }

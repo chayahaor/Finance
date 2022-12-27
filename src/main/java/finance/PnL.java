@@ -24,11 +24,13 @@ public class PnL
 {
     private final Connection connection;
     private final API api;
+    private final double riskFreeRate;
 
-    public PnL(Connection connection)
+    public PnL(Connection connection, double riskFreeRate)
     {
-        this.connection = connection;
         api = new API();
+        this.connection = connection;
+        this.riskFreeRate = riskFreeRate;
     }
 
     public JFreeChart getChart() throws SQLException, IOException

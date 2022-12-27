@@ -51,8 +51,10 @@ public class Main extends JFrame
             // create database connection
             Connection connection = createConnection();
 
+            double riskFreeRate = getRiskFreeRate();
+
             // add finance tab to the Main frame's JTabbedPane if Connection is successful
-            Finance finance = new Finance(connection);
+            Finance finance = new Finance(connection, riskFreeRate);
             tabbedPane.add("Finance Stuff", finance);
         } catch (SQLException exception)
         {
@@ -93,6 +95,22 @@ public class Main extends JFrame
                               + formatted + "');");
         }
         return connection;
+    }
+
+    private double getRiskFreeRate()
+    {
+        JFormattedTextField rfrValue
+                = new JFormattedTextField(new DecimalFormat("0.######"));
+        rfrValue.setValue(4.0);
+        rfrValue.setColumns(7);
+        JOptionPane.showMessageDialog(this, rfrValue,
+                "Enter the risk free rate today as a percentage in " + HOME_CURRENCY
+                , JOptionPane.PLAIN_MESSAGE);
+
+        double rfr = Double.parseDouble(rfrValue.getText());
+
+        // risk-free rate is a percentage
+        return rfr / 100.0;
     }
 
     public static void main(String[] args)

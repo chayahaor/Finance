@@ -1,7 +1,6 @@
 package finance;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -18,10 +17,12 @@ import static main.Main.HOME_CURRENCY;
 public class NpvButton extends JButton
 {
     private final Connection connection;
+    private double riskFreeRate;
 
-    public NpvButton(Connection connection)
+    public NpvButton(Connection connection, double riskFreeRate)
     {
         this.connection = connection;
+        this.riskFreeRate = riskFreeRate;
         this.setText("Get Current NPV in " + HOME_CURRENCY);
         this.addActionListener(this::pullCurrentValue);
     }
@@ -78,23 +79,9 @@ public class NpvButton extends JButton
                 ? -(quantityFromRow / fxRate)
                 : (quantityFromRow / fxRate);
 
-        // get the current risk-free rate from the Finance tab
-        double rfr = getFinanceParent().getRiskFreeRate();
-
         // apply maturity formula
-        sum += quantityInHomeCurrency / (1 + (diffInDays / 365.0) * rfr);
+        sum += quantityInHomeCurrency / (1 + (diffInDays / 365.0) * riskFreeRate);
 
         quantitiesPerCurrency.put(currentCurrency, sum);
-    }
-
-    private Finance getFinanceParent()
-    {
-        // travel up JPanels until Finance panel is reached
-        Container parent = this.getParent();
-        while (!(parent instanceof Finance))
-        {
-            parent = parent.getParent();
-        }
-        return (Finance) parent;
     }
 }
