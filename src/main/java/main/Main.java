@@ -6,7 +6,6 @@ import sandbox.Sandbox;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
 import java.sql.*;
 import java.text.DecimalFormat;
 import java.time.LocalDate;

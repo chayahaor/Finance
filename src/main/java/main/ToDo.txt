@@ -1,7 +1,6 @@
 TODO:
 README - Sara
-Add Java doc - Rachel
-Fix pnl data for buying and selling - Chaya
+Fix pnl data for selling (neg) and buying/initial (pos)- Chaya
 Test graph and pnl data - Chaya
 Account for weekends? - Chaya
 Format graph as proper dates (not time) - Chaya
