@@ -60,13 +60,17 @@ public class PnL
         Date mostRecent;
         if (mostRecentDateSet.next())
         {
-            mostRecent = mostRecentDateSet.getDate("Date");
+            mostRecent = mostRecentDateSet.getTimestamp("Date");
         }
         else {
-            // TODO:
-            //  if mainData is empty - mostRecent = new Date()
-            //  else initial date in mainData
-            mostRecent = new Date();
+            ResultSet initialDateSet = getRecentPnL.executeQuery("Call spGetInitial();");
+            if (initialDateSet.next())
+            {
+                mostRecent = initialDateSet.getTimestamp("ActionDate");
+            }
+            else {
+                mostRecent = new Date();
+            }
         }
 
         Date today = new Date();
@@ -92,7 +96,7 @@ public class PnL
                 } else
                 {
                     String day = new Date(dayLookingAt.getTime()
-                                          + (1000 * 60 * 60 * 24)).toString();
+                                          - (1000 * 60 * 60 * 24)).toString();
                     pnl = Double.parseDouble(api.convert(currency, HOME_CURRENCY, day));
                 }
                 double transactionPnL = pnl * quantity;
@@ -114,8 +118,8 @@ public class PnL
 
             Statement stmtInsert = connection.createStatement();
             stmtInsert.executeQuery("Call spInsertIntoPnL("
-                                    + "'" + formattedDate + "', "
-                                    + ", " + totalPnL + ");");
+                                    + "'" + formattedDate
+                                    + "', " + totalPnL + ");");
         }
 
     }
