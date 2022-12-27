@@ -14,6 +14,10 @@ public class DeleteButton extends JButton
         setForeground(Color.RED);
     }
 
+    /**
+     * Get the associated JComponent to be deleted
+     * @return the JComponent
+     */
     public JComponent getComponentToBeDeleted()
     {
         return componentToBeDeleted;

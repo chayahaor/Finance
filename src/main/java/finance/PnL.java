@@ -20,17 +20,27 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import static main.Main.HOME_CURRENCY;
+
 public class PnL
 {
     private final Connection connection;
     private final API api;
+    private final double riskFreeRate;
 
-    public PnL(Connection connection)
+    public PnL(Connection connection, double riskFreeRate)
     {
-        this.connection = connection;
         api = new API();
+        this.connection = connection;
+        this.riskFreeRate = riskFreeRate;
     }
 
+    /**
+     * Updates and gets the PnL chart
+     * @return the PnL chart
+     * @throws SQLException - if SQL Connection fails
+     * @throws IOException - if connection to API fails
+     */
     public JFreeChart getChart() throws SQLException, IOException
     {
         updatePnL();
@@ -47,54 +57,70 @@ public class PnL
         return chart;
     }
 
+    /**
+     * Update PnL table in database
+     * @throws SQLException - if SQL Connection fails
+     * @throws IOException - if connection to API fails
+     */
     private void updatePnL() throws SQLException, IOException
     {
         Statement getRecentPnL = connection.createStatement();
-        ResultSet mostRecentDate = getRecentPnL.executeQuery(
-                "Select Date from pnl Order by Date DESC");
-        Date mostRecent = mostRecentDate.getDate(0);
+        ResultSet mostRecentDateSet = getRecentPnL.executeQuery(
+                "Call spGetMostRecentDate();");
 
-        Statement stmt = connection.createStatement();
-        ResultSet resultSet = stmt.executeQuery("Call spGetMainDataByCurrency();");
+        Date mostRecent;
+        if (mostRecentDateSet.next())
+        {
+            mostRecent = mostRecentDateSet.getTimestamp("Date");
+        }
+        else {
+            ResultSet initialDateSet = getRecentPnL.executeQuery("Call spGetInitial();");
+            if (initialDateSet.next())
+            {
+                mostRecent = initialDateSet.getTimestamp("ActionDate");
+            }
+            else {
+                mostRecent = new Date();
+            }
+        }
+
         Date today = new Date();
         for (Date dayLookingAt = mostRecent;
              dayLookingAt.before(today);
              dayLookingAt = new Date(dayLookingAt.getTime() + (1000 * 60 * 60 * 24)))
         {
+            Statement stmt = connection.createStatement();
+            ResultSet resultSet = stmt.executeQuery("Call spGetMainDataByCurrency();");
             double totalPnL = 0;
             while (resultSet.next())
             {
                 double pnl;
-                Date transactionDate = resultSet.getDate("ActionDate");
+                Date transactionDate = resultSet.getTimestamp("ActionDate");
                 String currency = resultSet.getString("Currency");
-                Date maturityDate = resultSet.getDate("MaturityDate");
+                Date maturityDate = resultSet.getTimestamp("MaturityDate");
                 double quantity = resultSet.getDouble("Quantity");
                 double forwardPrice = resultSet.getDouble("ForwardPrice");
                 if (transactionDate.equals(dayLookingAt))
                 {
                     String day = dayLookingAt.toString();
-                    pnl = forwardPrice - Double.parseDouble(api.convert(currency, "USD", day));
+                    pnl = forwardPrice - Double.parseDouble(api.convert(currency, HOME_CURRENCY, day));
                 } else
                 {
                     String day = new Date(dayLookingAt.getTime()
-                                          + (1000 * 60 * 60 * 24)).toString();
-                    pnl = Double.parseDouble(api.convert(currency, "USD", day));
+                                          - (1000 * 60 * 60 * 24)).toString();
+                    pnl = Double.parseDouble(api.convert(currency, HOME_CURRENCY, day));
                 }
                 double transactionPnL = pnl * quantity;
-                if (maturityDate.before(dayLookingAt))
-                {
-                    totalPnL += transactionPnL;
-                } else
+                if (!maturityDate.before(dayLookingAt))
                 {
                     //if not mature, adjust for time
                     long diffInMs = maturityDate.getTime() - dayLookingAt.getTime();
                     double diffInDays = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
 
                     double time = diffInDays / 365.0;
-                    double rfr = 1; //TODO: get rfr as annual decimal
-                    transactionPnL = transactionPnL / (1 + time * rfr);
-                    totalPnL += transactionPnL;
+                    transactionPnL = transactionPnL / (1 + time * riskFreeRate);
                 }
+                totalPnL += transactionPnL;
             }
             ZoneId defaultZoneId = ZoneId.systemDefault();
             String formattedDate = DateTimeFormatter
@@ -103,12 +129,17 @@ public class PnL
 
             Statement stmtInsert = connection.createStatement();
             stmtInsert.executeQuery("Call spInsertIntoPnL("
-                                    + "'" + formattedDate + "', "
-                                    + ", " + totalPnL + ");");
+                                    + "'" + formattedDate
+                                    + "', " + totalPnL + ");");
         }
 
     }
 
+    /**
+     * Create XY dataset to be used to populate PnL Chart based on PnL table in database
+     * @return the XYDataset
+     * @throws SQLException - if SQL Connection fails
+     */
     private XYDataset createDataset() throws SQLException
     {
         XYSeries pnlData = new XYSeries("Profit and Loss");
@@ -116,7 +147,8 @@ public class PnL
         ResultSet resultSet = stmt.executeQuery("Call spGetPnL();");
         while (resultSet.next())
         {
-            pnlData.add(resultSet.getDate(0).getTime(), resultSet.getDouble(1));
+            pnlData.add(resultSet.getTimestamp("Date").getTime(),
+                    resultSet.getDouble("PNL"));
         }
 
         final XYSeriesCollection dataset = new XYSeriesCollection();

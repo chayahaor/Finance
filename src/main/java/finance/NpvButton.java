@@ -1,7 +1,6 @@
 package finance;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -18,14 +17,20 @@ import static main.Main.HOME_CURRENCY;
 public class NpvButton extends JButton
 {
     private final Connection connection;
+    private final double riskFreeRate;
 
-    public NpvButton(Connection connection)
+    public NpvButton(Connection connection, double riskFreeRate)
     {
         this.connection = connection;
+        this.riskFreeRate = riskFreeRate;
         this.setText("Get Current NPV in " + HOME_CURRENCY);
         this.addActionListener(this::pullCurrentValue);
     }
 
+    /**
+     * Pulls current value from database
+     * @param actionEvent - on click Get Current NPV button
+     */
     private void pullCurrentValue(ActionEvent actionEvent)
     {
         double currentValue = 0;
@@ -52,6 +57,12 @@ public class NpvButton extends JButton
         JOptionPane.showMessageDialog(this, "Current NPV: " + moneyFormatter.format(currentValue));
     }
 
+    /**
+     * Update the quantity/currency HashMap with the data from specific row in database
+     * @param resultSet - the current row in the database
+     * @param quantitiesPerCurrency - the HashMap being updated with the results
+     * @throws SQLException - if SQL Connection fails
+     */
     private void calculateRowCurrentValue(ResultSet resultSet,
                                           HashMap<String, Double> quantitiesPerCurrency)
             throws SQLException
@@ -78,23 +89,9 @@ public class NpvButton extends JButton
                 ? -(quantityFromRow / fxRate)
                 : (quantityFromRow / fxRate);
 
-        // get the current risk-free rate from the Finance tab
-        double rfr = getFinanceParent().getRiskFreeRate();
-
         // apply maturity formula
-        sum += quantityInHomeCurrency / (1 + (diffInDays / 365.0) * rfr);
+        sum += quantityInHomeCurrency / (1 + (diffInDays / 365.0) * riskFreeRate);
 
         quantitiesPerCurrency.put(currentCurrency, sum);
-    }
-
-    private Finance getFinanceParent()
-    {
-        // travel up JPanels until Finance panel is reached
-        Container parent = this.getParent();
-        while (!(parent instanceof Finance))
-        {
-            parent = parent.getParent();
-        }
-        return (Finance) parent;
     }
 }

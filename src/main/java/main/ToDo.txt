@@ -1,4 +1,6 @@
 TODO:
 README - Sara
-Fix RFR in PnL class by adding JOptionPane instead of text field - Rachel
-Add Java doc - Rachel
+Fix pnl data for selling (neg) and buying/initial (pos)- Chaya
+Test graph and pnl data - Chaya
+Account for weekends? - Chaya
+Format graph as proper dates (not time) - Chaya

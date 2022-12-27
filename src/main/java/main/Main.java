@@ -6,7 +6,6 @@ import sandbox.Sandbox;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
 import java.sql.*;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
@@ -26,18 +25,13 @@ public class Main extends JFrame
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new FlowLayout());
         setResizable(true);
-        try
-        {
-            setUpJTabbedPane();
-        } catch (Exception exception)
-        {
-            JOptionPane.showMessageDialog(this,
-                    "Something went wrong: " + exception.getMessage(),
-                    "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        setUpJTabbedPane();
     }
 
-    public void setUpJTabbedPane() throws IOException
+    /**
+     * Add tabs to the Main Frame
+     */
+    public void setUpJTabbedPane()
     {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setForeground(Color.BLACK);
@@ -51,8 +45,10 @@ public class Main extends JFrame
             // create database connection
             Connection connection = createConnection();
 
+            double riskFreeRate = getRiskFreeRate();
+
             // add finance tab to the Main frame's JTabbedPane if Connection is successful
-            Finance finance = new Finance(connection);
+            Finance finance = new Finance(connection, riskFreeRate);
             tabbedPane.add("Finance Stuff", finance);
         } catch (SQLException exception)
         {
@@ -65,6 +61,11 @@ public class Main extends JFrame
         add(tabbedPane);
     }
 
+    /**
+     * Create connection to finance database, insert initial row into database
+     * @return SQL Connection
+     * @throws SQLException - if SQL connection fails
+     */
     private Connection createConnection() throws SQLException
     {
         String dbName = "finance";
@@ -95,6 +96,30 @@ public class Main extends JFrame
         return connection;
     }
 
+    /**
+     * Prompt user for today's risk free rate
+     * @return - the risk-free rate
+     */
+    private double getRiskFreeRate()
+    {
+        JFormattedTextField rfrValue
+                = new JFormattedTextField(new DecimalFormat("0.######"));
+        rfrValue.setValue(4.0);
+        rfrValue.setColumns(7);
+        JOptionPane.showMessageDialog(this, rfrValue,
+                "Enter today's risk-free rate as a percentage in " + HOME_CURRENCY
+                , JOptionPane.PLAIN_MESSAGE);
+
+        double rfr = Double.parseDouble(rfrValue.getText());
+
+        // risk-free rate is a percentage
+        return rfr / 100.0;
+    }
+
+    /**
+     * Main method, instantiate the frame and set up Nimbus LAF
+     * @param args - the program arguments
+     */
     public static void main(String[] args)
     {
         // update the UIManager to use the Nimbus Look and Feel
