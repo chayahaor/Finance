@@ -21,7 +21,8 @@ import java.util.Objects;
 
 import static main.Main.HOME_CURRENCY;
 
-public class Finance extends JPanel {
+public class Finance extends JPanel
+{
     private final API api;
     private final Connection connection;
     private JFormattedTextField riskFreeRate;
@@ -31,19 +32,21 @@ public class Finance extends JPanel {
     private JFormattedTextField fxRate;
     private JDateChooser maturityDate;
 
-    public Finance(Connection connection) throws IOException
+    public Finance(Connection connection)
     {
         api = new API();
         this.connection = connection;
         setSize(900, 500);
         setLayout(new BorderLayout());
-        add(doFinancePanel(), BorderLayout.NORTH);
         try
         {
+            add(doFinancePanel(), BorderLayout.NORTH);
             add(addGraph());
-        } catch (Exception ignored)
+        } catch (Exception exception)
         {
-
+            JOptionPane.showMessageDialog(this,
+                    "Something went wrong: " + exception.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

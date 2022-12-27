@@ -13,7 +13,8 @@ import java.net.URL;
 
 import static main.Main.HOME_CURRENCY;
 
-public class API {
+public class API
+{
     private final String urlBase;
 
     public API()
@@ -42,27 +43,6 @@ public class API {
         JsonObject object = root.getAsJsonObject();
 
         return object.get("result").getAsString();
-    }
-
-    /**
-     * Uses API to convert between two currencies today and return the FX Rate
-     *
-     * @param from - the currency being converted
-     * @param to   - the currency that the "from" currency is being converted to
-     * @return - the FX rate for the conversion
-     * @throws IOException - if connection to API fails
-     */
-    public double convert(String from, String to) throws IOException
-    {
-        String convert = urlBase + "convert?from=" + from + "&to=" + to;
-        URL url = new URL(convert);
-        HttpURLConnection request = (HttpURLConnection) url.openConnection();
-        request.connect();
-        JsonElement root = JsonParser.parseReader(
-                new InputStreamReader((InputStream) request.getContent()));
-        JsonObject object = root.getAsJsonObject();
-
-        return Double.parseDouble(object.get("result").getAsString());
     }
 
     /**

@@ -14,12 +14,16 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
-public class PnL {
-    private JFreeChart chart;
-    private Connection connection;
-    private API api;
+public class PnL
+{
+    private final Connection connection;
+    private final API api;
 
     public PnL(Connection connection)
     {
@@ -30,7 +34,7 @@ public class PnL {
     public JFreeChart getChart() throws SQLException, IOException
     {
         updatePnL();
-        chart = ChartFactory.createXYLineChart(
+        JFreeChart chart = ChartFactory.createXYLineChart(
                 "Profit and Loss",
                 "Date",
                 "Profit/Loss",
@@ -45,12 +49,11 @@ public class PnL {
 
     private void updatePnL() throws SQLException, IOException
     {
-        //TODO:
-        // confirm dates are sent/received in the same manner
-        // decide if we want to throw exceptions in methods or put in try catch
-        // Make a party if this works because it did not take long :)
+        Statement getRecentPnL = connection.createStatement();
+        ResultSet mostRecentDate = getRecentPnL.executeQuery(
+                "Select Date from pnl Order by Date DESC");
+        Date mostRecent = mostRecentDate.getDate(0);
 
-        Date mostRecent = new Date(); //TODO: replace with most recent date in PnL DB
         Statement stmt = connection.createStatement();
         ResultSet resultSet = stmt.executeQuery("Call spGetMainDataByCurrency();");
         Date today = new Date();
@@ -58,10 +61,10 @@ public class PnL {
              dayLookingAt.before(today);
              dayLookingAt = new Date(dayLookingAt.getTime() + (1000 * 60 * 60 * 24)))
         {
+            double totalPnL = 0;
             while (resultSet.next())
             {
-                double totalPnL = 0;
-                double pnl = 0;
+                double pnl;
                 Date transactionDate = resultSet.getDate("ActionDate");
                 String currency = resultSet.getString("Currency");
                 Date maturityDate = resultSet.getDate("MaturityDate");
@@ -83,14 +86,25 @@ public class PnL {
                     totalPnL += transactionPnL;
                 } else
                 {
-                    double time = 1.0; //TODO: get time as a decimal of a year
-                    double rfr = 1.0; //TODO: get rfr as annual decimal
-                    transactionPnL = transactionPnL / 1 / time * rfr; //TODO: confirm equation with Dr. Katz
+                    //if not mature, adjust for time
+                    long diffInMs = maturityDate.getTime() - dayLookingAt.getTime();
+                    double diffInDays = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
+
+                    double time = diffInDays / 365.0;
+                    double rfr = 1; //TODO: get rfr as annual decimal
+                    transactionPnL = transactionPnL / (1 + time * rfr);
                     totalPnL += transactionPnL;
                 }
-                Statement stmtInsert = connection.createStatement();
-                stmtInsert.executeQuery("Call spInsertIntoPnL(" + dayLookingAt + ", " + totalPnL + ");");
             }
+            ZoneId defaultZoneId = ZoneId.systemDefault();
+            String formattedDate = DateTimeFormatter
+                    .ofPattern("yyyy-MM-dd", Locale.ENGLISH)
+                    .format(dayLookingAt.toInstant().atZone(defaultZoneId).toLocalDate());
+
+            Statement stmtInsert = connection.createStatement();
+            stmtInsert.executeQuery("Call spInsertIntoPnL("
+                                    + "'" + formattedDate + "', "
+                                    + ", " + totalPnL + ");");
         }
 
     }

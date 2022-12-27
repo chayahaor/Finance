@@ -15,8 +15,9 @@ import java.util.concurrent.TimeUnit;
 import static main.Main.DEFAULT_VALUE;
 import static main.Main.HOME_CURRENCY;
 
-public class NpvButton extends JButton {
-    private Connection connection;
+public class NpvButton extends JButton
+{
+    private final Connection connection;
 
     public NpvButton(Connection connection)
     {
