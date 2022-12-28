@@ -4,7 +4,6 @@ import api.API;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -44,13 +43,12 @@ public class PnL
     public JFreeChart getChart() throws SQLException, IOException
     {
         updatePnL();
-        JFreeChart chart = ChartFactory.createXYLineChart(
+        JFreeChart chart = ChartFactory.createTimeSeriesChart(
                 "Profit and Loss",
                 "Date",
                 "Profit/Loss",
-                createDataset(),
-                PlotOrientation.VERTICAL,
-                true, true, false);
+                createDataset());
+
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new java.awt.Dimension(100, 100));
 
@@ -74,7 +72,7 @@ public class PnL
             mostRecent = mostRecentDateSet.getTimestamp("Date");
         }
         else {
-            ResultSet initialDateSet = getRecentPnL.executeQuery("Call spGetInitial();");
+            ResultSet initialDateSet = getRecentPnL.executeQuery("Call spGetInitialDate();");
             if (initialDateSet.next())
             {
                 mostRecent = initialDateSet.getTimestamp("ActionDate");
@@ -96,6 +94,7 @@ public class PnL
             {
                 double pnl;
                 Date transactionDate = resultSet.getTimestamp("ActionDate");
+                String action = resultSet.getString("Action");
                 String currency = resultSet.getString("Currency");
                 Date maturityDate = resultSet.getTimestamp("MaturityDate");
                 double quantity = resultSet.getDouble("Quantity");
@@ -104,11 +103,13 @@ public class PnL
                 {
                     String day = dayLookingAt.toString();
                     pnl = forwardPrice - Double.parseDouble(api.convert(currency, HOME_CURRENCY, day));
+                    pnl= action.equals("Buy") ? pnl : -pnl;
                 } else
                 {
                     String day = new Date(dayLookingAt.getTime()
                                           - (1000 * 60 * 60 * 24)).toString();
                     pnl = Double.parseDouble(api.convert(currency, HOME_CURRENCY, day));
+                    pnl= action.equals("Buy") ? pnl : -pnl;
                 }
                 double transactionPnL = pnl * quantity;
                 if (!maturityDate.before(dayLookingAt))
