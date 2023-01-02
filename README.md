@@ -6,10 +6,10 @@ Many "what if" actions can be added to the sandbox and the user can visualize wh
 actions will do to their finances.
 ![](/Users/sarastavnitser/Downloads/sandboxBefore.png)
 ![](/Users/sarastavnitser/Downloads/sandboxAfter.png)
-The second page of the program is the environment where users can visualize possible profits and losses based on 
-specifications they provide of potential actions they may perform with their finances. The user selects an action from a
-dropdown menu, enters the original currency and the currency they wish to change to, the amount of money, forward price,
-and date of maturity. A PnL chart shows a visual representation of the potential financial action.
+
+The second page of the program is a simulation of what happens to users' finances based on 
+financial actions they take. The user selects an action from a dropdown menu, enters the foreign currency, quantity of 
+money, forward price, and date of maturity. A PnL chart shows a visual representation of the financial action.
 ![](/Users/sarastavnitser/Downloads/finance.png)
 [Rachel Brisman](https://github.com/RachelBrisman) <br>
 [Chaya Haor](https://github.com/ChayaHaor) <br>
