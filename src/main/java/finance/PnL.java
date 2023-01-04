@@ -4,7 +4,6 @@ import api.API;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -37,20 +36,20 @@ public class PnL
 
     /**
      * Updates and gets the PnL chart
+     *
      * @return the PnL chart
      * @throws SQLException - if SQL Connection fails
-     * @throws IOException - if connection to API fails
+     * @throws IOException  - if connection to API fails
      */
     public JFreeChart getChart() throws SQLException, IOException
     {
         updatePnL();
-        JFreeChart chart = ChartFactory.createXYLineChart(
+        JFreeChart chart = ChartFactory.createTimeSeriesChart(
                 "Profit and Loss",
                 "Date",
                 "Profit/Loss",
-                createDataset(),
-                PlotOrientation.VERTICAL,
-                true, true, false);
+                createDataset());
+
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new java.awt.Dimension(100, 100));
 
@@ -59,8 +58,9 @@ public class PnL
 
     /**
      * Update PnL table in database
+     *
      * @throws SQLException - if SQL Connection fails
-     * @throws IOException - if connection to API fails
+     * @throws IOException  - if connection to API fails
      */
     private void updatePnL() throws SQLException, IOException
     {
@@ -72,21 +72,25 @@ public class PnL
         if (mostRecentDateSet.next())
         {
             mostRecent = mostRecentDateSet.getTimestamp("Date");
-        }
-        else {
-            ResultSet initialDateSet = getRecentPnL.executeQuery("Call spGetInitial();");
+        } else
+        {
+            ResultSet initialDateSet = getRecentPnL.executeQuery("Call spGetInitialDate();");
             if (initialDateSet.next())
             {
                 mostRecent = initialDateSet.getTimestamp("ActionDate");
-            }
-            else {
+            } else
+            {
                 mostRecent = new Date();
             }
         }
 
+        //we already have most recent in DB. Start looking for the day after
+        mostRecent = new Date(mostRecent.getTime() + (1000*60*60*24));
+
         Date today = new Date();
+        Date yesterday = new Date(today.getTime() - (1000 * 60 * 60 * 24));
         for (Date dayLookingAt = mostRecent;
-             dayLookingAt.before(today);
+             dayLookingAt.before(yesterday);
              dayLookingAt = new Date(dayLookingAt.getTime() + (1000 * 60 * 60 * 24)))
         {
             Statement stmt = connection.createStatement();
@@ -96,6 +100,7 @@ public class PnL
             {
                 double pnl;
                 Date transactionDate = resultSet.getTimestamp("ActionDate");
+                String action = resultSet.getString("Action");
                 String currency = resultSet.getString("Currency");
                 Date maturityDate = resultSet.getTimestamp("MaturityDate");
                 double quantity = resultSet.getDouble("Quantity");
@@ -110,6 +115,7 @@ public class PnL
                                           - (1000 * 60 * 60 * 24)).toString();
                     pnl = Double.parseDouble(api.convert(currency, HOME_CURRENCY, day));
                 }
+                pnl = action.equals("Sell") ? -pnl : pnl;
                 double transactionPnL = pnl * quantity;
                 if (!maturityDate.before(dayLookingAt))
                 {
@@ -137,12 +143,13 @@ public class PnL
 
     /**
      * Create XY dataset to be used to populate PnL Chart based on PnL table in database
+     *
      * @return the XYDataset
      * @throws SQLException - if SQL Connection fails
      */
     private XYDataset createDataset() throws SQLException
     {
-        XYSeries pnlData = new XYSeries("Profit and Loss");
+        XYSeries pnlData = new XYSeries("Net Present Value");
         Statement stmt = connection.createStatement();
         ResultSet resultSet = stmt.executeQuery("Call spGetPnL();");
         while (resultSet.next())
