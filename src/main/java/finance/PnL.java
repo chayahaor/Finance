@@ -84,6 +84,9 @@ public class PnL
             }
         }
 
+        //we already have most recent in DB. Start looking for the day after
+        mostRecent = new Date(mostRecent.getTime() + (1000*60*60*24));
+
         Date today = new Date();
         Date yesterday = new Date(today.getTime() - (1000 * 60 * 60 * 24));
         for (Date dayLookingAt = mostRecent;
@@ -146,7 +149,7 @@ public class PnL
      */
     private XYDataset createDataset() throws SQLException
     {
-        XYSeries pnlData = new XYSeries("Profit and Loss");
+        XYSeries pnlData = new XYSeries("Net Present Value");
         Statement stmt = connection.createStatement();
         ResultSet resultSet = stmt.executeQuery("Call spGetPnL();");
         while (resultSet.next())
