@@ -11,10 +11,10 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
-DROP DATABASE IF EXISTS `Finance`;
+DROP DATABASE IF EXISTS `Finance2`;
 
-CREATE DATABASE IF NOT EXISTS `Finance` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `Finance`;
+CREATE DATABASE IF NOT EXISTS `Finance2` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `Finance2`;
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -22,7 +22,7 @@ USE `Finance`;
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `finance`
+-- Database: `finance2`
 --
 
 DELIMITER $$
@@ -56,6 +56,10 @@ Select Date, PNL from `pnl`
 Order by Date;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spGetRiskFreeRate` ()   BEGIN
+Select RiskFreeRate from `rfr` LIMIT 1;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `spInitial` (IN `InitialAmount` INT(11), IN `HomeCurrency` VARCHAR(10), IN `InitialDate` DATETIME)   BEGIN
 insert into `maindata` (ActionDate, Action_Id, Currency, MaturityDate, Quantity, ForwardPrice) values (InitialDate, 5, HomeCurrency, InitialDate, InitialAmount, 1);
 END$$
@@ -70,6 +74,10 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `spInsertMainData` (IN `ActionDate` 
 	INSERT INTO `maindata` (ActionDate, Action_ID, Currency, MaturityDate, Quantity, ForwardPrice)
     values (ActionDate, ActionID, Currency, MaturityDate, Quantity, ForwardPrice);
 
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spSetRiskFreeRate` (IN `rfr` FLOAT)   BEGIN
+Insert into `rfr` (RiskFreeRate) VALUES (rfr);
 END$$
 
 DELIMITER ;
@@ -112,6 +120,8 @@ CREATE TABLE `maindata` (
   `ForwardPrice` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
 --
 -- Table structure for table `pnl`
 --
@@ -120,6 +130,17 @@ CREATE TABLE `pnl` (
   `ID` int(11) NOT NULL,
   `Date` datetime NOT NULL,
   `PNL` float NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `rfr`
+--
+
+CREATE TABLE `rfr` (
+  `ID` int(11) NOT NULL,
+  `RiskFreeRate` float NOT NULL DEFAULT 4
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --

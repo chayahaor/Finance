@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DecimalFormat;
@@ -32,11 +33,11 @@ public class Finance extends JPanel
     private JFormattedTextField fxRate;
     private JDateChooser maturityDate;
 
-    public Finance(Connection connection, double riskFreeRate)
+    public Finance(Connection connection)
     {
         api = new API();
         this.connection = connection;
-        this.riskFreeRate = riskFreeRate;
+        this.riskFreeRate = getRiskFreeRate(connection);
         setSize(900, 500);
         setLayout(new BorderLayout());
         try
@@ -52,7 +53,60 @@ public class Finance extends JPanel
     }
 
     /**
+     * Prompt user for the risk-free rate in home currency if not already stored in database
+     *
+     * @param connection - the SQL Connection
+     * @return - the risk-free rate
+     */
+    private double getRiskFreeRate(Connection connection)
+    {
+        double defaultRiskFreeRate = 4.0;
+        double retVal;
+
+        try
+        {
+            Statement stmt = connection.createStatement();
+            ResultSet resultSet = stmt.executeQuery("Call spGetRiskFreeRate();");
+            if (resultSet.next())
+            {
+                retVal = resultSet.getDouble("RiskFreeRate");
+            } else
+            {
+                // prompt the user for the risk-free rate in home currency
+                JLabel promptText = new JLabel
+                        ("Enter the risk-free rate as a percentage to be used throughout the program:");
+                JFormattedTextField rfrValue
+                        = new JFormattedTextField(new DecimalFormat("0.######"));
+                rfrValue.setValue(defaultRiskFreeRate);
+                rfrValue.setColumns(7);
+
+                JPanel panel = new JPanel();
+                panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+                panel.add(promptText);
+                panel.add(rfrValue);
+
+                JOptionPane.showMessageDialog(this, panel,
+                        "Risk-Free Rate in " + HOME_CURRENCY, JOptionPane.PLAIN_MESSAGE);
+
+                double rfr = Double.parseDouble(rfrValue.getText());
+
+                // risk-free rate is a percentage
+                retVal = rfr / 100.0;
+
+                // insert value into database
+                stmt.executeQuery("Call spSetRiskFreeRate(" + retVal + ");");
+            }
+        } catch (SQLException exception)
+        {
+            retVal = defaultRiskFreeRate;
+        }
+
+        return retVal;
+    }
+
+    /**
      * Adds JPanel with NpvButton and database action components
+     *
      * @return JPanel being added to the tab
      * @throws IOException - if connection to API fails
      */
@@ -68,6 +122,7 @@ public class Finance extends JPanel
 
     /**
      * Adds JPanel with database action components
+     *
      * @return JPanel being added to the tab
      * @throws IOException - if connection to API fails
      */
@@ -118,6 +173,7 @@ public class Finance extends JPanel
 
     /**
      * Insert current GUI values into the database
+     *
      * @param event - on click Perform Action button
      */
     private void onClick(ActionEvent event)
@@ -154,9 +210,10 @@ public class Finance extends JPanel
 
     /**
      * Add PnL graph to the tab
+     *
      * @return JPanel containing the graph to be added to the tab
      * @throws SQLException - in case SQL Connection fails
-     * @throws IOException - in case connection to API fails
+     * @throws IOException  - in case connection to API fails
      */
     public JPanel addGraph() throws SQLException, IOException
     {
