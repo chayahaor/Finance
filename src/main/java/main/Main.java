@@ -19,12 +19,15 @@ public class Main extends JFrame
 
     public Main()
     {
+        // set up frame
         setTitle("Finance Project");
         setSize(1000, 600);
         setMinimumSize(new Dimension(1000, 600));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new FlowLayout());
         setResizable(true);
+
+        // set up both tabs
         setUpJTabbedPane();
     }
 
@@ -45,10 +48,8 @@ public class Main extends JFrame
             // create database connection
             Connection connection = createConnection();
 
-            double riskFreeRate = getRiskFreeRate();
-
-            // add finance tab to the Main frame's JTabbedPane if Connection is successful
-            Finance finance = new Finance(connection, riskFreeRate);
+            // add finance tab to the Main frame's JTabbedPane if connection is successful
+            Finance finance = new Finance(connection);
             tabbedPane.add("Finance Stuff", finance);
         } catch (SQLException exception)
         {
@@ -68,15 +69,19 @@ public class Main extends JFrame
      */
     private Connection createConnection() throws SQLException
     {
+        // generate the SQL connection through localhost
         String dbName = "finance";
         int portNumber = 3306;
         Connection connection = DriverManager.getConnection(
                 "jdbc:mysql://localhost:" + portNumber + "/" + dbName, "root", "");
 
+        // get the initial quantity in the database
         Statement stmt = connection.createStatement();
-        ResultSet resultSet = stmt.executeQuery("Select * from maindata");
-        if (!resultSet.next()) // if there is no result set
+        ResultSet resultSet = stmt.executeQuery("Call spGetInitialDate();");
+
+        if (!resultSet.next()) // if there is no result set (i.e. no initial value in database)
         {
+            // prompt the user for initial quantity
             JFormattedTextField defaultAmount
                     = new JFormattedTextField(new DecimalFormat("###0.00"));
             defaultAmount.setValue(DEFAULT_VALUE);
@@ -84,6 +89,8 @@ public class Main extends JFrame
             JOptionPane.showMessageDialog(this, defaultAmount,
                     "Enter Initial Amount", JOptionPane.PLAIN_MESSAGE);
             double initialAmount = Double.parseDouble(defaultAmount.getText());
+
+            // insert initial quantity into database
             LocalDate today = LocalDate.now();
             String formatted = DateTimeFormatter
                     .ofPattern("yyyy-MM-dd", Locale.ENGLISH)
@@ -94,26 +101,6 @@ public class Main extends JFrame
                               + formatted + "');");
         }
         return connection;
-    }
-
-    /**
-     * Prompt user for today's risk free rate
-     * @return - the risk-free rate
-     */
-    private double getRiskFreeRate()
-    {
-        JFormattedTextField rfrValue
-                = new JFormattedTextField(new DecimalFormat("0.######"));
-        rfrValue.setValue(4.0);
-        rfrValue.setColumns(7);
-        JOptionPane.showMessageDialog(this, rfrValue,
-                "Enter today's risk-free rate as a percentage in " + HOME_CURRENCY
-                , JOptionPane.PLAIN_MESSAGE);
-
-        double rfr = Double.parseDouble(rfrValue.getText());
-
-        // risk-free rate is a percentage
-        return rfr / 100.0;
     }
 
     /**
