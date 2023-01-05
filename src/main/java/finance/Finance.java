@@ -69,7 +69,7 @@ public class Finance extends JPanel
             ResultSet resultSet = stmt.executeQuery("Call spGetRiskFreeRate();");
             if (resultSet.next())
             {
-                retVal = resultSet.getDouble("RFR");
+                retVal = resultSet.getDouble("RiskFreeRate");
             } else
             {
                 // prompt the user for the risk-free rate in home currency

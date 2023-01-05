@@ -70,7 +70,7 @@ public class Main extends JFrame
     private Connection createConnection() throws SQLException
     {
         // generate the SQL connection through localhost
-        String dbName = "finance";
+        String dbName = "Finance2";
         int portNumber = 3306;
         Connection connection = DriverManager.getConnection(
                 "jdbc:mysql://localhost:" + portNumber + "/" + dbName, "root", "");
