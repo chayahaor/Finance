@@ -45,7 +45,7 @@ public class PnL
     {
         updatePnL();
         JFreeChart chart = ChartFactory.createTimeSeriesChart(
-                "Profit and Loss",
+                "Net Present Value",
                 "Date",
                 "Profit/Loss",
                 createDataset());
