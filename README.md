@@ -15,5 +15,5 @@ actions will do to their finances.<br/>
 
 The second page of the program is a simulation of what happens to users' finances based on 
 financial actions they take. The user selects an action from a dropdown menu, enters the foreign currency, quantity of 
-money, forward price, and date of maturity. A PnL chart shows a visual representation of the financial action.<br/>
+money, forward price, and date of maturity. A Net Present Value chart shows a visual representation of the financial action.<br/>
 ![Finance tab](src/main/resources/images/finance.png)

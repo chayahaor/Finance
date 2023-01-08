@@ -211,7 +211,7 @@ public class Finance extends JPanel
     }
 
     /**
-     * Add Npv graph to the tab
+     * Add NPV graph to the tab
      *
      * @return JPanel containing the graph to be added to the tab
      * @throws SQLException - in case SQL Connection fails
