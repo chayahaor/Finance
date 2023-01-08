@@ -109,7 +109,6 @@ INSERT INTO `action` (`ID`, `Action`) VALUES
 --
 -- Table structure for table `maindata`
 --
---
 
 CREATE TABLE `maindata` (
   `ID` int(11) NOT NULL,
