@@ -21,13 +21,13 @@ import java.util.concurrent.TimeUnit;
 
 import static main.Main.HOME_CURRENCY;
 
-public class PnL
+public class NpvGraph
 {
     private final Connection connection;
     private final API api;
     private final double riskFreeRate;
 
-    public PnL(Connection connection, double riskFreeRate)
+    public NpvGraph(Connection connection, double riskFreeRate)
     {
         api = new API();
         this.connection = connection;
@@ -35,19 +35,19 @@ public class PnL
     }
 
     /**
-     * Updates and gets the PnL chart
+     * Updates and gets the Npv chart
      *
-     * @return the PnL chart
+     * @return the Npv chart
      * @throws SQLException - if SQL Connection fails
      * @throws IOException  - if connection to API fails
      */
     public JFreeChart getChart() throws SQLException, IOException
     {
-        updatePnL();
+        updateNpv();
         JFreeChart chart = ChartFactory.createTimeSeriesChart(
-                "Profit and Loss",
+                "Net Present Value Over Time",
                 "Date",
-                "Profit/Loss",
+                "Net Present Value",
                 createDataset());
 
         ChartPanel chartPanel = new ChartPanel(chart);
@@ -57,15 +57,15 @@ public class PnL
     }
 
     /**
-     * Update PnL table in database
+     * Update Npv table in database
      *
      * @throws SQLException - if SQL Connection fails
      * @throws IOException  - if connection to API fails
      */
-    private void updatePnL() throws SQLException, IOException
+    private void updateNpv() throws SQLException, IOException
     {
-        Statement getRecentPnL = connection.createStatement();
-        ResultSet mostRecentDateSet = getRecentPnL.executeQuery(
+        Statement getRecentNpv = connection.createStatement();
+        ResultSet mostRecentDateSet = getRecentNpv.executeQuery(
                 "Call spGetMostRecentDate();");
 
         Date mostRecent;
@@ -74,7 +74,7 @@ public class PnL
             mostRecent = mostRecentDateSet.getTimestamp("Date");
         } else
         {
-            ResultSet initialDateSet = getRecentPnL.executeQuery("Call spGetInitialDate();");
+            ResultSet initialDateSet = getRecentNpv.executeQuery("Call spGetInitialDate();");
             if (initialDateSet.next())
             {
                 mostRecent = initialDateSet.getTimestamp("ActionDate");
@@ -85,7 +85,7 @@ public class PnL
         }
 
         //we already have most recent in DB. Start looking for the day after
-        mostRecent = new Date(mostRecent.getTime() + (1000*60*60*24));
+        mostRecent = new Date(mostRecent.getTime() + (1000 * 60 * 60 * 24));
 
         Date today = new Date();
         Date yesterday = new Date(today.getTime() - (1000 * 60 * 60 * 24));
@@ -95,10 +95,10 @@ public class PnL
         {
             Statement stmt = connection.createStatement();
             ResultSet resultSet = stmt.executeQuery("Call spGetMainDataByCurrency();");
-            double totalPnL = 0;
+            double totalNpv = 0;
             while (resultSet.next())
             {
-                double pnl;
+                double npv;
                 Date transactionDate = resultSet.getTimestamp("ActionDate");
                 String action = resultSet.getString("Action");
                 String currency = resultSet.getString("Currency");
@@ -108,15 +108,16 @@ public class PnL
                 if (transactionDate.equals(dayLookingAt))
                 {
                     String day = dayLookingAt.toString();
-                    pnl = forwardPrice - Double.parseDouble(api.convert(currency, HOME_CURRENCY, day));
+                    npv = forwardPrice
+                          - Double.parseDouble(api.convert(currency, HOME_CURRENCY, day));
                 } else
                 {
                     String day = new Date(dayLookingAt.getTime()
                                           - (1000 * 60 * 60 * 24)).toString();
-                    pnl = Double.parseDouble(api.convert(currency, HOME_CURRENCY, day));
+                    npv = Double.parseDouble(api.convert(currency, HOME_CURRENCY, day));
                 }
-                pnl = action.equals("Sell") ? -pnl : pnl;
-                double transactionPnL = pnl * quantity;
+                npv = action.equals("Sell") ? -npv : npv;
+                double transactionNpv = npv * quantity;
                 if (!maturityDate.before(dayLookingAt))
                 {
                     //if not mature, adjust for time
@@ -124,9 +125,9 @@ public class PnL
                     double diffInDays = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
 
                     double time = diffInDays / 365.0;
-                    transactionPnL = transactionPnL / (1 + time * riskFreeRate);
+                    transactionNpv = transactionNpv / (1 + time * riskFreeRate);
                 }
-                totalPnL += transactionPnL;
+                totalNpv += transactionNpv;
             }
             ZoneId defaultZoneId = ZoneId.systemDefault();
             String formattedDate = DateTimeFormatter
@@ -134,32 +135,32 @@ public class PnL
                     .format(dayLookingAt.toInstant().atZone(defaultZoneId).toLocalDate());
 
             Statement stmtInsert = connection.createStatement();
-            stmtInsert.executeQuery("Call spInsertIntoPnL("
+            stmtInsert.executeQuery("Call spInsertIntoNpv("
                                     + "'" + formattedDate
-                                    + "', " + totalPnL + ");");
+                                    + "', " + totalNpv + ");");
         }
 
     }
 
     /**
-     * Create XY dataset to be used to populate PnL Chart based on PnL table in database
+     * Create XY dataset to be used to populate Npv Chart based on Npv table in database
      *
      * @return the XYDataset
      * @throws SQLException - if SQL Connection fails
      */
     private XYDataset createDataset() throws SQLException
     {
-        XYSeries pnlData = new XYSeries("Net Present Value");
+        XYSeries netPresentValueData = new XYSeries("Net Present Value");
         Statement stmt = connection.createStatement();
-        ResultSet resultSet = stmt.executeQuery("Call spGetPnL();");
+        ResultSet resultSet = stmt.executeQuery("Call spGetNpv();");
         while (resultSet.next())
         {
-            pnlData.add(resultSet.getTimestamp("Date").getTime(),
-                    resultSet.getDouble("PNL"));
+            netPresentValueData.add(resultSet.getTimestamp("Date").getTime(),
+                    resultSet.getDouble("NPV"));
         }
 
         final XYSeriesCollection dataset = new XYSeriesCollection();
-        dataset.addSeries(pnlData);
+        dataset.addSeries(netPresentValueData);
         return dataset;
     }
 

@@ -16,6 +16,7 @@ public class DeleteButton extends JButton
 
     /**
      * Get the associated JComponent to be deleted
+     *
      * @return the JComponent
      */
     public JComponent getComponentToBeDeleted()
