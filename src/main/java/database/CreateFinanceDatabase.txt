@@ -43,7 +43,7 @@ END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `spGetMostRecentDate`()
 BEGIN
-Select Date from pnl Order by Date DESC LIMIT 1;
+Select Date from `npv` Order by Date DESC LIMIT 1;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `spGetInitialDate`()
@@ -51,8 +51,8 @@ BEGIN
 Select ActionDate from `maindata` where Action_Id = 5;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `spGetPnL` ()   BEGIN
-Select Date, PNL from `pnl`
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spGetNpv` ()   BEGIN
+Select Date, NPV from `npv`
 Order by Date;
 END$$
 
@@ -64,8 +64,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `spInitial` (IN `InitialAmount` INT(
 insert into `maindata` (ActionDate, Action_Id, Currency, MaturityDate, Quantity, ForwardPrice) values (InitialDate, 5, HomeCurrency, InitialDate, InitialAmount, 1);
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `spInsertIntoPnL` (IN `Date` DATETIME, IN `Quantity` FLOAT)   BEGIN
-INSERT INTO `pnl` (Date, PNL)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spInsertIntoNpv` (IN `Date` DATETIME, IN `Quantity` FLOAT)   BEGIN
+INSERT INTO `npv` (Date, NPV)
     values (Date, Quantity);
 END$$
 
@@ -109,6 +109,7 @@ INSERT INTO `action` (`ID`, `Action`) VALUES
 --
 -- Table structure for table `maindata`
 --
+--
 
 CREATE TABLE `maindata` (
   `ID` int(11) NOT NULL,
@@ -123,13 +124,13 @@ CREATE TABLE `maindata` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `pnl`
+-- Table structure for table `npv`
 --
 
-CREATE TABLE `pnl` (
+CREATE TABLE `npv` (
   `ID` int(11) NOT NULL,
   `Date` datetime NOT NULL,
-  `PNL` float NOT NULL
+  `NPV` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -161,9 +162,9 @@ ALTER TABLE `maindata`
   ADD KEY `FK_Action_Id` (`Action_Id`);
 
 --
--- Indexes for table `pnl`
+-- Indexes for table `npv`
 --
-ALTER TABLE `pnl`
+ALTER TABLE `npv`
   ADD PRIMARY KEY (`ID`);
 
 --
@@ -183,9 +184,9 @@ ALTER TABLE `maindata`
   MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
--- AUTO_INCREMENT for table `pnl`
+-- AUTO_INCREMENT for table `npv`
 --
-ALTER TABLE `pnl`
+ALTER TABLE `npv`
   MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
 
 --

@@ -35,9 +35,9 @@ public class NpvGraph
     }
 
     /**
-     * Updates and gets the Npv chart
+     * Updates and gets the NPV chart
      *
-     * @return the Npv chart
+     * @return the NPV chart
      * @throws SQLException - if SQL Connection fails
      * @throws IOException  - if connection to API fails
      */
@@ -57,7 +57,7 @@ public class NpvGraph
     }
 
     /**
-     * Update Npv table in database
+     * Update NPV table in database
      *
      * @throws SQLException - if SQL Connection fails
      * @throws IOException  - if connection to API fails
@@ -143,7 +143,7 @@ public class NpvGraph
     }
 
     /**
-     * Create XY dataset to be used to populate Npv Chart based on Npv table in database
+     * Create XY dataset to be used to populate NPV Chart based on NPV table in database
      *
      * @return the XYDataset
      * @throws SQLException - if SQL Connection fails
