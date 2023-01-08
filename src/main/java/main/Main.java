@@ -64,6 +64,7 @@ public class Main extends JFrame
 
     /**
      * Create connection to finance database, insert initial row into database
+     *
      * @return SQL Connection
      * @throws SQLException - if SQL connection fails
      */
@@ -105,6 +106,7 @@ public class Main extends JFrame
 
     /**
      * Main method, instantiate the frame and set up Nimbus LAF
+     *
      * @param args - the program arguments
      */
     public static void main(String[] args)

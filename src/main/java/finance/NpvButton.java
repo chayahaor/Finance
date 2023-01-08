@@ -29,6 +29,7 @@ public class NpvButton extends JButton
 
     /**
      * Pulls current value from database
+     *
      * @param actionEvent - on click Get Current NPV button
      */
     private void pullCurrentValue(ActionEvent actionEvent)
@@ -59,7 +60,8 @@ public class NpvButton extends JButton
 
     /**
      * Update the quantity/currency HashMap with the data from specific row in database
-     * @param resultSet - the current row in the database
+     *
+     * @param resultSet             - the current row in the database
      * @param quantitiesPerCurrency - the HashMap being updated with the results
      * @throws SQLException - if SQL Connection fails
      */

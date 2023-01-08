@@ -42,7 +42,7 @@ public class Sandbox extends JPanel
         {
             JOptionPane.showMessageDialog(this,
                     "Something went wrong getting the currencies: "
-                            + exception.getMessage(),
+                    + exception.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
 
@@ -162,9 +162,10 @@ public class Sandbox extends JPanel
 
     /**
      * Generate a sandbox button given parameters
-     * @param text - the text of the JButton
+     *
+     * @param text     - the text of the JButton
      * @param listener - the action listener of the JButton
-     * @param panel - the JPanel to add the JButton to
+     * @param panel    - the JPanel to add the JButton to
      */
     private void generateButton(String text, ActionListener listener, JPanel panel)
     {
@@ -176,6 +177,7 @@ public class Sandbox extends JPanel
 
     /**
      * Resets the Sandbox
+     *
      * @param actionEvent - when clicking on reset button
      */
     private void onClickReset(ActionEvent actionEvent)
@@ -189,6 +191,7 @@ public class Sandbox extends JPanel
 
     /**
      * Adds another WhatIfPanel to the SandBox
+     *
      * @param actionEvent - on clicking the add more button
      */
     private void onClickMore(ActionEvent actionEvent)
@@ -208,6 +211,7 @@ public class Sandbox extends JPanel
 
     /**
      * Deletes a specific row from the Sandbox
+     *
      * @param actionEvent - when clicking the DeleteButton associated with that row
      */
     private void onClickDelete(ActionEvent actionEvent)
@@ -228,6 +232,7 @@ public class Sandbox extends JPanel
 
     /**
      * Shows the NPV for today
+     *
      * @param actionEvent - on clicking Show NPV Today button
      */
     private void onClickCurrent(ActionEvent actionEvent)
@@ -239,6 +244,7 @@ public class Sandbox extends JPanel
 
     /**
      * Prompts user for a specific date and shows the NPV for that date
+     *
      * @param actionEvent - on clicking Show NPV for Specified Date button
      */
     private void onClickFuture(ActionEvent actionEvent)
@@ -255,7 +261,8 @@ public class Sandbox extends JPanel
 
     /**
      * Calculate the total NPV between today and a specified date
-     * @param today - today's date
+     *
+     * @param today        - today's date
      * @param specifiedDay - the specified date
      */
     private void calculate(Date today, Date specifiedDay)
@@ -273,6 +280,7 @@ public class Sandbox extends JPanel
 
     /**
      * Get the initial amount user specified in GUI
+     *
      * @return initial amount (or default if something goes wrong)
      */
     private double getInitial()
